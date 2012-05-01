@@ -1,0 +1,39 @@
+<html>
+  <head>
+    <style type='text/css'>
+      a            { color:#a0a0e0 }
+      div.title    { 
+          color:#C0F0C0; 
+          font-size:1.2em; 
+          font-weight:bold; 
+          margin-top:1em; 
+          margin-bottom:0.5em; 
+          text-align:center }
+      div.subtitle { 
+          color:#C0F0C0; 
+          font-size:0.8em; 
+          margin-bottom:1em; 
+          text-align:center }
+      div.freetext { color:#F0F0F0 }
+      div.list     { color:#C0C0F0 }
+    </style>
+  </head>
+  <body>
+! 提示：<br />
+ * 记得按菜单键哦，很多功能在按菜单键后弹出！
+!
+$ 1.1
+  % Version 1.1
+  _ 2012-05-01
+    * 检查更新
+    * 下载课程表
+$ 1.0
+  % Version 1.0
+  _ 2012-04-30
+    * 课程表
+    * 显示第几周
+    * 自定义时间表
+    * 课前提醒、课堂静音
+$ END_OF_CHANGE_LOG
+  </body>
+</html>
