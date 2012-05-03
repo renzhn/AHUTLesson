@@ -14,7 +14,6 @@ public class TimetableSettingActivity extends Activity {
 	private static final String[] mode = {"当前", "夏季时间" , "冬季时间" };
 	private Spinner spinner;
 	private ArrayAdapter<String> adapter;
-	private Timetable timetable;
 	private EditText etBeginDate_year,etBeginDate_month,etBeginDate_day;
 	private EditText etBegin0,etBegin1,etBegin2,etBegin3,etBegin4;
 	private EditText etEnd0,etEnd1,etEnd2,etEnd3,etEnd4;
@@ -22,7 +21,6 @@ public class TimetableSettingActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 
 		super.onCreate(savedInstanceState);
-		timetable = new Timetable(this.getBaseContext());
 		setContentView(R.layout.timetable);
 		initView();
 		spinner = (Spinner) findViewById(R.id.spinnerSetMode);
@@ -44,19 +42,19 @@ public class TimetableSettingActivity extends Activity {
 	
 	protected void submitTimeTable() {
 		// 更新时间表
-		timetable.setBeginDate_year(Integer.valueOf(etBeginDate_year.getText().toString()));
-		timetable.setBeginDate_month(Integer.valueOf(etBeginDate_month.getText().toString()));
-		timetable.setBeginDate_day(Integer.valueOf(etBeginDate_day.getText().toString()));
-		timetable.setBeginTime(0, etBegin0.getText().toString());
-		timetable.setBeginTime(1, etBegin1.getText().toString());
-		timetable.setBeginTime(2, etBegin2.getText().toString());
-		timetable.setBeginTime(3, etBegin3.getText().toString());
-		timetable.setBeginTime(4, etBegin4.getText().toString());
-		timetable.setEndTime(0, etEnd0.getText().toString());
-		timetable.setEndTime(1, etEnd1.getText().toString());
-		timetable.setEndTime(2, etEnd2.getText().toString());
-		timetable.setEndTime(3, etEnd3.getText().toString());
-		timetable.setEndTime(4, etEnd4.getText().toString());
+		Timetable.setBeginDate_year(Integer.valueOf(etBeginDate_year.getText().toString()));
+		Timetable.setBeginDate_month(Integer.valueOf(etBeginDate_month.getText().toString()));
+		Timetable.setBeginDate_day(Integer.valueOf(etBeginDate_day.getText().toString()));
+		Timetable.setBeginTime(0, etBegin0.getText().toString());
+		Timetable.setBeginTime(1, etBegin1.getText().toString());
+		Timetable.setBeginTime(2, etBegin2.getText().toString());
+		Timetable.setBeginTime(3, etBegin3.getText().toString());
+		Timetable.setBeginTime(4, etBegin4.getText().toString());
+		Timetable.setEndTime(0, etEnd0.getText().toString());
+		Timetable.setEndTime(1, etEnd1.getText().toString());
+		Timetable.setEndTime(2, etEnd2.getText().toString());
+		Timetable.setEndTime(3, etEnd3.getText().toString());
+		Timetable.setEndTime(4, etEnd4.getText().toString());
 	}
 
 	private void initView() {
@@ -77,21 +75,21 @@ public class TimetableSettingActivity extends Activity {
 		etEnd3 = (EditText)findViewById(R.id.time_end3);
 		etEnd4 = (EditText)findViewById(R.id.time_end4);
 		
-		etBeginDate_year.setText(Integer.toString(timetable.getBeginDate_year()));
-		etBeginDate_month.setText(Integer.toString(timetable.getBeginDate_month()));
-		etBeginDate_day.setText(Integer.toString(timetable.getBeginDate_day())); 
+		etBeginDate_year.setText(Integer.toString(Timetable.getBeginDate_year()));
+		etBeginDate_month.setText(Integer.toString(Timetable.getBeginDate_month()));
+		etBeginDate_day.setText(Integer.toString(Timetable.getBeginDate_day())); 
 		
-		etBegin0.setText(timetable.getBeginTime(0));
-		etBegin1.setText(timetable.getBeginTime(1));
-		etBegin2.setText(timetable.getBeginTime(2));
-		etBegin3.setText(timetable.getBeginTime(3));
-		etBegin4.setText(timetable.getBeginTime(4));
+		etBegin0.setText(Timetable.begintime[0]);
+		etBegin1.setText(Timetable.begintime[1]);
+		etBegin2.setText(Timetable.begintime[2]);
+		etBegin3.setText(Timetable.begintime[3]);
+		etBegin4.setText(Timetable.begintime[4]);
 	
-		etEnd0.setText(timetable.getEndTime(0));
-		etEnd1.setText(timetable.getEndTime(1));
-		etEnd2.setText(timetable.getEndTime(2));
-		etEnd3.setText(timetable.getEndTime(3));
-		etEnd4.setText(timetable.getEndTime(4));
+		etEnd0.setText(Timetable.endtime[0]);
+		etEnd1.setText(Timetable.endtime[1]);
+		etEnd2.setText(Timetable.endtime[2]);
+		etEnd3.setText(Timetable.endtime[3]);
+		etEnd4.setText(Timetable.endtime[4]);
 	
 	}
 

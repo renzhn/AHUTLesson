@@ -112,7 +112,7 @@ public class MainActivity extends Activity {
 		if(date.startsWith("0"))
 			date = date.substring(1);
 		int numOfWeek = timetable.getNumOfWeekSincePeriod();
-		return date + " " + Timetable.weekname[timetable.getCurrentWeekDay()] + " " + "第" + String.valueOf(numOfWeek) + "周";
+		return date + " " + Timetable.weekname[Timetable.getCurrentWeekDay()] + " " + "第" + String.valueOf(numOfWeek) + "周";
 	}
 	
 	@Override

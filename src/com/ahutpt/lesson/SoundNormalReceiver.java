@@ -27,9 +27,9 @@ public class SoundNormalReceiver extends BroadcastReceiver {
 		
 		//设置下一次
 		boolean enableSilent = preferences.getBoolean("SilentMode", true);
-		Lesson nextLesson = timetable.getNextLesson(Timetable.NextSilent);
+		Lesson nextLesson = timetable.getNextLesson(Timetable.DelaySilent);
 		if(nextLesson!=null&&enableSilent){
-			long alarmTime = nextLesson.getNextTime(Timetable.NextSilent);
+			long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
 			Intent intent1 = new Intent(context,SoundSilentReceiver.class);
 			intent1.putExtra("week", nextLesson.week);
 			intent1.putExtra("time", nextLesson.time);

@@ -13,14 +13,18 @@ import java.util.Date;
 public class Timetable {
 	
 	private Context context;
-	private SharedPreferences preferences;
-	private String[] begintime = {"","","","",""};
-	private String[] endtime= {"","","","",""};
-	private int beginDate_year,beginDate_month,beginDate_day;
 	private Calendar cal;
-	public int year,month,dayOfMonth,dayOfYear,weekDay;
+	private static SharedPreferences preferences;
+	public static String[] begintime = new String[5];
+	public static String[] endtime = new String[5];
+	private static int beginDate_year;
+	private static int beginDate_month;
+	private static int beginDate_day;
+	public static int year,month,dayOfMonth,dayOfYear,weekDay;
+	public static int begintimemin[] = new int[5];
+	public static int endtimemin[] = new int[5];
 	public static String[] weekname,lessontime_name;
-	
+	private static Editor edit;
 	private static final boolean DEBUG = true;
 	
 	public Timetable(Context context0){
@@ -59,6 +63,15 @@ public class Timetable {
 		endtime[2] = preferences.getString("time_end2", "16:05");
 		endtime[3] = preferences.getString("time_end3", "18:05");
 		endtime[4] = preferences.getString("time_end4", "21:30");
+		
+		for(int i = 0;i < 5; i++){
+			begintimemin[i] = time2minute(begintime[i]);
+		}
+		
+		for(int i = 0;i < 5; i++){
+			endtimemin[i] = time2minute(endtime[i]);
+		}
+		
 	}
 
 	public int getNumOfWeekSincePeriod() {
@@ -72,7 +85,7 @@ public class Timetable {
 			return 0;
 	}
 	
-	public int calcPassDays(Calendar cal_old){
+	public static int calcPassDays(Calendar cal_old){
 		int passYear = ((year - cal_old.get(Calendar.YEAR))==1)? 1 : 0;
 		int oldday = cal_old.get(Calendar.DAY_OF_YEAR);
 		if(passYear == 0 && dayOfYear>=oldday){
@@ -84,7 +97,7 @@ public class Timetable {
 		return 0;
 	}
 	
-	public int dayOfYear(int year) {
+	public static int dayOfYear(int year) {
 		//一年中的天数
 		if((year%4==0&&year%400!=0)||year%400==0)
 			return 365;
@@ -92,7 +105,7 @@ public class Timetable {
 			return 366;
 	}
 
-	public int getYearOfCurrentPeriod() {
+	public static int getYearOfCurrentPeriod() {
 		// 计算当前学期的开学年份
 		if(month >= 1 && month <= 2){
 			return year - 1;
@@ -101,14 +114,7 @@ public class Timetable {
 		}
 	}
 
-	public String getBeginTime(int num){
-		return begintime[num];
-	}
-	public String getEndTime(int num){
-		return endtime[num];
-	}
-	Editor edit = null;
-	public boolean setBeginTime(int num,String newtime){
+	public static boolean setBeginTime(int num,String newtime){
 		if(!checkTime(newtime))return false;
 		begintime[num] = newtime;
 		if(edit == null)
@@ -117,7 +123,7 @@ public class Timetable {
 		edit.commit();
 		return true;
 	}
-	public boolean setEndTime(int num,String newtime){
+	public static boolean setEndTime(int num,String newtime){
 		if(!checkTime(newtime))return false;
 		begintime[num] = newtime;
 		if(edit == null)
@@ -127,54 +133,54 @@ public class Timetable {
 		return true;
 	}
 
-	public int getTimeId(String time) {
+	public static int getTimeId(String time,int advanceMode) {
 		//某一时间对应的时间段
+		int min = time2minute(time);
 		for(int i = 0;i < 5;i++){
-			if(time2minute(time) >= (time2minute(begintime[i])) && time2minute(time) <= time2minute(endtime[i]))
+			if(min >= (begintimemin[i] - getTimeDelay(advanceMode)) && min <= (endtimemin[i] + getTimeDelay(advanceMode))){
 				return i;
+			}
 		}
 		return -1;
 	}
 	
-	public int getCurTimeBlock(){
+	public static int getCurrentTimeBlock(int advanceMode){
 		//返回当前时间段，如果不在上课时间段，返回-1
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
 		String  time  =  sDateFormat.format(new java.util.Date()); 
-		return getTimeId(time);
+		return getTimeId(time, advanceMode);
 	}
 	
-	public static final int NextDefault = 0;
-	public static final int NextAlarm = 1;
-	public static final int NextSilent = 2;
+	public static final int DelayDefault = 0;
+	public static final int DelayAlarm = 1;
+	public static final int DelaySilent = 2;
 	
 	public int getNextTimeBlock(int advanceMode){
 		//返回将要到来的时间段
 		//advanceMode:0默认 1闹钟提前时间 2静音提前时间
 		int timeInAdvance = 0;
 		switch (advanceMode){
-		case NextAlarm:
+		case DelayAlarm:
 			timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
 			break;
-		case NextSilent:
+		case DelaySilent:
 			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
 			break;
 		}
-		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
-		String  time  =  sDateFormat.format(new java.util.Date()); 
-		int min = time2minute(time);
+		int min = getCurrentMinute();
 		for(int i = 0;i < 5;i++){
-			if(min < (time2minute(begintime[i]) - timeInAdvance ))
+			if(min < (begintimemin[i] - timeInAdvance ))
 				return i;
 		}
 		return 5;
 	}
 	
-	public int time2minute(String time){
+	public static int time2minute(String time){
 		int hour = Integer.valueOf(time.substring(0, 2));
 		int minute = Integer.valueOf(time.substring(3, 5));
 		return hour * 60 + minute;
 	}
-	public boolean checkTime(String time){
+	public static boolean checkTime(String time){
 		if(time.length()==5){
 			if(Integer.valueOf(time.substring(0,2)) >= 0 && Integer.valueOf(time.substring(0,2)) < 24){
 				if(Integer.valueOf(time.substring(3,5)) >= 0 && Integer.valueOf(time.substring(3,5)) < 60){
@@ -185,18 +191,18 @@ public class Timetable {
 		return false;
 	}
 
-	public int getBeginDate_year() {
+	public static int getBeginDate_year() {
 		return beginDate_year;
 	}
 
-	public int getBeginDate_month() {
+	public static int getBeginDate_month() {
 		return beginDate_month + 1;
 	}
 
-	public int getBeginDate_day() {
+	public static int getBeginDate_day() {
 		return beginDate_day;
 	}
-	public void setBeginDate_year(int beginYear){
+	public static void setBeginDate_year(int beginYear){
 		if(beginYear==year || beginYear==year-1){
 			if(edit == null)
 				edit = preferences.edit();
@@ -204,7 +210,7 @@ public class Timetable {
 			edit.commit();
 		}
 	}
-	public void setBeginDate_month(int beginMonth){
+	public static void setBeginDate_month(int beginMonth){
 		if(beginMonth>=1 && beginMonth<=12){
 			if(edit == null)
 				edit = preferences.edit();
@@ -212,7 +218,7 @@ public class Timetable {
 			edit.commit();
 		}
 	}
-	public void setBeginDate_day(int beginDay){
+	public static void setBeginDate_day(int beginDay){
 		if(beginDay>=1 && beginDay<=31){
 			if(edit == null)
 				edit = preferences.edit();
@@ -220,20 +226,47 @@ public class Timetable {
 			edit.commit();
 		}
 	}
+	
+	public Lesson getCurrentLesson(int advanceMode) {
+		// 当前时间的课
+		return new Lesson(weekDay, getCurrentTimeBlock(advanceMode), context);
+	}
 
+	public long getCurrentLessonEndTime(int time, int advanceMode) {
+		// 当前时间的课结束时间
+		Calendar c = Calendar.getInstance();
+		String t = endtime[time];
+		int hour = Integer.valueOf(t.substring(0, 2));
+		int min = Integer.valueOf(t.substring(3));
+		c.setTimeInMillis(System.currentTimeMillis());
+		c.set(Calendar.HOUR_OF_DAY, hour);
+		c.set(Calendar.MINUTE, min);
+		c.set(Calendar.SECOND, 0);
+		c.set(Calendar.MILLISECOND, 0);
+		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
+	}
+
+	public Lesson getNextLesson(int advanceMode) {
+		int week;
+		int time = getNextTimeBlock(advanceMode);
+		Lesson lesson;
+		for(week = weekDay;week < 7; week++){
+			while(time < 5){
+				lesson = new Lesson(week, time, context);
+				if(lesson.exist&&lesson.isNowHaving()==-1&&!lesson.isAppended())
+					return lesson;
+				time++;
+			}
+			time = 0;
+		}
+		return null;
+	}
+	
 	public long getNextLessonBeginTime(int week, int time,int advanceMode) {
 		//某课上课时间(毫秒)，若已上则下周
-		int timeInAdvance = 0;
-		switch (advanceMode){
-		case NextAlarm:
-			timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
-			break;
-		case NextSilent:
-			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
-			break;
-		}
+		
 		Calendar c = Calendar.getInstance();
-		String t = getBeginTime(time);
+		String t = begintime[time];
 		int weekOfMonth = c.get(Calendar.WEEK_OF_MONTH);
 		int hour = Integer.valueOf(t.substring(0, 2));
 		int min = Integer.valueOf(t.substring(3));
@@ -253,19 +286,13 @@ public class Timetable {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		if(DEBUG)
-			Log.i("ahutlesson", "下次上课时间： " + this.miliTime2String(c.getTimeInMillis()));
-		return c.getTimeInMillis() - timeInAdvance * 60 * 1000;
+			Log.i("ahutlesson", "下次上课时间： " + Timetable.miliTime2String(c.getTimeInMillis()));
+		return c.getTimeInMillis() - getTimeDelay(advanceMode) * 60 * 1000;
 	}
 	
 	public long getNextLessonEndTime(int week,int time,int advanceMode){
-		int timeInAdvance = 0;
-		switch (advanceMode){
-		case NextSilent:
-			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
-			break;
-		}
 		Calendar c = Calendar.getInstance();
-		String t = getEndTime(time);
+		String t = endtime[time];
 		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
 		int hour = Integer.valueOf(t.substring(0, 2));
 		int min = Integer.valueOf(t.substring(3));
@@ -279,26 +306,10 @@ public class Timetable {
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		if(DEBUG)
-			Log.i("ahutlesson", "下课时间： " + "week: " + week + ", time: " + time + " : " + this.miliTime2String(c.getTimeInMillis()));
-		return c.getTimeInMillis() + timeInAdvance * 60 * 1000;
+			Log.i("ahutlesson", "下课时间： " + "week: " + week + ", time: " + time + " : " + Timetable.miliTime2String(c.getTimeInMillis()));
+		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
-	public Lesson getNextLesson(int advanceMode) {
-		int week;
-		int time = getNextTimeBlock(advanceMode);
-		Lesson lesson;
-		for(week = weekDay;week < 7; week++){
-			while(time < 5){
-				lesson = new Lesson(week, time, context);
-				if(lesson.exist&&lesson.isNowHaving()==-1)
-					return lesson;
-				time++;
-			}
-			time = 0;
-		}
-		return null;
-	}
-	
 	public int isNowHavingLesson(int week, int time) {
 		//本周本课状态
 		//-1还没上，0正在上，1上过了
@@ -309,11 +320,9 @@ public class Timetable {
 			return 1;
 		}else{
 			int curMinute = curCal.get(Calendar.HOUR_OF_DAY) * 60 + curCal.get(Calendar.MINUTE);
-			int beginMinute = time2minute(getBeginTime(time));
-			int endMinute = time2minute(getEndTime(time));
-			if(curMinute < beginMinute){
+			if(curMinute < begintimemin[time]){
 				return -1;
-			}else if(curMinute >= beginMinute && curMinute <= endMinute){
+			}else if(curMinute >= begintimemin[time] && curMinute <= endtimemin[time]){
 				return 0;
 			}else{
 				return 1;
@@ -321,30 +330,58 @@ public class Timetable {
 		}
 	}
 
-	public int getCurrentWeekDay() {
+	public static int getCurrentWeekDay() {
 		Calendar calendar = Calendar.getInstance();
 		return systemWeek2NormalWeek(calendar.get(Calendar.DAY_OF_WEEK));
 	}
 	
-	public int systemWeek2NormalWeek(int sys){
+	public static int getTimeDelay(int advanceMode){
+		switch (advanceMode){
+		case DelayAlarm:
+			return Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
+		case DelaySilent:
+			return  Integer.valueOf(preferences.getString("SilentDelay", "10"));
+		}
+		return 0;
+	}
+	
+	public static int systemWeek2NormalWeek(int sys){
 		int week = sys -2;
 		if(week==-1)
 			return 6;
 		return week;
 	}
 	
-	public int normalWeek2SystemWeek(int week){
+	public static int normalWeek2SystemWeek(int week){
 		if(week == 6)
 			return 1;
 		return week + 2;
 	}
 
 
-	public String miliTime2String(long miliTime){
+	public static String miliTime2String(long miliTime){
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("MM月d日 HH:mm"); 
 		Date date = new Date();
 		date.setTime(miliTime);
 		return  sDateFormat.format(date);
+	}
+	
+	public static int getCurrentMinute(){
+		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
+		String  time  =  sDateFormat.format(new java.util.Date()); 
+		return time2minute(time);
+	}
+	
+	public static boolean nowIsAtLessonBreak(int i) {
+		// 0 早上四节课的课间， 2 下午四节课的课间
+		int min = getCurrentMinute();
+		switch(i){
+		case 0:
+			return (min >= endtimemin[0] && min <= begintimemin[1])? true:false;
+		case 2:
+			return (min >= endtimemin[2] && min <= begintimemin[3])? true:false;
+		}
+		return false;
 	}
 
 }

@@ -62,10 +62,10 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	private void addNextLessonAlarm() {
 		//…Ë÷√œ¬Ω⁄øŒƒ÷÷”
-		Lesson nextLesson = timetable.getNextLesson(Timetable.NextAlarm);
+		Lesson nextLesson = timetable.getNextLesson(Timetable.DelayAlarm);
 		if(nextLesson!=null){
 			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-			long alarmTime = nextLesson.getNextTime(Timetable.NextAlarm);
+			long alarmTime = nextLesson.getNextTime(Timetable.DelayAlarm);
 			Intent intent = new Intent(context,AlarmReceiver.class);
 			intent.putExtra("week", nextLesson.week);
 			intent.putExtra("time", nextLesson.time);

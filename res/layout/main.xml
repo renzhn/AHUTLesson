@@ -20,5 +20,5 @@
                 android:textColor="#FFF"
                 android:textSize="14sp" />
     </RelativeLayout>
-
+    
 </LinearLayout>

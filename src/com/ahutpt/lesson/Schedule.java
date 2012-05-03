@@ -12,6 +12,7 @@ import android.view.View;
  * »æÖÆÈÕÀú
  * */
 public class Schedule extends ScheduleParent {
+	
 	private ArrayList<ScheduleElement> elements = new ArrayList<ScheduleElement>();
 	public Grid grid;
 

@@ -30,8 +30,6 @@ public class LessonActivity extends Activity {
 		
 		setContentView(R.layout.lesson);
 		
-		Timetable timetable = new Timetable(this);
-		
 		tvLessonName = (TextView)findViewById(R.id.tvLessonName);
 		tvLessonPlace = (TextView)findViewById(R.id.tvLessonPlace);
 		tvTeacherName = (TextView)findViewById(R.id.tvTeacherName);
@@ -48,7 +46,7 @@ public class LessonActivity extends Activity {
 			tvTeacherName.setText(lesson.teacher);	
 		}
 		
-		tvLessonTime.setText(timetable.getBeginTime(time) + " ~ " + timetable.getEndTime(time));
+		tvLessonTime.setText(Timetable.begintime[time] + " ~ " +Timetable.endtime[time]);
 	}
 	
 	@Override

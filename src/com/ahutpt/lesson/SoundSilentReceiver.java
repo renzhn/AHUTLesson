@@ -45,8 +45,8 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 	private void setCancelSilent(int week,int time) {
 		// »Ö¸´Õý³£ÒôÁ¿
 		Timetable timetable = new Timetable(context);
-		Lesson nextLesson = timetable.getNextLesson(Timetable.NextDefault);
-		long alarmTime = nextLesson.getNextEndTime(Timetable.NextSilent);
+		Lesson nextLesson = timetable.getCurrentLesson(Timetable.DelaySilent);
+		long alarmTime = nextLesson.getCurrentLessonEndTime(Timetable.DelaySilent);
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(context,SoundNormalReceiver.class);
 		intent.putExtra("week", week);

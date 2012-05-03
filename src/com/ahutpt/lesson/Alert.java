@@ -41,10 +41,10 @@ public class Alert {
 	
 	public void setAlarm(){
 		am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		Lesson nextLesson = timetable.getNextLesson(Timetable.NextAlarm);
+		Lesson nextLesson = timetable.getNextLesson(Timetable.DelayAlarm);
 		Intent intent;
 		if(nextLesson!=null&&enableAlert){
-				long alarmTime = nextLesson.getNextTime(Timetable.NextAlarm);
+				long alarmTime = nextLesson.getNextTime(Timetable.DelayAlarm);
 				intent = new Intent(context,AlarmReceiver.class);
 				intent.putExtra("week", nextLesson.week);
 				intent.putExtra("time", nextLesson.time);
@@ -52,9 +52,9 @@ public class Alert {
 				PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 				am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 		}
-		nextLesson = timetable.getNextLesson(Timetable.NextSilent);
+		nextLesson = timetable.getNextLesson(Timetable.DelaySilent);
 		if(nextLesson!=null&&enableSilent){
-				long alarmTime = nextLesson.getNextTime(Timetable.NextSilent);
+				long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
 				intent = new Intent(context,SoundSilentReceiver.class);
 				intent.putExtra("week", nextLesson.week);
 				intent.putExtra("time", nextLesson.time);

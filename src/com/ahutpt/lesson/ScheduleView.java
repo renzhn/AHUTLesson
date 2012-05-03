@@ -9,17 +9,17 @@ import android.view.View;
 public class ScheduleView extends View {
 	public Schedule sch;
 
+	public ScheduleView(Activity activity) {
+		super(activity);
+
+		sch = new Schedule(activity, this);
+	}
+	
 	@Override
 	protected void onDraw(Canvas canvas) {
 
 		sch.draw(canvas);
 
-	}
-
-	public ScheduleView(Activity activity) {
-		super(activity);
-
-		sch = new Schedule(activity, this);
 	}
 
 	@Override
