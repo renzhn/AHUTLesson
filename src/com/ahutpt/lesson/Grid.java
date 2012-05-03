@@ -16,6 +16,7 @@ import android.view.View;
 public class Grid extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
+	private static Timetable timetable;
 
 	public Grid(Activity activity, View view) {
 		super(activity, view);
@@ -26,6 +27,9 @@ public class Grid extends ScheduleParent implements Serializable {
 
 	@Override
 	public void draw(Canvas canvas) {
+		if(timetable == null){
+				timetable = new Timetable(context);
+		}
 		left = borderMargin;
 		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
 		float calendarWidth = view.getMeasuredWidth() - left * 2;
@@ -34,32 +38,48 @@ public class Grid extends ScheduleParent implements Serializable {
 		cellHeight = calendarHeight / 5;
 		
 		
-		//画当前课背景
-		Timetable timetable = new Timetable(context);
-		int week = timetable.weekDay;
+		//画当前时间背景
+		int colOfCurrentTime = timetable.weekDay;
 		int rowOfCurrentTime = timetable.getCurTimeBlock();
 		if(rowOfCurrentTime!=-1){
 			Paint paintbg = new Paint();
-			Lesson lesson = new Lesson(week,rowOfCurrentTime,context);
+			Lesson lesson = new Lesson(colOfCurrentTime,rowOfCurrentTime,context);
 			if(lesson.exist){
 				paintbg.setColor(Color.parseColor("#B22222"));
 			}else{
 				paintbg.setColor(Color.parseColor("#7CFC00"));
 			}
-			canvas.drawRect(left + cellWidth * week, 
+			canvas.drawRect(left + cellWidth * colOfCurrentTime, 
 					top + cellHeight * rowOfCurrentTime,
-					left + cellWidth * (week + 1), 
+					left + cellWidth * (colOfCurrentTime + 1), 
 					top + cellHeight * (rowOfCurrentTime + 1), paintbg);	
 		}
 		//画下节课背景
-		Lesson nextLesson = timetable.getNextLesson();
+		Lesson nextLesson = timetable.getNextLesson(Timetable.NextDefault);
 		if(nextLesson != null){
-			Paint paintbg = new Paint();
-			paintbg.setColor(Color.parseColor("#CDCDCD"));
-			canvas.drawRect(left + cellWidth * (nextLesson.week), 
-					top + cellHeight * nextLesson.time,
-					left + cellWidth * (nextLesson.week + 1), 
-					top + cellHeight * (nextLesson.time + 1), paintbg);	
+			boolean flag = false;
+			if(nextLesson.time==0||nextLesson.time==2){
+				Lesson appendLesson = new Lesson(nextLesson.week, nextLesson.time + 1, context);
+				if(appendLesson.exist){
+					if(appendLesson.name.contentEquals(nextLesson.name)){
+						Paint paintbg = new Paint();
+						paintbg.setColor(Color.parseColor("#CDCDCD"));
+						canvas.drawRect(left + cellWidth * (nextLesson.week), 
+								top + cellHeight * nextLesson.time,
+								left + cellWidth * (nextLesson.week + 1), 
+								top + cellHeight * (nextLesson.time + 2), paintbg);	
+						flag = true;
+					}
+				}
+			}
+			if(!flag){
+				Paint paintbg = new Paint();
+				paintbg.setColor(Color.parseColor("#CDCDCD"));
+				canvas.drawRect(left + cellWidth * (nextLesson.week), 
+						top + cellHeight * nextLesson.time,
+						left + cellWidth * (nextLesson.week + 1), 
+						top + cellHeight * (nextLesson.time + 1), paintbg);	
+			}
 		}
 		
 		paint.setColor(Color.LTGRAY);
@@ -78,71 +98,77 @@ public class Grid extends ScheduleParent implements Serializable {
 		paint.setAntiAlias(true);
 		
 		// 开始绘制日期文本
-		Lesson lesson;
+		
+		LessonManager mLessonManager = new LessonManager(context);
+		Lesson[] lessons = mLessonManager.getAllLessons();
+
+		if(lessons==null)
+			return;
+		
 		float textLeft,textTop;
-		for(int col = 0; col < 7; col++){
-			for(int row = 0; row < 5; row++){
-				paint.setTextSize(lessonNameSize);
-				lesson = new Lesson(col, row, this.context);
-				if(lesson.exist){
-					String lessonname = lesson.alias;
-					String lessonplace = lesson.place;
-					textLeft = left + cellWidth * col
-							+ (cellWidth - paint.getTextSize() * 2) / 2;
-					textTop = top + cellHeight * row
-							+ (cellHeight - paint.getTextSize() * 2 - 20) / 2;
-					
-					//画课程名
-					if(lesson.isNowHaving()==0)
-						paint.setColor(Color.WHITE);
-					else
-						paint.setColor(Color.BLACK);
-					if(lessonname.length()<=2){
-						canvas.drawText(lessonname, textLeft, textTop, paint);
-					}else if(lessonname.length()<=4){
-						canvas.drawText(lessonname.substring(0, 2), textLeft, textTop, paint);
-						canvas.drawText(lessonname.substring(2), textLeft, textTop + (paint.getTextSize() + 5) , paint);
-					}else{
-						canvas.drawText(lessonname.substring(0, 2), textLeft, textTop, paint);
-						canvas.drawText(lessonname.substring(2, 4), textLeft, textTop + (paint.getTextSize() + 5), paint);
-						canvas.drawText("...", textLeft, textTop + (paint.getTextSize() + 5) * 2, paint);
-					}
-					//画地点
-					if(lesson.isNowHaving()==0)
-						paint.setColor(Color.WHITE);
-					else
-						paint.setColor(Color.parseColor("#B22222"));
-					paint.setTextSize(lessonPlaceSize);
-					
-					if(lessonplace.length()<=4){
-						textLeft = left + cellWidth * col
-								+ (cellWidth - paint.measureText(lessonplace)) / 2;
-						textTop = top + cellHeight * (row + 1) - 15;
-						canvas.drawText(lessonplace, textLeft, textTop, paint);
-					}else if(lessonplace.length()<=8){
-						String roomNumber = lessonplace.substring(lessonplace.length() - 3, lessonplace.length());
-						if(isInt(roomNumber)){	
-							textLeft = left + cellWidth * col
-									+ (cellWidth - paint.measureText(lessonplace.substring(0, lessonplace.length() - 3))) / 2;
-							textTop = top + cellHeight * (row + 1) - 15 - paint.getTextSize();
-							canvas.drawText(lessonplace.substring(0, lessonplace.length() - 3), textLeft, textTop, paint);	
-							textLeft = left + cellWidth * col
-									+ (cellWidth - paint.measureText(roomNumber)) / 2;
-							canvas.drawText(roomNumber, textLeft, textTop + paint.getTextSize(), paint);
-						}else{
-							textLeft = left + cellWidth * col
-									+ (cellWidth - paint.measureText(lessonplace.substring(0, 4))) / 2;
-							textTop = top + cellHeight * (row + 1) - 15 - paint.getTextSize();
-							canvas.drawText(lessonplace.substring(0, 4), textLeft, textTop, paint);	
-							textLeft = left + cellWidth * col
-									+ (cellWidth - paint.measureText(lessonplace.substring(4))) / 2;
-							canvas.drawText(lessonplace.substring(4), textLeft, textTop + paint.getTextSize(), paint);
-						}
-					}
+		String name,place;
+		int i = 0, week, time;
+		while(lessons[i]!=null){
+			paint.setTextSize(lessonNameSize);
+			week = lessons[i].week;
+			time = lessons[i].time;
+			name = lessons[i].alias;
+			place = lessons[i].place;
+			textLeft = left + cellWidth * week
+					+ (cellWidth - paint.getTextSize() * 2) / 2;
+			textTop = top + cellHeight * time
+					+ (cellHeight - paint.getTextSize() * 2 - 20) / 2;
+			
+			//画课程名
+			if(lessons[i].isNowHaving()==0)
+				paint.setColor(Color.WHITE);
+			else
+				paint.setColor(Color.BLACK);
+			if(name.length()<=2){
+				canvas.drawText(name, textLeft, textTop, paint);
+			}else if(name.length()<=4){
+				canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
+				canvas.drawText(name.substring(2), textLeft, textTop + (paint.getTextSize() + 5) , paint);
+			}else{
+				canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
+				canvas.drawText(name.substring(2, 4), textLeft, textTop + (paint.getTextSize() + 5), paint);
+				canvas.drawText("...", textLeft, textTop + (paint.getTextSize() + 5) * 2, paint);
+			}
+			//画地点
+			if(lessons[i].isNowHaving()==0)
+				paint.setColor(Color.WHITE);
+			else
+				paint.setColor(Color.parseColor("#B22222"));
+			
+			paint.setTextSize(lessonPlaceSize);
+			
+			if(place.length()<=4){
+				textLeft = left + cellWidth * week
+						+ (cellWidth - paint.measureText(place)) / 2;
+				textTop = top + cellHeight * (time + 1) - 15;
+				canvas.drawText(place, textLeft, textTop, paint);
+			}else if(place.length()<=8){
+				String roomNumber = place.substring(place.length() - 3, place.length());
+				if(isInt(roomNumber)){	
+					textLeft = left + cellWidth * week
+							+ (cellWidth - paint.measureText(place.substring(0, place.length() - 3))) / 2;
+					textTop = top + cellHeight * (time + 1) - 15 - paint.getTextSize();
+					canvas.drawText(place.substring(0, place.length() - 3), textLeft, textTop, paint);	
+					textLeft = left + cellWidth * week
+							+ (cellWidth - paint.measureText(roomNumber)) / 2;
+					canvas.drawText(roomNumber, textLeft, textTop + paint.getTextSize(), paint);
+				}else{
+					textLeft = left + cellWidth * week
+							+ (cellWidth - paint.measureText(place.substring(0, 4))) / 2;
+					textTop = top + cellHeight * (time + 1) - 15 - paint.getTextSize();
+					canvas.drawText(place.substring(0, 4), textLeft, textTop, paint);	
+					textLeft = left + cellWidth * week
+							+ (cellWidth - paint.measureText(place.substring(4))) / 2;
+					canvas.drawText(place.substring(4), textLeft, textTop + paint.getTextSize(), paint);
 				}
 			}
+			i++;
 		}
-		
 	}
 
 	private boolean isInt(String substring) {

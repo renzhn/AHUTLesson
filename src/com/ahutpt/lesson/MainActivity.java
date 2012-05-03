@@ -1,9 +1,13 @@
 package com.ahutpt.lesson;
 
 import java.text.SimpleDateFormat;
+import com.mobclick.android.MobclickAgent;
+import com.mobclick.android.UmengUpdateListener;
+
 import com.ahutpt.lesson.R;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,17 +28,36 @@ public class MainActivity extends Activity {
 	private ScheduleView scheduleView;
 	private Timetable timetable;
 	private Alert alert;
-	private AsyncTask<Integer, Integer, Integer> loading;
 	private boolean noticeUpdate;
+	private AsyncTask<Integer, Integer, Integer> loading;
 	private boolean loaded = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.loading);
+
+		ChangeLog cl = new ChangeLog(this);
+		if (cl.firstRun()){
+			cl.getLogDialog().show();
+		}
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		noticeUpdate = preferences.getBoolean("notice_update", true);
+		
+		//MobclickAgent.setDebugMode(true);
+		MobclickAgent.setUpdateOnlyWifi(false);
+		MobclickAgent.updateOnlineConfig(this);
+		MobclickAgent.onError(this);
+		if(noticeUpdate){
+			MobclickAgent.update(this);
+			MobclickAgent.updateAutoPopup = true;
+			MobclickAgent.setUpdateListener(new UmengUpdateListener(){
+				public void onUpdateReturned(int arg) {
+					
+				}
+			});
+		}
 	}
 	
 	@Override
@@ -45,11 +68,20 @@ public class MainActivity extends Activity {
 		super.onResume();
 		loading = new LoadingSchedule();
 		loading.execute();
-		ChangeLog cl = new ChangeLog(this);
-		if (cl.firstRun())
-			cl.getLogDialog().show();
+		MobclickAgent.onResume(this);
 	}
 	
+	@Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
+    
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+	}
+
 	class LoadingSchedule extends AsyncTask<Integer, Integer, Integer>{
 
 		@Override
@@ -73,27 +105,7 @@ public class MainActivity extends Activity {
 			loaded = true;
         } 
 	}
-	
-	class checkUpdate extends AsyncTask<String, String, String> {
-		@Override
-		protected String doInBackground(String... para) {
-			//return NetworkHelper.readURL("http://ahut2011.sinaapp.com/app/lesson/check.php?ver=" + getAppVersionName(getApplicationContext()));
-			return null;
-		}
 
-		@Override
-		protected void onPostExecute(String result) {
-			if(!noticeUpdate)return;
-			/*
-			if (result.contentEquals("FoundNewVersion")) {
-	    		Intent intent = new Intent(getBaseContext(), FoundUpdateActivity.class);
-				intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-				startActivity(intent);
-			}
-			*/
-		}
-	}
-	
 	public String dateInfo(){
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("MM月d日"); 
 		String  date  =  sDateFormat.format(new java.util.Date()); 
@@ -117,6 +129,9 @@ public class MainActivity extends Activity {
 			Intent i = new Intent(this, SettingActivity.class);
 			startActivity(i);
 			return true;
+		case R.id.menu_help:
+			openHelpDialog();
+			return true;
 		case R.id.menu_exit:
 			super.onDestroy();
 			this.finish();
@@ -124,6 +139,13 @@ public class MainActivity extends Activity {
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
+	}
+	
+	private void openHelpDialog() {
+		new AlertDialog.Builder(this)
+				.setTitle("使用说明")
+				.setMessage(R.string.help_message)
+				.setPositiveButton("确定",null).show();
 	}
 	
 	@Override

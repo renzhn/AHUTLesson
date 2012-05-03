@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.NotificationManager;
 import android.app.Notification;
@@ -15,26 +16,35 @@ public class AlarmReceiver extends BroadcastReceiver {
 	private SharedPreferences preferences;
 	private Context context;
 	private int week,time;
-	private boolean enableAlert,enableNotification,enableSound;
+	private Timetable timetable;
+	private boolean enableAlert,enableNotification,enableSound,enableNotificationSound,enableVibrate,enableLED;
+	private static final boolean DEBUG = false;
 	
 	@Override
-	public void onReceive(Context context0, Intent intent) {
+	public void onReceive(Context context0, Intent intent0) {
 		//接到上课广播
 		context = context0;
-		
+		timetable = new Timetable(context);
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
 		if(!enableAlert)
 			return;
 
-		enableNotification = preferences.getBoolean("SendNotificationWhenNotice", true);
+		enableNotification = preferences.getBoolean("SendNotificationWhenNotice", false);
 		enableSound = preferences.getBoolean("PlaySoundWhenNotice", true);
+		enableNotificationSound = preferences.getBoolean("NotificationSoundWhenNotice", false);
+		enableVibrate = preferences.getBoolean("VibrateWhenNotice", true);
+		enableLED = preferences.getBoolean("BlinkWhenNotice", true);
 		
-		week = intent.getExtras().getInt("week");
-		time = intent.getExtras().getInt("time");
-
-        String info = intent.getStringExtra("LessonInfo");  
-        Log.i("ahutLesson","LessonInfo: " + info); 
+		week = intent0.getExtras().getInt("week");
+		time = intent0.getExtras().getInt("time");
+		
+		addNextLessonAlarm();
+		
+		if(DEBUG){
+			 String info = intent0.getStringExtra("LessonInfo");  
+		     Log.i("ahutLesson","LessonInfo: " + info); 
+		}
 	    
         if(enableNotification){
             pushNotification();
@@ -47,6 +57,22 @@ public class AlarmReceiver extends BroadcastReceiver {
 	        i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 	        context.startActivity(i);
 		}
+		
+	}
+
+	private void addNextLessonAlarm() {
+		//设置下节课闹钟
+		Lesson nextLesson = timetable.getNextLesson(Timetable.NextAlarm);
+		if(nextLesson!=null){
+			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+			long alarmTime = nextLesson.getNextTime(Timetable.NextAlarm);
+			Intent intent = new Intent(context,AlarmReceiver.class);
+			intent.putExtra("week", nextLesson.week);
+			intent.putExtra("time", nextLesson.time);
+			intent.putExtra("LessonInfo", nextLesson.toString());  
+			PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+			alarm.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+		}
 	}
 
 	private void pushNotification() {
@@ -55,7 +81,19 @@ public class AlarmReceiver extends BroadcastReceiver {
 		String notice = Timetable.lessontime_name[time] + "有" + lesson.alias + "课";
         NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);               
         Notification n = new Notification(R.drawable.calendar_small, notice, System.currentTimeMillis());             
-        n.flags = Notification.FLAG_AUTO_CANCEL;                
+        n.flags = Notification.FLAG_AUTO_CANCEL;
+        if(enableNotificationSound){
+        	n.defaults |= Notification.DEFAULT_SOUND;
+        }
+        if(enableVibrate){
+            n.defaults |= Notification.DEFAULT_VIBRATE;//VIBRATE
+        }
+        if(enableLED){
+        	n.flags |= Notification.FLAG_SHOW_LIGHTS;
+            n.ledARGB = 0xff00ff00;
+            n.ledOnMS = 300;
+            n.ledOffMS = 1000;//LED
+        }
         Intent i = new Intent(context, LessonActivity.class);
 		i.putExtra("week", week);
 		i.putExtra("time", time);

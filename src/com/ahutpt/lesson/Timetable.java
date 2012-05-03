@@ -33,7 +33,6 @@ public class Timetable {
 		weekDay = getCurrentWeekDay();
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		
 
 		weekname = context.getResources().getStringArray(R.array.week_name);
 		lessontime_name = context.getResources()
@@ -131,7 +130,7 @@ public class Timetable {
 	public int getTimeId(String time) {
 		//某一时间对应的时间段
 		for(int i = 0;i < 5;i++){
-			if(time2minute(time) >= time2minute(begintime[i]) && time2minute(time) <= time2minute(endtime[i]))
+			if(time2minute(time) >= (time2minute(begintime[i])) && time2minute(time) <= time2minute(endtime[i]))
 				return i;
 		}
 		return -1;
@@ -144,13 +143,27 @@ public class Timetable {
 		return getTimeId(time);
 	}
 	
-	public int getNextTimeBlock(){
+	public static final int NextDefault = 0;
+	public static final int NextAlarm = 1;
+	public static final int NextSilent = 2;
+	
+	public int getNextTimeBlock(int advanceMode){
 		//返回将要到来的时间段
+		//advanceMode:0默认 1闹钟提前时间 2静音提前时间
+		int timeInAdvance = 0;
+		switch (advanceMode){
+		case NextAlarm:
+			timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
+			break;
+		case NextSilent:
+			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
+			break;
+		}
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
 		String  time  =  sDateFormat.format(new java.util.Date()); 
 		int min = time2minute(time);
 		for(int i = 0;i < 5;i++){
-			if(min < time2minute(begintime[i]))
+			if(min < (time2minute(begintime[i]) - timeInAdvance ))
 				return i;
 		}
 		return 5;
@@ -208,28 +221,49 @@ public class Timetable {
 		}
 	}
 
-	public long getNextLessonTime(int week, int time) {
-		//某课下次上课时间(毫秒)
+	public long getNextLessonBeginTime(int week, int time,int advanceMode) {
+		//某课上课时间(毫秒)，若已上则下周
+		int timeInAdvance = 0;
+		switch (advanceMode){
+		case NextAlarm:
+			timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
+			break;
+		case NextSilent:
+			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
+			break;
+		}
 		Calendar c = Calendar.getInstance();
 		String t = getBeginTime(time);
-		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
+		int weekOfMonth = c.get(Calendar.WEEK_OF_MONTH);
 		int hour = Integer.valueOf(t.substring(0, 2));
 		int min = Integer.valueOf(t.substring(3));
 		c.setTimeInMillis(System.currentTimeMillis());
 		if(isNowHavingLesson(week,time)!=-1){
-			c.set(Calendar.DAY_OF_YEAR,dayOfYear + 7);
+			c.set(Calendar.WEEK_OF_MONTH, weekOfMonth + 1);
 		}
-		c.set(Calendar.DAY_OF_WEEK, normalWeek2SystemWeek(week));
+		int sysWeek = normalWeek2SystemWeek(week);
+		if(sysWeek == 1){
+			//系统的星期日是上周的星期日
+			c.set(Calendar.WEEK_OF_MONTH, weekOfMonth + 1);
+		}
+		
+		c.set(Calendar.DAY_OF_WEEK, sysWeek);
 		c.set(Calendar.HOUR_OF_DAY, hour);
 		c.set(Calendar.MINUTE, min);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
 		if(DEBUG)
 			Log.i("ahutlesson", "下次上课时间： " + this.miliTime2String(c.getTimeInMillis()));
-		return c.getTimeInMillis();
+		return c.getTimeInMillis() - timeInAdvance * 60 * 1000;
 	}
 	
-	public long getNextLessonEndTime(int week,int time){
+	public long getNextLessonEndTime(int week,int time,int advanceMode){
+		int timeInAdvance = 0;
+		switch (advanceMode){
+		case NextSilent:
+			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
+			break;
+		}
 		Calendar c = Calendar.getInstance();
 		String t = getEndTime(time);
 		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
@@ -246,28 +280,23 @@ public class Timetable {
 		c.set(Calendar.MILLISECOND, 0);
 		if(DEBUG)
 			Log.i("ahutlesson", "下课时间： " + "week: " + week + ", time: " + time + " : " + this.miliTime2String(c.getTimeInMillis()));
-		return c.getTimeInMillis();
+		return c.getTimeInMillis() + timeInAdvance * 60 * 1000;
 	}
 
-	public Lesson getNextLesson() {
+	public Lesson getNextLesson(int advanceMode) {
 		int week;
-		int time = getNextTimeBlock();
+		int time = getNextTimeBlock(advanceMode);
 		Lesson lesson;
 		for(week = weekDay;week < 7; week++){
 			while(time < 5){
 				lesson = new Lesson(week, time, context);
-				if(lesson.exist)
+				if(lesson.exist&&lesson.isNowHaving()==-1)
 					return lesson;
 				time++;
 			}
 			time = 0;
 		}
 		return null;
-	}
-	
-	public Lesson getCurrentLesson(){
-		Lesson lesson = new Lesson(weekDay,getCurTimeBlock(),context);
-		return lesson;
 	}
 	
 	public int isNowHavingLesson(int week, int time) {
@@ -300,13 +329,13 @@ public class Timetable {
 	public int systemWeek2NormalWeek(int sys){
 		int week = sys -2;
 		if(week==-1)
-			week = 6;
+			return 6;
 		return week;
 	}
 	
 	public int normalWeek2SystemWeek(int week){
 		if(week == 6)
-			week = -1;
+			return 1;
 		return week + 2;
 	}
 

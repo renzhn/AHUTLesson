@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahutpt.lesson"
-    android:versionCode="1"
-    android:versionName="1.0.0" >
+    android:versionCode="4"
+    android:versionName="1.0.3" >
 
     <application
         android:icon="@drawable/calendar"
@@ -70,7 +70,7 @@
         <activity
             android:label="@string/app_name"
             android:name=".AlarmAlertActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
+            android:theme="@android:style/Theme.Dialog" >
             <intent-filter >
                 <action android:name="com.ahutpt.lesson.ALARMALERTACTIVITY" />
                 
@@ -87,13 +87,32 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
+                <activity
+            android:label="@string/app_name"
+            android:name=".FoundUpdateActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="com.ahutpt.lesson.FOUNDUPDATEACTIVITY" />
+                
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
         <receiver android:process=":remote" android:name=".AlarmReceiver"/>
         <receiver android:process=":remote" android:name=".SoundSilentReceiver"/>
         <receiver android:process=":remote" android:name=".SoundNormalReceiver"/>
+        
+        <meta-data android:value="4f9fa64852701569cd0000e2" android:name="UMENG_APPKEY"></meta-data>
+		<meta-data android:value="Default" android:name="UMENG_CHANNEL"/>
+        
     </application>
-
+	
     <uses-sdk android:minSdkVersion="8" />
-
-    <uses-permission android:name="android.permission.VIBRATE" />
+    
+	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
+	<uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
+	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
 
 </manifest>

@@ -1,13 +1,11 @@
 package com.ahutpt.lesson;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class Lesson {
 
-	private static SQLiteDatabase db;
 	private static DatabaseHelper DBHelper;
 	private static Timetable timetable;
 	private Context context;
@@ -37,7 +35,7 @@ public class Lesson {
 		context = context0;
 		timetable = new Timetable(context);
 		DBHelper = new DatabaseHelper(context,"ahutlesson");  
-		db = DBHelper.getWritableDatabase();
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		String[] cols = {"lessonname","lessonalias","lessonplace","teachername"};
 		Cursor lessoninfo = db.query("lesson", cols, "week=" + String.valueOf(week0) + " and time=" + String.valueOf(time0), null, null, null, null);
 		if(lessoninfo.getCount()==0){
@@ -58,51 +56,24 @@ public class Lesson {
 		db.close();
 	}
 	
-	public long getNextTime(){
+	public long getNextTime(int advanceMode){
 		//下一次上此课的时间（毫秒）
-		return timetable.getNextLessonTime(week,time);
+		return timetable.getNextLessonBeginTime(week,time,advanceMode);
 	}
 	
-	public long getNextEndTime() {
-		return timetable.getNextLessonEndTime(week,time);
+	public long getNextEndTime(int advanceMode) {
+		return timetable.getNextLessonEndTime(week,time,advanceMode);
 	}
 	
 	public int isNowHaving(){
-		//-1还没上，0正在上，1上过了
+		//-1还没上，0正在上，1上过了, 2不存在
+		if(!exist)
+			return 2;
 		return timetable.isNowHavingLesson(week,time);
-	}
-	
-	public void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName){
-		db = DBHelper.getWritableDatabase();
-		if(lessonName.contentEquals(""))
-			return ;
-		Cursor result;
-		String[] selection = { "lessonname" };
-		result = db.query("lesson", selection, "week=" + String.valueOf(week) + " and time=" + String.valueOf(time), null, null, null, null);
-		if(result.getCount()==0){
-			ContentValues cv = new ContentValues();
-			cv.put("week", week);
-			cv.put("time", time);
-			cv.put("lessonname", lessonName);
-			cv.put("lessonalias", lessonAlias);
-			cv.put("lessonplace", lessonPlace);
-			cv.put("teachername", teacherName);
-			db.insert("lesson", null, cv);
-		}else{
-			ContentValues cv = new ContentValues();
-			cv.put("lessonname", lessonName);
-			cv.put("lessonalias", lessonAlias);
-			cv.put("lessonplace", lessonPlace);
-			cv.put("teachername", teacherName);
-			db.update("lesson", cv, "week=" + String.valueOf(week) + " AND time=" + String.valueOf(time), null);
-		}
-		exist = true;
-		result.close();
-		db.close();
 	}
 
 	public void delete() {
-		db = DBHelper.getWritableDatabase();
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", "week=" + String.valueOf(week) + " and time=" + String.valueOf(time), null);
 		db.close();
 		exist = false;

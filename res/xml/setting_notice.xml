@@ -20,15 +20,44 @@
 
         <CheckBoxPreference
             android:defaultValue="true"
+            android:key="PlaySoundWhenNotice"
+            android:summary="在提醒时播放声音"
+            android:title="声音提醒" />
+        
+        <EditTextPreference 
+            android:defaultValue="{TIME}有{LESSON}课，该上课了！！"
+            android:key="MessageWhenNotice"
+            android:dialogTitle="自定义提醒信息" 
+            android:dialogMessage="{TIME}表示时间段,{LESSON}表示课程名"
+            android:summary="自定义播放声音时的提醒信息"
+            android:title="自定义提醒信息"/>
+        
+    </PreferenceCategory>    
+    <PreferenceCategory android:title="通知设置" >
+        
+        <CheckBoxPreference
+            android:defaultValue="false"
             android:key="SendNotificationWhenNotice"
             android:summary="在通知栏显示通知"
             android:title="发送通知" />
 
         <CheckBoxPreference
             android:defaultValue="true"
-            android:key="PlaySoundWhenNotice"
-            android:summary="在提醒时播放声音"
-            android:title="声音提醒" />
-    </PreferenceCategory>
+            android:key="NotificationSoundWhenNotice"
+            android:summary="发送通知时声音提示"
+            android:title="声音提示" />
+        
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="VibrateWhenNotice"
+            android:summary="发送通知时将手机振动"
+            android:title="振动" />
+
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="BlinkWhenNotice"
+            android:summary="发送通知时闪烁LED灯"
+            android:title="闪烁LED灯" />
+        </PreferenceCategory>
 
 </PreferenceScreen>

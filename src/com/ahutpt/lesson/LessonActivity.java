@@ -1,5 +1,10 @@
 package com.ahutpt.lesson;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import com.mobclick.android.MobclickAgent;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,10 +21,15 @@ public class LessonActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
+		if(!((week >= 0 && week <= 6)&&(time >=0 && time <= 4))){
+			this.finish();
+		}
+		
 		setContentView(R.layout.lesson);
-
+		
 		Timetable timetable = new Timetable(this);
 		
 		tvLessonName = (TextView)findViewById(R.id.tvLessonName);
@@ -45,6 +55,8 @@ public class LessonActivity extends Activity {
 	protected void onResume() {
 		// 删除或修改后重新载入
 		super.onResume();
+
+		MobclickAgent.onResume(this);
 		
 		tvLessonName = (TextView)findViewById(R.id.tvLessonName);
 		tvLessonPlace = (TextView)findViewById(R.id.tvLessonPlace);
@@ -58,6 +70,12 @@ public class LessonActivity extends Activity {
 			tvTeacherName.setText(lesson.teacher);	
 		}
 	}
+	
+	@Override
+    public void onPause() {
+        super.onPause();
+        MobclickAgent.onPause(this);
+    }
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -76,6 +94,12 @@ public class LessonActivity extends Activity {
 			startActivity(i);
 			return true;
 		case R.id.menu_delete_lesson:
+			Map<String, String> loglesson= new HashMap<String, String>();
+			loglesson.put("name", lesson.name);
+			loglesson.put("alias", lesson.alias);
+			loglesson.put("place", lesson.place);
+			loglesson.put("teacher", lesson.teacher);
+			MobclickAgent.onEvent(this, "delete_lesson", loglesson);
 			lesson.delete();
 			LessonActivity.this.finish();
 			return true;

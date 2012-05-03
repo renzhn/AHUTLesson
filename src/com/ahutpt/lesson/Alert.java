@@ -40,28 +40,26 @@ public class Alert {
 	}
 	
 	public void setAlarm(){
-		int timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
-		Lesson nextLesson = timetable.getNextLesson();
-		if(nextLesson!=null){
-			am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-			long alarmTime = nextLesson.getNextTime();
-			if(enableAlert){
-				Intent intent = new Intent(context,AlarmReceiver.class);
+		am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+		Lesson nextLesson = timetable.getNextLesson(Timetable.NextAlarm);
+		Intent intent;
+		if(nextLesson!=null&&enableAlert){
+				long alarmTime = nextLesson.getNextTime(Timetable.NextAlarm);
+				intent = new Intent(context,AlarmReceiver.class);
 				intent.putExtra("week", nextLesson.week);
 				intent.putExtra("time", nextLesson.time);
 				intent.putExtra("LessonInfo", nextLesson.toString());  
 				PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
-				am.set(AlarmManager.RTC_WAKEUP, alarmTime - timeInAdvance * 60 * 1000 , sender);
-			}
-			if(enableSilent){
-				int silentDelay = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "10"));
-				Intent intent1 = new Intent(context,SoundSilentReceiver.class);
-				intent1.putExtra("week", nextLesson.week);
-				intent1.putExtra("time", nextLesson.time);
-				PendingIntent sender1 = PendingIntent.getBroadcast(context, 0, intent1, PendingIntent.FLAG_CANCEL_CURRENT);
-				am.set(AlarmManager.RTC_WAKEUP, alarmTime - silentDelay * 60 * 1000 , sender1);
-			}
-			
+				am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
+		}
+		nextLesson = timetable.getNextLesson(Timetable.NextSilent);
+		if(nextLesson!=null&&enableSilent){
+				long alarmTime = nextLesson.getNextTime(Timetable.NextSilent);
+				intent = new Intent(context,SoundSilentReceiver.class);
+				intent.putExtra("week", nextLesson.week);
+				intent.putExtra("time", nextLesson.time);
+				PendingIntent sender1 = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+				am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender1);
 		}
 	}
 }
