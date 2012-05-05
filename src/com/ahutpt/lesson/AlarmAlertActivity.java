@@ -2,6 +2,10 @@ package com.ahutpt.lesson;
 
 import java.io.IOException;
 
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -29,7 +33,7 @@ public class AlarmAlertActivity extends Activity {
 		int week = getIntent().getExtras().getInt("week");
 		int time = getIntent().getExtras().getInt("time");
 		
-		lesson = new Lesson(week,time,this);
+		lesson = LessonManager.getLessonAt(week, time, this);
 		
 		playMusic();
 		

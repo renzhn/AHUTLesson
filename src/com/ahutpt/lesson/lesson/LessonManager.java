@@ -1,4 +1,8 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.lesson;
+
+import com.ahutpt.lesson.MainActivity;
+import com.ahutpt.lesson.helper.DatabaseHelper;
+import com.ahutpt.lesson.time.Timetable;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,19 +10,20 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class LessonManager {
-	
+
+	private static Context context;
 	private static DatabaseHelper DBHelper;
-	private Context context;
+	public static Lesson lessons[][] = new Lesson[7][5];
+	public static boolean loaded = false;
 	
 	public LessonManager(Context context0){
 		context = context0;
+		DBHelper = new DatabaseHelper(context, "ahutlesson");
+		getAllLessons();
+		loaded = true;
 	}
 	
-	public Lesson[] getAllLessons(){
-		
-		Lesson[] lessons = new Lesson[35];
-		
-		DBHelper = new DatabaseHelper(context,"ahutlesson");  
+	public void getAllLessons(){
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		
 		String name,alias,place,teacher;
@@ -29,10 +34,9 @@ public class LessonManager {
 		if(lessoninfo.getCount()==0){
 			lessoninfo.close();
 			db.close();
-			return null;
+			return;
 		}
 		lessoninfo.moveToFirst();
-		int i = 0;
 		do{
 			name =  lessoninfo.getString(0);
 			alias = lessoninfo.getString(1);
@@ -40,17 +44,30 @@ public class LessonManager {
 			teacher = lessoninfo.getString(3);
 			week = lessoninfo.getInt(4);
 			time = lessoninfo.getInt(5);
-			if(name==null||alias==null||place==null||teacher==null)continue;
-			lessons[i] = new Lesson(name,alias,place,teacher,week,time,context);
-			i++;
+			lessons[week][time] = new Lesson(name,alias,place,teacher,week,time,context);
 		}while(lessoninfo.moveToNext());
 		lessoninfo.close();
 		db.close();
-		return lessons;
+		return;
 	}
 	
-
-	public void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int week,int time){
+	public static Lesson getLessonAt(int week0, int time0, Context context0){
+		if(!Timetable.isValidWeek(week0)||!Timetable.isValidTime(time0))return null;
+		return lessons[week0][time0];
+	}
+	
+	public static void deleteLessonAt(int week0, int time0){
+		if(DBHelper==null)return;
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		db.delete("lesson", "week=" + week0 + " and time="
+				+ time0, null);
+		db.close();
+		lessons[week0][time0] = null;
+		MainActivity.refresh();
+	}
+	
+	public static void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int week,int time){
+		if(DBHelper==null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		if(lessonName.contentEquals(""))
 			return ;
@@ -76,5 +93,7 @@ public class LessonManager {
 		}
 		result.close();
 		db.close();
+		lessons[week][time] = new Lesson(lessonName,lessonAlias,lessonPlace,teacherName,week,time,context);
+		MainActivity.refresh();
 	}
 }

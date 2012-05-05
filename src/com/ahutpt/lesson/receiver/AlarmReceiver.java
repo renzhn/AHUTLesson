@@ -1,11 +1,17 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.receiver;
+
+import com.ahutpt.lesson.AlarmAlertActivity;
+import com.ahutpt.lesson.LessonActivity;
+import com.ahutpt.lesson.R;
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.NotificationManager;
@@ -16,15 +22,18 @@ public class AlarmReceiver extends BroadcastReceiver {
 	private SharedPreferences preferences;
 	private Context context;
 	private int week,time;
-	private Timetable timetable;
 	private boolean enableAlert,enableNotification,enableSound,enableNotificationSound,enableVibrate,enableLED;
-	private static final boolean DEBUG = false;
 	
 	@Override
 	public void onReceive(Context context0, Intent intent0) {
 		//接到上课广播
 		context = context0;
-		timetable = new Timetable(context);
+		
+		if(!Timetable.loaded)
+			new Timetable(context);
+		if(!LessonManager.loaded)
+			new LessonManager(context);
+		
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
 		if(!enableAlert)
@@ -40,11 +49,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 		time = intent0.getExtras().getInt("time");
 		
 		addNextLessonAlarm();
-		
-		if(DEBUG){
-			 String info = intent0.getStringExtra("LessonInfo");  
-		     Log.i("ahutLesson","LessonInfo: " + info); 
-		}
 	    
         if(enableNotification){
             pushNotification();
@@ -62,7 +66,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	private void addNextLessonAlarm() {
 		//设置下节课闹钟
-		Lesson nextLesson = timetable.getNextLesson(Timetable.DelayAlarm);
+		Lesson nextLesson = Timetable.getNextLesson(Timetable.DelayAlarm);
 		if(nextLesson!=null){
 			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			long alarmTime = nextLesson.getNextTime(Timetable.DelayAlarm);
@@ -76,7 +80,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	}
 
 	private void pushNotification() {
-		Lesson lesson = new Lesson(week, time, context);
+		Lesson lesson = LessonManager.getLessonAt(week, time, context);
 		new Timetable(context);
 		String notice = Timetable.lessontime_name[time] + "有" + lesson.alias + "课";
         NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);               

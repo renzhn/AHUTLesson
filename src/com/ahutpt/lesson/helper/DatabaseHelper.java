@@ -1,4 +1,4 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.helper;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

@@ -1,4 +1,4 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.network;
 
 import java.io.IOException;
 import java.io.InputStream;

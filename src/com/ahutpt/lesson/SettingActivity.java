@@ -1,5 +1,7 @@
 package com.ahutpt.lesson;
 
+import com.ahutpt.lesson.helper.ChangeLog;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -71,7 +73,7 @@ public class SettingActivity extends PreferenceActivity {
 			public boolean onPreferenceClick(Preference preference) {
 
 				new AlertDialog.Builder(SettingActivity.this).setTitle(R.string.about)
-				.setMessage("安工大课程助手 For Android\n" + "作者邮箱： renzhen999@gmail.com")
+				.setMessage(R.string.about_msg)
 				.setNegativeButton("OK", null).show();
 				
 				return true;

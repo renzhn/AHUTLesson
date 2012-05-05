@@ -1,4 +1,4 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.view;
 
 import java.util.ArrayList;
 

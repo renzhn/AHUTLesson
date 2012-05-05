@@ -1,6 +1,11 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.view;
 
 import java.io.Serializable;
+
+import com.ahutpt.lesson.LessonActivity;
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -16,13 +21,14 @@ import android.view.View;
 public class Grid extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private static Timetable timetable;
 	private Canvas canvas;
 
 	float top, left;
 	float cellWidth, cellHeight;
 	float calendarWidth, calendarHeight;
 	float textLeft, textTop;
+	
+	private static int markWeek = -1,markTime = -1;
 	
 	public static final int NORMALTIME = 0;
 	public static final int FREETIME = 1;
@@ -31,7 +37,6 @@ public class Grid extends ScheduleParent implements Serializable {
 	
 	public Grid(Activity activity, View view) {
 		super(activity, view);
-		timetable = new Timetable(context);
 		left = borderMargin;
 		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
 	}
@@ -48,56 +53,69 @@ public class Grid extends ScheduleParent implements Serializable {
 		//画线
 		drawLines();
 		
-		//载入课程
-		LessonManager mLessonManager = new LessonManager(context);
-		Lesson[] lessons = mLessonManager.getAllLessons();
-		if (lessons == null)
-			return;
-		
 		//去掉四节课中间的线
 		paint.setColor(Color.WHITE);
-		for(int i = 0;lessons[i] != null;i++) {
-			if(lessons[i].canAppend()){
-				canvas.drawLine(left + cellWidth * lessons[i].week, top + cellHeight * (lessons[i].time + 1), left + cellWidth * (lessons[i].week + 1),
-						top + cellHeight * (lessons[i].time + 1), paint);
+		for(Lesson[] lessonsOfDay:LessonManager.lessons){
+			if(lessonsOfDay!=null){
+				for(Lesson lesson:lessonsOfDay){
+					if(lesson!=null){
+						if(lesson.canAppend()){
+						canvas.drawLine(left + cellWidth * lesson.week, top + cellHeight * (lesson.time + 1), left + cellWidth * (lesson.week + 1),
+								top + cellHeight * (lesson.time + 1), paint);
+						}
+					}
+				}
 			}
 		}
 		
 		//画背景
 		drawBackgrounds();
 		
-		paint.setAntiAlias(true);
+		//载入课程
+		if(!LessonManager.loaded)
+			new LessonManager(context);
+		if(!Timetable.loaded)
+			new Timetable(context);
+		
+		Timetable.initTime();
+		
 		//课程名和地点
-		for(int i = 0;lessons[i] != null;i++) {
-			if(lessons[i].canAppend()&&Timetable.nowIsAtLessonBreak(lessons[i].time)){
-				drawLesson(lessons[i].week, lessons[i].time,
-						lessons[i], true, lessons[i].appendMode());
-			}else if(lessons[i].isAppended()&&Timetable.nowIsAtLessonBreak(lessons[i].time - 1)){
-				//四节课的课间且是后两节课，不用画了
-			}else{
-				drawLesson(lessons[i].week, lessons[i].time,
-						lessons[i], lessons[i].isNowHaving()==0?true:false, lessons[i].appendMode());
+		paint.setAntiAlias(true);
+		for(Lesson[] lessonsOfDay:LessonManager.lessons){
+			if(lessonsOfDay!=null){
+				for(Lesson lesson:lessonsOfDay){
+					if(lesson!=null){
+						if(lesson.canAppend()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
+							drawLesson(lesson, true, lesson.appendMode());
+						}else if(lesson.isAppended()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
+							//四节课的课间且是后两节课，不用画了
+						}else{
+							drawLesson(lesson, lesson.isNowHaving()==0?true:false, lesson.appendMode());
+						}
+					}
+				}
 			}
 		}
+		
+		drawMarkBorder();
 	}
 
 	private void drawBackgrounds() {
 		//画背景
 
-		Lesson lesson = new Lesson(Timetable.weekDay,
-				Timetable.getCurrentTimeBlock(Timetable.DelayDefault), context);
-		
 		//处理在四节课课间的情况
-		Lesson tLesson = new Lesson(Timetable.weekDay, 0, context);
-		if(tLesson.exist&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(0)){
+		Lesson tLesson = LessonManager.getLessonAt(Timetable.weekDay, 0, context);
+		if(tLesson!=null&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(Timetable.weekDay, 0)){
 			drawBackground(tLesson.week, tLesson.time, BUSYTIME, tLesson.appendMode());
 		}
-		tLesson = new Lesson(Timetable.weekDay, 2, context);
-		if(tLesson.exist&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(2)){
+		tLesson = LessonManager.getLessonAt(Timetable.weekDay, 2, context);
+		if(tLesson!=null&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(Timetable.weekDay, 2)){
 			drawBackground(tLesson.week, tLesson.time, BUSYTIME, tLesson.appendMode());
 		}
 		
-		if(lesson.exist) {
+		Lesson lesson = LessonManager.getLessonAt(Timetable.weekDay,
+				Timetable.getCurrentTimeBlock(Timetable.DelayDefault), context);
+		if(lesson!=null) {
 			drawBackground(lesson.week, lesson.time, BUSYTIME, lesson.appendMode());
 		}else{
 			int curTimeBlock = Timetable.getCurrentTimeBlock(Timetable.DelayDefault);
@@ -106,11 +124,20 @@ public class Grid extends ScheduleParent implements Serializable {
 			}
 		}
 
-		lesson = timetable.getNextLesson(Timetable.DelayDefault);
-		drawBackground(lesson.week, lesson.time, NEXTTIME, lesson.appendMode());
-
+		lesson = Timetable.getNextLesson(Timetable.DelayDefault);
+		if(lesson!=null){
+			drawBackground(lesson.week, lesson.time, NEXTTIME, lesson.appendMode());
+		}
 	}
 
+	private void drawMarkBorder(){
+		paint.setColor(RED);
+		paint.setStyle(Paint.Style.STROKE);
+		if(markWeek!=-1&&markTime!=-1){
+			canvas.drawRect(left + cellWidth * markWeek, top + cellHeight * markTime, left + cellWidth * (markWeek + 1), top + cellHeight * (markTime + 1), paint);
+		}
+	}
+	
 	private void drawLines() {
 		paint.setColor(Color.LTGRAY);
 
@@ -127,6 +154,10 @@ public class Grid extends ScheduleParent implements Serializable {
 
 	}
 	
+	public static final int GREEN = Color.parseColor("#228B22");
+	public static final int RED = Color.parseColor("#B22222");
+	public static final int GRAY = Color.parseColor("#CDCDCD");
+	
 	private void drawBackground(int week,int time, int mode, int append) {
 		// 画下节课背景
 		// append:0 默认 1 扩展下节 -1 扩展上节
@@ -136,13 +167,13 @@ public class Grid extends ScheduleParent implements Serializable {
 			paintbg.setColor(Color.WHITE);
 			break;
 		case FREETIME:
-			paintbg.setColor(Color.parseColor("#228B22"));
+			paintbg.setColor(GREEN);
 			break;
 		case BUSYTIME:
-			paintbg.setColor(Color.parseColor("#B22222"));
+			paintbg.setColor(RED);
 			break;
 		case NEXTTIME:
-			paintbg.setColor(Color.parseColor("#CDCDCD"));
+			paintbg.setColor(GRAY);
 			break;
 		}
 		switch (append){
@@ -166,9 +197,14 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 	}
 
-	private void drawLesson(int week, int time, Lesson lesson,boolean busytime,
+	private void drawLesson(Lesson lesson,boolean busytime,
 			int appendMode) {
 		// 一般课程
+		if(lesson == null) return;
+		paint.setTextSize(lessonNameSize);
+		int week,time;
+		week = lesson.week;
+		time = lesson.time;
 		String name, place;
 		name = lesson.alias;
 		place = lesson.place;
@@ -181,13 +217,13 @@ public class Grid extends ScheduleParent implements Serializable {
 			+ (cellHeight - paint.getTextSize() * 2 - 20) / 2;
 			break;
 		case 1:
-			mlesson = new Lesson(week, time + 1, context);
+			mlesson = LessonManager.getLessonAt(week, time + 1, context);
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * time
 			+ (cellHeight * 2 - paint.getTextSize() * 2 - 20) / 2;
 			break;
 		case -1:
-			mlesson = new Lesson(week, time - 1, context);
+			mlesson = LessonManager.getLessonAt(week, time - 1, context);
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * (time - 1)
 			+ (cellHeight * 2 - paint.getTextSize() * 2 - 20) / 2;
@@ -195,11 +231,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 
 		// 画课程名
-		paint.setTextSize(lessonNameSize);
 		if (busytime)
 			paint.setColor(Color.WHITE);
 		else
 			paint.setColor(Color.BLACK);
+		
 		if (name.length() <= 2) {
 			canvas.drawText(name, textLeft, textTop, paint);
 		} else if (name.length() <= 4) {
@@ -268,8 +304,13 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 	}
 
-	private boolean isInt(String substring) {
-		return substring.matches("\\d*");
+	private boolean isInt(String str) {
+		for(int i = 0;i < str.length(); i++){
+			if(!Character.isDigit(str.charAt(i))){
+				return false;
+			}
+		}
+		return true;
 	}
 
 	public void openLessonDetail(float x, float y) {
@@ -280,5 +321,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		i.putExtra("week", week);
 		i.putExtra("time", time);
 		context.startActivity(i);
+	}
+	
+	public void markLesson(float x, float y) {
+		markWeek = (int) (x / cellWidth);
+		markTime = (int) ((y - top) / cellHeight);
+		
 	}
 }

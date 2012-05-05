@@ -1,4 +1,4 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.time;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,10 +10,14 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import com.ahutpt.lesson.R;
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+
 public class Timetable {
 	
-	private Context context;
-	private Calendar cal;
+	private static Context context;
+	private static Calendar cal;
 	private static SharedPreferences preferences;
 	public static String[] begintime = new String[5];
 	public static String[] endtime = new String[5];
@@ -25,27 +29,22 @@ public class Timetable {
 	public static int endtimemin[] = new int[5];
 	public static String[] weekname,lessontime_name;
 	private static Editor edit;
-	private static final boolean DEBUG = true;
+	private static final boolean DEBUG = false;
+	public static boolean loaded = false;
 	
 	public Timetable(Context context0){
 		context = context0;
-		cal = Calendar.getInstance();
-		year = cal.get(Calendar.YEAR);
-		month = cal.get(Calendar.MONTH);
-		dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
-		dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
-		weekDay = getCurrentWeekDay();
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-
 		weekname = context.getResources().getStringArray(R.array.week_name);
 		lessontime_name = context.getResources()
 				.getStringArray(R.array.lessontime_name);
-		
+		initTime();
 		loadData();
+		loaded = true;
 	}
 	
-	public void loadData() {
+	public static void loadData() {
 		// 载入/刷新数据
 		
 		beginDate_year = preferences.getInt("begin_date_year", getYearOfCurrentPeriod());
@@ -72,6 +71,20 @@ public class Timetable {
 			endtimemin[i] = time2minute(endtime[i]);
 		}
 		
+	}
+	
+	public static void initTime(){
+		cal = Calendar.getInstance();
+		year = cal.get(Calendar.YEAR);
+		month = cal.get(Calendar.MONTH);
+		dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+		dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
+		weekDay = getCurrentWeekDay();
+	}
+	
+	public static void loadLesson(){
+		if(!LessonManager.loaded)
+			new LessonManager(context);
 	}
 
 	public int getNumOfWeekSincePeriod() {
@@ -155,7 +168,7 @@ public class Timetable {
 	public static final int DelayAlarm = 1;
 	public static final int DelaySilent = 2;
 	
-	public int getNextTimeBlock(int advanceMode){
+	public static int getNextTimeBlock(int advanceMode){
 		//返回将要到来的时间段
 		//advanceMode:0默认 1闹钟提前时间 2静音提前时间
 		int timeInAdvance = 0;
@@ -229,7 +242,7 @@ public class Timetable {
 	
 	public Lesson getCurrentLesson(int advanceMode) {
 		// 当前时间的课
-		return new Lesson(weekDay, getCurrentTimeBlock(advanceMode), context);
+		return LessonManager.getLessonAt(weekDay, getCurrentTimeBlock(advanceMode), context);
 	}
 
 	public long getCurrentLessonEndTime(int time, int advanceMode) {
@@ -246,14 +259,15 @@ public class Timetable {
 		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
-	public Lesson getNextLesson(int advanceMode) {
+	public static Lesson getNextLesson(int advanceMode) {
 		int week;
 		int time = getNextTimeBlock(advanceMode);
+		loadLesson();
 		Lesson lesson;
-		for(week = weekDay;week < 7; week++){
+		for(week = getCurrentWeekDay();week < 7; week++){
 			while(time < 5){
-				lesson = new Lesson(week, time, context);
-				if(lesson.exist&&lesson.isNowHaving()==-1&&!lesson.isAppended())
+				lesson =  LessonManager.getLessonAt(week, time, context);
+				if(lesson != null&&lesson.isNowHaving()==-1&&!lesson.isAppended())
 					return lesson;
 				time++;
 			}
@@ -262,7 +276,7 @@ public class Timetable {
 		return null;
 	}
 	
-	public long getNextLessonBeginTime(int week, int time,int advanceMode) {
+	public static long getNextLessonBeginTime(int week, int time,int advanceMode) {
 		//某课上课时间(毫秒)，若已上则下周
 		
 		Calendar c = Calendar.getInstance();
@@ -290,7 +304,7 @@ public class Timetable {
 		return c.getTimeInMillis() - getTimeDelay(advanceMode) * 60 * 1000;
 	}
 	
-	public long getNextLessonEndTime(int week,int time,int advanceMode){
+	public static long getNextLessonEndTime(int week,int time,int advanceMode){
 		Calendar c = Calendar.getInstance();
 		String t = endtime[time];
 		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
@@ -310,9 +324,10 @@ public class Timetable {
 		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
-	public int isNowHavingLesson(int week, int time) {
+	public static int isNowHavingLesson(int week, int time) {
 		//本周本课状态
 		//-1还没上，0正在上，1上过了
+		weekDay = getCurrentWeekDay();
 		Calendar curCal = Calendar.getInstance();
 		if(weekDay < week){
 			return -1;
@@ -330,10 +345,6 @@ public class Timetable {
 		}
 	}
 
-	public static int getCurrentWeekDay() {
-		Calendar calendar = Calendar.getInstance();
-		return systemWeek2NormalWeek(calendar.get(Calendar.DAY_OF_WEEK));
-	}
 	
 	public static int getTimeDelay(int advanceMode){
 		switch (advanceMode){
@@ -365,15 +376,28 @@ public class Timetable {
 		date.setTime(miliTime);
 		return  sDateFormat.format(date);
 	}
-	
-	public static int getCurrentMinute(){
-		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
-		String  time  =  sDateFormat.format(new java.util.Date()); 
-		return time2minute(time);
+
+	public static int getCurrentWeekDay() {
+		Calendar calendar = Calendar.getInstance();
+		return systemWeek2NormalWeek(calendar.get(Calendar.DAY_OF_WEEK));
 	}
 	
-	public static boolean nowIsAtLessonBreak(int i) {
+	public static int getCurrentMinute(){
+		Calendar calendar = Calendar.getInstance();
+		return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
+	}
+	
+	public static boolean isValidWeek(int week){
+		return (week >= 0&&week <= 6)?true:false;
+	}
+	
+	public static boolean isValidTime(int time){
+		return (time >= 0&&time <= 4)?true:false;
+	}
+	
+	public static boolean nowIsAtLessonBreak(int week, int i) {
 		// 0 早上四节课的课间， 2 下午四节课的课间
+		if(week != weekDay) return false;
 		int min = getCurrentMinute();
 		switch(i){
 		case 0:

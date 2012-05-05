@@ -3,6 +3,9 @@ package com.ahutpt.lesson;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
 import com.mobclick.android.MobclickAgent;
 
 import android.app.Activity;
@@ -39,8 +42,8 @@ public class LessonActivity extends Activity {
 		tvCurrentTime = (TextView)findViewById(R.id.tvCurrentTime);
 		tvCurrentTime.setText(Timetable.weekname[week] + Timetable.lessontime_name[time]);
 
-		lesson = new Lesson(week,time,this);
-		if(lesson.exist){
+		lesson = LessonManager.getLessonAt(week, time, this);
+		if(lesson != null){
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
 			tvTeacherName.setText(lesson.teacher);	
@@ -61,8 +64,8 @@ public class LessonActivity extends Activity {
 		tvTeacherName = (TextView)findViewById(R.id.tvTeacherName);
 		tvLessonTime = (TextView)findViewById(R.id.tvLessonTime);
 		
-		lesson = new Lesson(week,time,this);
-		if(lesson.exist){
+		lesson = LessonManager.getLessonAt(week, time, this);
+		if(lesson != null){
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
 			tvTeacherName.setText(lesson.teacher);	

@@ -12,12 +12,14 @@
  * @author: Karsten Priegnitz
  * @see: http://code.google.com/p/android-change-log/
  */
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.helper;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import com.ahutpt.lesson.R;
 
 import android.app.AlertDialog;
 import android.content.Context;

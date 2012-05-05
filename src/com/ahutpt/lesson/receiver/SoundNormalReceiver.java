@@ -1,4 +1,8 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.receiver;
+
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,13 +16,16 @@ import android.widget.Toast;
 
 public class SoundNormalReceiver extends BroadcastReceiver {
 	
-	private Timetable timetable;
 	private SharedPreferences preferences;
 	
 	@Override
 	public void onReceive(Context context, Intent arg1) {
+		if(!Timetable.loaded)
+			new Timetable(context);
+		if(!LessonManager.loaded)
+			new LessonManager(context);
+		
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		timetable = new Timetable(context);
 		AudioManager am=(AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 		am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
 		
@@ -27,7 +34,7 @@ public class SoundNormalReceiver extends BroadcastReceiver {
 		
 		//设置下一次
 		boolean enableSilent = preferences.getBoolean("SilentMode", true);
-		Lesson nextLesson = timetable.getNextLesson(Timetable.DelaySilent);
+		Lesson nextLesson = Timetable.getNextLesson(Timetable.DelaySilent);
 		if(nextLesson!=null&&enableSilent){
 			long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
 			Intent intent1 = new Intent(context,SoundSilentReceiver.class);

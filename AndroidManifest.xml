@@ -97,9 +97,9 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <receiver android:process=":remote" android:name=".AlarmReceiver"/>
-        <receiver android:process=":remote" android:name=".SoundSilentReceiver"/>
-        <receiver android:process=":remote" android:name=".SoundNormalReceiver"/>
+        <receiver android:process=":remote" android:name=".receiver.AlarmReceiver"/>
+        <receiver android:process=":remote" android:name=".receiver.SoundSilentReceiver"/>
+        <receiver android:process=":remote" android:name=".receiver.SoundNormalReceiver"/>
         
         <meta-data android:value="4f9fa64852701569cd0000e2" android:name="UMENG_APPKEY"></meta-data>
 		<meta-data android:value="Default" android:name="UMENG_CHANNEL"/>

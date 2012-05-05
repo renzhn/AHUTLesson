@@ -1,5 +1,4 @@
-package com.ahutpt.lesson;
-
+package com.ahutpt.lesson.view;
 
 import com.ahutpt.lesson.interfaces.ScheduleElement;
 

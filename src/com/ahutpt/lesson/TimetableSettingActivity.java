@@ -1,5 +1,7 @@
 package com.ahutpt.lesson;
 
+import com.ahutpt.lesson.time.Timetable;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;

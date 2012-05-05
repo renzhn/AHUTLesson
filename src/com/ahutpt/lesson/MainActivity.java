@@ -5,6 +5,10 @@ import com.mobclick.android.MobclickAgent;
 import com.mobclick.android.UmengUpdateListener;
 
 import com.ahutpt.lesson.R;
+import com.ahutpt.lesson.helper.ChangeLog;
+import com.ahutpt.lesson.time.Alert;
+import com.ahutpt.lesson.time.Timetable;
+import com.ahutpt.lesson.view.ScheduleView;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -13,34 +17,36 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Debug;
 import android.preference.PreferenceManager;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity{
 	
-	private ScheduleView scheduleView;
+	private static ScheduleView scheduleView;
 	private Timetable timetable;
 	private Alert alert;
 	private boolean noticeUpdate;
-	private AsyncTask<Integer, Integer, Integer> loading;
-	private boolean loaded = false;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.loading);
+		
+		Debug.startMethodTracing("ahutlesson");
+		
+		timetable = new Timetable(MainActivity.this);
+		alert = new Alert(MainActivity.this);
 
 		ChangeLog cl = new ChangeLog(this);
 		if (cl.firstRun()){
 			cl.getLogDialog().show();
 		}
+		
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		noticeUpdate = preferences.getBoolean("notice_update", true);
@@ -48,7 +54,7 @@ public class MainActivity extends Activity {
 		//MobclickAgent.setDebugMode(true);
 		MobclickAgent.setUpdateOnlyWifi(false);
 		MobclickAgent.updateOnlineConfig(this);
-		MobclickAgent.onError(this);
+		//MobclickAgent.onError(this);
 		if(noticeUpdate){
 			MobclickAgent.update(this);
 			MobclickAgent.updateAutoPopup = true;
@@ -58,16 +64,25 @@ public class MainActivity extends Activity {
 				}
 			});
 		}
+		
+		//主要布局
+		LinearLayout mainLayout = (LinearLayout) getLayoutInflater().inflate(
+				R.layout.main, null);
+		setContentView(mainLayout);
+		//日期信息
+		TextView tvDate = (TextView)findViewById(R.id.tvDate);
+		tvDate.setText(dateInfo());
+		//绘制课表
+		scheduleView = new ScheduleView(MainActivity.this);
+		mainLayout.addView(scheduleView);
+
+		Debug.stopMethodTracing();
 	}
 	
 	@Override
 	protected void onResume() {
-		// 刷新显示
-		setContentView(R.layout.loading);
-		loaded = false;
 		super.onResume();
-		loading = new LoadingSchedule();
-		loading.execute();
+		alert.setAlarm();
 		MobclickAgent.onResume(this);
 	}
 	
@@ -77,40 +92,13 @@ public class MainActivity extends Activity {
         MobclickAgent.onPause(this);
     }
     
-	@Override
-	protected void onDestroy() {
-		super.onDestroy();
+	public static void refresh(){
+		if(scheduleView!=null)
+			scheduleView.invalidate();
 	}
-
-	class LoadingSchedule extends AsyncTask<Integer, Integer, Integer>{
-
-		@Override
-		protected Integer doInBackground(Integer... arg0) {
-			timetable = new Timetable(MainActivity.this);
-			alert = new Alert(MainActivity.this);
-			alert.setAlarm();
-			return 0;
-		}
-		@Override  
-        protected void onPostExecute(Integer result) {  
-
-			LinearLayout mainLayout = (LinearLayout) getLayoutInflater().inflate(
-					R.layout.main, null);
-			setContentView(mainLayout);
-			
-			TextView tvDate = (TextView)findViewById(R.id.tvDate);
-			tvDate.setText(dateInfo());
-			scheduleView = new ScheduleView(MainActivity.this);
-			mainLayout.addView(scheduleView);
-			loaded = true;
-        } 
-	}
-
 	public String dateInfo(){
-		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("MM月d日"); 
+		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("M月d日"); 
 		String  date  =  sDateFormat.format(new java.util.Date()); 
-		if(date.startsWith("0"))
-			date = date.substring(1);
 		int numOfWeek = timetable.getNumOfWeekSincePeriod();
 		return date + " " + Timetable.weekname[Timetable.getCurrentWeekDay()] + " " + "第" + String.valueOf(numOfWeek) + "周";
 	}
@@ -146,13 +134,6 @@ public class MainActivity extends Activity {
 				.setTitle("使用说明")
 				.setMessage(R.string.help_message)
 				.setPositiveButton("确定",null).show();
-	}
-	
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if(!loaded) return false;
-		scheduleView.onKeyDown(keyCode, event);
-		return super.onKeyDown(keyCode, event);
 	}
 
 	public static String getAppVersionName(Context context) {

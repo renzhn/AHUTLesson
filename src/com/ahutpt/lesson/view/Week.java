@@ -1,6 +1,7 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.view;
 
 import com.ahutpt.lesson.R;
+
 import android.app.Activity;
 import android.graphics.Canvas;
 import android.graphics.Color;

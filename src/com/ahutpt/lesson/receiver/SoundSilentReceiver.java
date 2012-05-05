@@ -1,4 +1,8 @@
-package com.ahutpt.lesson;
+package com.ahutpt.lesson.receiver;
+
+import com.ahutpt.lesson.lesson.Lesson;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Timetable;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -8,6 +12,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 public class SoundSilentReceiver extends BroadcastReceiver {
@@ -20,7 +25,10 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context0, Intent intent) {
 		context = context0;
-		
+		if(!Timetable.loaded)
+			new Timetable(context);
+		if(!LessonManager.loaded)
+			new LessonManager(context);
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableSilent = preferences.getBoolean("SilentMode", true);
 		enableVibrate = preferences.getBoolean("VibrateWhenSilentMode", false);
@@ -45,13 +53,16 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 	private void setCancelSilent(int week,int time) {
 		// 恢复正常音量
 		Timetable timetable = new Timetable(context);
-		Lesson nextLesson = timetable.getCurrentLesson(Timetable.DelaySilent);
-		long alarmTime = nextLesson.getCurrentLessonEndTime(Timetable.DelaySilent);
+		Lesson curLesson = timetable.getCurrentLesson(Timetable.DelaySilent);
+		if(!curLesson.exist)return;//手动更改时间，执行时并无课
+		long alarmTime = curLesson.getCurrentLessonEndTime(Timetable.DelaySilent);
+		if(true){
+		     Log.i("ahutLesson","将恢复音量: " + Timetable.miliTime2String(alarmTime)); 
+		}
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(context,SoundNormalReceiver.class);
 		intent.putExtra("week", week);
 		intent.putExtra("time", time);
-		intent.putExtra("mode", "cancel");
 		PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 		am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 	}
