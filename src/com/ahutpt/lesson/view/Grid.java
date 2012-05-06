@@ -209,24 +209,26 @@ public class Grid extends ScheduleParent implements Serializable {
 		name = lesson.alias;
 		place = lesson.place;
 		textLeft = left + cellWidth * week
-				+ (cellWidth - paint.getTextSize() * 2) / 2;
+				+ cellWidth / 2 - paint.getTextSize();
 		Lesson mlesson;
 		switch(appendMode){
 		case 0:
 			textTop = top + cellHeight * time
-			+ (cellHeight - paint.getTextSize() * 2 - 20) / 2;
+			+ cellHeight / 2 - paint.getTextSize();
 			break;
 		case 1:
 			mlesson = LessonManager.getLessonAt(week, time + 1, context);
+			if(mlesson==null)return;
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * time
-			+ (cellHeight * 2 - paint.getTextSize() * 2 - 20) / 2;
+			+ cellHeight - paint.getTextSize();
 			break;
 		case -1:
 			mlesson = LessonManager.getLessonAt(week, time - 1, context);
+			if(mlesson==null)return;
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * (time - 1)
-			+ (cellHeight * 2 - paint.getTextSize() * 2 - 20) / 2;
+			+ cellHeight - paint.getTextSize();
 			break;
 		}
 
@@ -246,8 +248,6 @@ public class Grid extends ScheduleParent implements Serializable {
 			canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
 			canvas.drawText(name.substring(2, 4), textLeft,
 					textTop + (paint.getTextSize() + 5), paint);
-			canvas.drawText("...", textLeft, textTop
-					+ (paint.getTextSize() + 5) * 2, paint);
 		}
 		// »­µØµã
 		paint.setTextSize(lessonPlaceSize);
@@ -258,13 +258,13 @@ public class Grid extends ScheduleParent implements Serializable {
 
 		switch(appendMode){
 		case 0:
-			textTop = top + cellHeight * (time + 1) - 15;
+			textTop = top + cellHeight * (time + 1) - cellHeight / 5;
 			break;
 		case 1:
-			textTop = top + cellHeight * (time + 2) - cellHeight / 2 - 15;
+			textTop = top + cellHeight * (time + 2) - cellHeight / 2 - cellHeight / 5;
 			break;
 		case -1:
-			textTop = top + cellHeight * (time) + cellHeight / 2 - 15;
+			textTop = top + cellHeight * (time) + cellHeight / 2 - cellHeight / 5;
 			break;
 		}
 
@@ -273,7 +273,6 @@ public class Grid extends ScheduleParent implements Serializable {
 					+ (cellWidth - paint.measureText(place)) / 2;
 			canvas.drawText(place, textLeft, textTop, paint);
 		} else if (place.length() <= 8) {
-			textTop -= paint.getTextSize();
 			String roomNumber = place.substring(place.length() - 3,
 					place.length());
 			if (isInt(roomNumber)) {

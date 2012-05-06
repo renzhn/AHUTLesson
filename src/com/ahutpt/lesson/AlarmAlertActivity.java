@@ -34,6 +34,9 @@ public class AlarmAlertActivity extends Activity {
 		int time = getIntent().getExtras().getInt("time");
 		
 		lesson = LessonManager.getLessonAt(week, time, this);
+		if(lesson==null){
+			this.finish();
+		}
 		
 		playMusic();
 		

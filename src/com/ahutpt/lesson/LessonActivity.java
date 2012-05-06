@@ -95,13 +95,15 @@ public class LessonActivity extends Activity {
 			startActivity(i);
 			return true;
 		case R.id.menu_delete_lesson:
-			Map<String, String> loglesson= new HashMap<String, String>();
-			loglesson.put("name", lesson.name);
-			loglesson.put("alias", lesson.alias);
-			loglesson.put("place", lesson.place);
-			loglesson.put("teacher", lesson.teacher);
-			MobclickAgent.onEvent(this, "delete_lesson", loglesson);
-			lesson.delete();
+			if(lesson!=null){
+				Map<String, String> loglesson= new HashMap<String, String>();
+				loglesson.put("name", lesson.name);
+				loglesson.put("alias", lesson.alias);
+				loglesson.put("place", lesson.place);
+				loglesson.put("teacher", lesson.teacher);
+				MobclickAgent.onEvent(this, "delete_lesson", loglesson);
+				lesson.delete();
+			}
 			LessonActivity.this.finish();
 			return true;
 		default:

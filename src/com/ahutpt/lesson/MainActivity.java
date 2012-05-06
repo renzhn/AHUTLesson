@@ -18,7 +18,6 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.os.Debug;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -37,8 +36,6 @@ public class MainActivity extends Activity{
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		
-		Debug.startMethodTracing("ahutlesson");
-		
 		timetable = new Timetable(MainActivity.this);
 		alert = new Alert(MainActivity.this);
 
@@ -54,7 +51,7 @@ public class MainActivity extends Activity{
 		//MobclickAgent.setDebugMode(true);
 		MobclickAgent.setUpdateOnlyWifi(false);
 		MobclickAgent.updateOnlineConfig(this);
-		//MobclickAgent.onError(this);
+		MobclickAgent.onError(this);
 		if(noticeUpdate){
 			MobclickAgent.update(this);
 			MobclickAgent.updateAutoPopup = true;
@@ -75,8 +72,6 @@ public class MainActivity extends Activity{
 		//»æÖÆ¿Î±í
 		scheduleView = new ScheduleView(MainActivity.this);
 		mainLayout.addView(scheduleView);
-
-		Debug.stopMethodTracing();
 	}
 	
 	@Override

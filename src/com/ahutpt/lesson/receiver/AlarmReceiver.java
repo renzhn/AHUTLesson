@@ -81,7 +81,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	private void pushNotification() {
 		Lesson lesson = LessonManager.getLessonAt(week, time, context);
-		new Timetable(context);
+		if(lesson==null)return;
 		String notice = Timetable.lessontime_name[time] + "сп" + lesson.alias + "©н";
         NotificationManager nm = (NotificationManager)context.getSystemService(Context.NOTIFICATION_SERVICE);               
         Notification n = new Notification(R.drawable.calendar_small, notice, System.currentTimeMillis());             

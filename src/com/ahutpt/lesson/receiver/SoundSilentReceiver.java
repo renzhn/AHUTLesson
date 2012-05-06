@@ -12,7 +12,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import android.widget.Toast;
 
 public class SoundSilentReceiver extends BroadcastReceiver {
@@ -54,11 +53,8 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 		// 恢复正常音量
 		Timetable timetable = new Timetable(context);
 		Lesson curLesson = timetable.getCurrentLesson(Timetable.DelaySilent);
-		if(!curLesson.exist)return;//手动更改时间，执行时并无课
+		if(curLesson==null)return;//手动更改时间，执行时并无课
 		long alarmTime = curLesson.getCurrentLessonEndTime(Timetable.DelaySilent);
-		if(true){
-		     Log.i("ahutLesson","将恢复音量: " + Timetable.miliTime2String(alarmTime)); 
-		}
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(context,SoundNormalReceiver.class);
 		intent.putExtra("week", week);
