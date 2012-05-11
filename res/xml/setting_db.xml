@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+   
+    <PreferenceCategory android:title="课表管理" >
+        
+        <EditTextPreference 
+            android:key="down_xh"
+            android:dialogTitle="请输入学号" 
+            android:summary="下载课表前请先设置学号"
+            android:title="学号设置"/>
+        <Preference
+            android:key="down_db"
+            android:title="下载课程表" />
+        <Preference
+            android:key="delete_db"
+            android:title="清空课表" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

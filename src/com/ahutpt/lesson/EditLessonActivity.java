@@ -1,8 +1,5 @@
 package com.ahutpt.lesson;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ahutpt.lesson.lesson.Lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
@@ -95,13 +92,7 @@ public class EditLessonActivity extends Activity {
 		lessonPlace = etLessonPlace.getText().toString();
 		teacherName = etTeacherName.getText().toString();
 		LessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace, teacherName, week, time);
-		
-		Map<String, String> loglesson= new HashMap<String, String>();
-		loglesson.put("name", lessonName);
-		loglesson.put("alias", lessonAlias);
-		loglesson.put("place", lessonPlace);
-		loglesson.put("teacher", teacherName);
-		MobclickAgent.onEvent(this, "delete_lesson", loglesson);
+		MobclickAgent.onEvent(this, "add_lesson", lessonName + " : " + lessonPlace + " : " + teacherName);
 	}
 
 }

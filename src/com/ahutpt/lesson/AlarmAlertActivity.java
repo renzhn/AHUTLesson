@@ -28,7 +28,10 @@ public class AlarmAlertActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		new Timetable(this.getApplicationContext());
+		if(!Timetable.loaded)
+			new Timetable(this);
+		if(!LessonManager.loaded)
+			new LessonManager(this);
 		
 		int week = getIntent().getExtras().getInt("week");
 		int time = getIntent().getExtras().getInt("time");

@@ -13,6 +13,7 @@ import com.ahutpt.lesson.view.ScheduleView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
@@ -41,6 +42,15 @@ public class MainActivity extends Activity{
 
 		ChangeLog cl = new ChangeLog(this);
 		if (cl.firstRun()){
+			new AlertDialog.Builder(this).setTitle("在线下载课表")
+			.setMessage("是否进入课表下载页面？")
+			.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					Intent i = new Intent(MainActivity.this, ManageDBActivity.class);
+					startActivity(i);
+				}
+			}).setNegativeButton("取消", null).show();
+			
 			cl.getLogDialog().show();
 		}
 		
@@ -87,10 +97,6 @@ public class MainActivity extends Activity{
         MobclickAgent.onPause(this);
     }
     
-	public static void refresh(){
-		if(scheduleView!=null)
-			scheduleView.invalidate();
-	}
 	public String dateInfo(){
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("M月d日"); 
 		String  date  =  sDateFormat.format(new java.util.Date()); 

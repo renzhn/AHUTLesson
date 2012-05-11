@@ -46,6 +46,17 @@ public class SettingActivity extends PreferenceActivity {
 			
 		});
 		
+		Preference dbManage = (Preference)findPreference("setting_dbmanage");
+		dbManage.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+			public boolean onPreferenceClick(Preference preference) {
+				Intent i = new Intent(SettingActivity.this, ManageDBActivity.class);
+				startActivity(i);
+				return true;
+			}
+			
+		});
+		
 		Preference changelog = (Preference)findPreference("changelog");
 		changelog.setOnPreferenceClickListener(new OnPreferenceClickListener(){
 
@@ -86,7 +97,7 @@ public class SettingActivity extends PreferenceActivity {
 	public void share() {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, "我在用安工大课程助手，挺不错的，下载地址：http://dev1994.com/app/lesson");
+		intent.putExtra(Intent.EXTRA_TEXT, "我在用安工大课程助手，挺不错的，下载地址：http://dev1994.com/ahut/app/lesson");
 		startActivity(Intent.createChooser(intent, "分享到"));
 	}
 

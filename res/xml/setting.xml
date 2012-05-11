@@ -11,7 +11,10 @@
             android:title="提醒设置" />
         <Preference
             android:key="setting_silent"
-            android:title="静音设置" />
+            android:title="静音设置" />       
+        <Preference
+            android:key="setting_dbmanage"
+            android:title="课表管理" />
     </PreferenceCategory>
     
     <PreferenceCategory android:title="关于" >

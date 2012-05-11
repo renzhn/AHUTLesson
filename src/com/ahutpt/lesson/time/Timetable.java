@@ -27,7 +27,7 @@ public class Timetable {
 	public static int year,month,dayOfMonth,dayOfYear,weekDay;
 	public static int begintimemin[] = new int[5];
 	public static int endtimemin[] = new int[5];
-	public static String[] weekname,lessontime_name;
+	public static String[] weekname = new String[7],lessontime_name = new String[5];
 	private static Editor edit;
 	private static final boolean DEBUG = false;
 	public static boolean loaded = false;

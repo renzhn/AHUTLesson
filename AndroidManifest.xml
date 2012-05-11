@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahutpt.lesson"
-    android:versionCode="6"
-    android:versionName="1.2" >
+    android:versionCode="7"
+    android:versionName="1.3" >
 
     <application
         android:icon="@drawable/calendar"
@@ -50,6 +50,16 @@
         </activity>
         <activity
             android:label="@string/app_name"
+            android:name=".ManageDBActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="com.ahutpt.lesson.MANAGEDBACTIVITY" />
+                
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity> 
+        <activity
+            android:label="@string/app_name"
             android:name=".SettingNoticeActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
@@ -88,16 +98,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-                <activity
-            android:label="@string/app_name"
-            android:name=".FoundUpdateActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutpt.lesson.FOUNDUPDATEACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
+        
         <receiver android:process=":remote" android:name=".receiver.AlarmReceiver"/>
         <receiver android:process=":remote" android:name=".receiver.SoundSilentReceiver"/>
         <receiver android:process=":remote" android:name=".receiver.SoundNormalReceiver"/>

@@ -1,8 +1,5 @@
 package com.ahutpt.lesson;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.ahutpt.lesson.lesson.Lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
@@ -24,11 +21,16 @@ public class LessonActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if(!Timetable.loaded)
+			new Timetable(this);
+		if(!LessonManager.loaded)
+			new LessonManager(this);
 		
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
 		if(!((week >= 0 && week <= 6)&&(time >=0 && time <= 4))){
 			this.finish();
+			return;
 		}
 		
 		setContentView(R.layout.lesson);
@@ -96,12 +98,7 @@ public class LessonActivity extends Activity {
 			return true;
 		case R.id.menu_delete_lesson:
 			if(lesson!=null){
-				Map<String, String> loglesson= new HashMap<String, String>();
-				loglesson.put("name", lesson.name);
-				loglesson.put("alias", lesson.alias);
-				loglesson.put("place", lesson.place);
-				loglesson.put("teacher", lesson.teacher);
-				MobclickAgent.onEvent(this, "delete_lesson", loglesson);
+				MobclickAgent.onEvent(this, "delete_lesson",lesson.name + " : " + lesson.place + " : " + lesson.teacher);
 				lesson.delete();
 			}
 			LessonActivity.this.finish();

@@ -1,6 +1,10 @@
 package com.ahutpt.lesson.lesson;
 
-import com.ahutpt.lesson.MainActivity;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import org.json.JSONTokener;
+
 import com.ahutpt.lesson.helper.DatabaseHelper;
 import com.ahutpt.lesson.time.Timetable;
 
@@ -63,7 +67,41 @@ public class LessonManager {
 				+ time0, null);
 		db.close();
 		lessons[week0][time0] = null;
-		MainActivity.refresh();
+		new LessonManager(context);
+	}
+	
+	public static boolean updateDB(String JSONDATA) {
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		db.delete("lesson", null, null);
+		try {
+			JSONTokener jsonParser = new JSONTokener(JSONDATA);
+			JSONObject lesson;
+			JSONArray lessons;
+			lessons = (JSONArray)jsonParser.nextValue();
+			for(int i = 0;i < lessons.length(); i++){
+				lesson = lessons.getJSONObject(i);
+				String lessonName = lesson.getString("lessonname");
+				String lessonAlias = lesson.getString("lessonalias");
+				String teacherName = lesson.getString("teachername");
+				int week = lesson.getInt("week");
+				int time = lesson.getInt("time");
+				String lessonPlace = lesson.getString("place");
+				ContentValues cv = new ContentValues();
+				cv.put("lessonname", lessonName);
+				cv.put("lessonalias", lessonAlias);
+				cv.put("teachername", teacherName);
+				cv.put("lessonplace", lessonPlace);
+				cv.put("week", week);
+				cv.put("time", time);
+				db.insert("lesson", null, cv);
+			}
+			clean();
+			new LessonManager(context);
+			return true;
+		} catch (JSONException ex) {
+			// 异常处理代码
+			return false;
+		}
 	}
 	
 	public static void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int week,int time){
@@ -94,6 +132,17 @@ public class LessonManager {
 		result.close();
 		db.close();
 		lessons[week][time] = new Lesson(lessonName,lessonAlias,lessonPlace,teacherName,week,time,context);
-		MainActivity.refresh();
+		new LessonManager(context);
+	}
+
+	public static void deleteDB() {
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		db.delete("lesson", null, null);
+		clean();
+		new LessonManager(context);
+	}
+	
+	public static void clean(){
+		lessons = new Lesson[7][5];
 	}
 }
