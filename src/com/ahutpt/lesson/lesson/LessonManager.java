@@ -78,6 +78,7 @@ public class LessonManager {
 			JSONObject lesson;
 			JSONArray lessons;
 			lessons = (JSONArray)jsonParser.nextValue();
+			if(lessons==null)return false;
 			for(int i = 0;i < lessons.length(); i++){
 				lesson = lessons.getJSONObject(i);
 				String lessonName = lesson.getString("lessonname");
@@ -95,11 +96,14 @@ public class LessonManager {
 				cv.put("time", time);
 				db.insert("lesson", null, cv);
 			}
+			db.close();
 			clean();
 			new LessonManager(context);
 			return true;
 		} catch (JSONException ex) {
 			// 异常处理代码
+			return false;
+		} catch(ClassCastException ex){
 			return false;
 		}
 	}
@@ -138,6 +142,7 @@ public class LessonManager {
 	public static void deleteDB() {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
+		db.close();
 		clean();
 		new LessonManager(context);
 	}

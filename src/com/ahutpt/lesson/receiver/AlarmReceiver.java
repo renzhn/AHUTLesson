@@ -50,9 +50,9 @@ public class AlarmReceiver extends BroadcastReceiver {
 		
 		addNextLessonAlarm();
 	    
-        if(enableNotification){
-            pushNotification();
-        }
+		if(enableNotification){
+			pushNotification();
+		}
         
 		if(enableSound){
 	        Intent i = new Intent(context, AlarmAlertActivity.class);

@@ -18,7 +18,6 @@ public class ManageDBActivity extends android.preference.PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.setting_db);
 		
@@ -61,7 +60,6 @@ public class ManageDBActivity extends android.preference.PreferenceActivity {
 	}
 
 	private void beginUpdate() {
-		// TODO Auto-generated method stub
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		String xh = preferences.getString("down_xh", "");
 		if(xh.contentEquals("")){

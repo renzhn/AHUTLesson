@@ -1,5 +1,6 @@
 package com.ahutpt.lesson;
 
+import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 
 import android.app.Activity;
@@ -24,6 +25,11 @@ public class TimetableSettingActivity extends Activity {
 
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.timetable);
+		if(!Timetable.loaded)
+			new Timetable(this);
+		if(!LessonManager.loaded)
+			new LessonManager(this);
+		
 		initView();
 		spinner = (Spinner) findViewById(R.id.spinnerSetMode);
 		adapter = new ArrayAdapter<String>(this,
