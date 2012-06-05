@@ -8,7 +8,7 @@
 	<string name="about">关于</string>
 	<string name="about_msg">安工大课程助手 For Android\n 作者邮箱： renzhen999@gmail.com</string>
 	
-	<string name="help_message">1.触摸主界面的方格进入相应的课程设置\n2.在课程信息页面按下菜单键以添加或删除课程\n3.在主界面按下菜单键进入设置页面\n4.主界面的方格颜色：\n * 绿色的方格表示当前正在这个时间段并且无课\n * 红色的表示当前在这个时间段并且有课\n * 灰色的表示下次要上的课\n5.闹钟的声音可以在时钟（系统自带应用）的闹钟设置里选择</string>
+	<string name="help_message">1.触摸主界面的方格进入相应的课程页面\n2.长按方格以添加或删除课程\n3.在主界面按下菜单键进入设置页面\n4.主界面的方格颜色：\n * 绿色的方格表示当前正在这个时间段并且无课\n * 红色的表示当前在这个时间段并且有课\n * 灰色的表示下次要上的课\n5.闹钟的声音可以在时钟（系统自带应用）的闹钟设置里选择</string>
 
 	<string-array name="week_name">
 		<item>周一</item>

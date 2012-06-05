@@ -30,6 +30,10 @@ public class EditLessonActivity extends Activity {
 		
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
+
+		if(!((week >= 0 && week <= 6)&&(time >=0 && time <= 4))){
+			this.finish();
+		}
 		
 		setContentView(R.layout.edit_lesson);
 		

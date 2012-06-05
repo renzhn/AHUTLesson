@@ -28,7 +28,7 @@ public class Grid extends ScheduleParent implements Serializable {
 	float calendarWidth, calendarHeight;
 	float textLeft, textTop;
 	
-	private static int markWeek = -1,markTime = -1;
+	public static int markWeek = -1,markTime = -1;
 	
 	public static final int NORMALTIME = 0;
 	public static final int FREETIME = 1;
@@ -312,13 +312,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		return true;
 	}
 
-	public void openLessonDetail(float x, float y) {
+	public void openLessonDetail() {
 		// 打开课程详情
-		int week = (int) (x / cellWidth);
-		int time = (int) ((y - top) / cellHeight);
 		Intent i = new Intent(context, LessonActivity.class);
-		i.putExtra("week", week);
-		i.putExtra("time", time);
+		i.putExtra("week", markWeek);
+		i.putExtra("time", markTime);
 		context.startActivity(i);
 	}
 	

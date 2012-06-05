@@ -87,7 +87,7 @@ public class Timetable {
 			new LessonManager(context);
 	}
 
-	public int getNumOfWeekSincePeriod() {
+	public static int getNumOfWeekSincePeriod() {
 		//计算开学第几周
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);

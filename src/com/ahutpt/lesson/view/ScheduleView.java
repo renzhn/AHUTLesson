@@ -27,10 +27,13 @@ public class ScheduleView extends View{
 	public boolean onTouchEvent(MotionEvent event) {
 		sch.grid.markLesson(event.getX(), event.getY());
 		ScheduleView.this.invalidate();
-		switch(event.getAction()){
-		case MotionEvent.ACTION_UP:
-			sch.grid.openLessonDetail(event.getX(), event.getY());
-			return true;
+
+		if(this.isPressed()){
+			switch(event.getAction()){
+			case MotionEvent.ACTION_UP:
+				sch.grid.openLessonDetail();
+				return true;
+			}
 		}
 		return super.onTouchEvent(event);
 	}
