@@ -30,10 +30,10 @@ public class LessonManager {
 	public void getAllLessons(){
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		
-		String name,alias,place,teacher;
+		String name,alias,place,teacher,homework;
 		int week,time;
 		
-		String[] cols = {"lessonname","lessonalias","lessonplace","teachername","week","time"};
+		String[] cols = {"lessonname","lessonalias","lessonplace","teachername","homework","week","time"};
 		Cursor lessoninfo = db.query("lesson", cols, null, null, null, null, null);
 		if(lessoninfo.getCount()==0){
 			lessoninfo.close();
@@ -46,9 +46,10 @@ public class LessonManager {
 			alias = lessoninfo.getString(1);
 			place = lessoninfo.getString(2);
 			teacher = lessoninfo.getString(3);
-			week = lessoninfo.getInt(4);
-			time = lessoninfo.getInt(5);
-			lessons[week][time] = new Lesson(name,alias,place,teacher,week,time,context);
+			homework = lessoninfo.getString(4);
+			week = lessoninfo.getInt(5);
+			time = lessoninfo.getInt(6);
+			lessons[week][time] = new Lesson(name,alias,place,teacher,homework,week,time,context);
 		}while(lessoninfo.moveToNext());
 		lessoninfo.close();
 		db.close();
@@ -77,24 +78,30 @@ public class LessonManager {
 			JSONTokener jsonParser = new JSONTokener(JSONDATA);
 			JSONObject lesson;
 			JSONArray lessons;
-			lessons = (JSONArray)jsonParser.nextValue();
-			if(lessons==null)return false;
-			for(int i = 0;i < lessons.length(); i++){
-				lesson = lessons.getJSONObject(i);
-				String lessonName = lesson.getString("lessonname");
-				String lessonAlias = lesson.getString("lessonalias");
-				String teacherName = lesson.getString("teachername");
-				int week = lesson.getInt("week");
-				int time = lesson.getInt("time");
-				String lessonPlace = lesson.getString("place");
-				ContentValues cv = new ContentValues();
-				cv.put("lessonname", lessonName);
-				cv.put("lessonalias", lessonAlias);
-				cv.put("teachername", teacherName);
-				cv.put("lessonplace", lessonPlace);
-				cv.put("week", week);
-				cv.put("time", time);
-				db.insert("lesson", null, cv);
+			try{
+				lessons = (JSONArray)jsonParser.nextValue();
+				if(lessons==null)
+				return false;
+				for(int i = 0;i < lessons.length(); i++){
+					lesson = lessons.getJSONObject(i);
+					String lessonName = lesson.getString("lessonname");
+					String lessonAlias = lesson.getString("lessonalias");
+					String teacherName = lesson.getString("teachername");
+					int week = lesson.getInt("week");
+					int time = lesson.getInt("time");
+					String lessonPlace = lesson.getString("place");
+					ContentValues cv = new ContentValues();
+					cv.put("lessonname", lessonName);
+					cv.put("lessonalias", lessonAlias);
+					cv.put("teachername", teacherName);
+					cv.put("lessonplace", lessonPlace);
+					cv.put("week", week);
+					cv.put("time", time);
+					db.insert("lesson", null, cv);
+				}
+			}catch(NullPointerException e){
+				e.printStackTrace();
+				return false;
 			}
 			db.close();
 			clean();
@@ -135,10 +142,36 @@ public class LessonManager {
 		}
 		result.close();
 		db.close();
-		lessons[week][time] = new Lesson(lessonName,lessonAlias,lessonPlace,teacherName,week,time,context);
 		new LessonManager(context);
 	}
-
+	
+	public static void editHomework(int week, int time, String input) {
+		// 编辑作业
+		if(DBHelper==null)return;
+		if(input == null || input.contentEquals(""))return;
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("homework", input);
+		db.update("lesson", cv, "week=" + String.valueOf(week) + " AND time=" + String.valueOf(time), null);
+		if(lessons[week][time] != null){
+			lessons[week][time].homework = input;
+			lessons[week][time].hasHomework = true;
+		}
+	}
+	
+	public static void deleteHomework(int week, int time){
+		// 删除作业
+		if(DBHelper==null)return;
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("homework", "");
+		db.update("lesson", cv, "week=" + String.valueOf(week) + " AND time=" + String.valueOf(time), null);
+		if(lessons[week][time] != null){
+			lessons[week][time].homework = null;
+			lessons[week][time].hasHomework = false;
+		}
+	}
+	
 	public static void deleteDB() {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
@@ -150,4 +183,5 @@ public class LessonManager {
 	public static void clean(){
 		lessons = new Lesson[7][5];
 	}
+	
 }

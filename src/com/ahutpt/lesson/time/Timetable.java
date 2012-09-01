@@ -21,9 +21,7 @@ public class Timetable {
 	private static SharedPreferences preferences;
 	public static String[] begintime = new String[5];
 	public static String[] endtime = new String[5];
-	private static int beginDate_year;
-	private static int beginDate_month;
-	private static int beginDate_day;
+	private static int beginDate_year,beginDate_month,beginDate_day;
 	public static int year,month,dayOfMonth,dayOfYear,weekDay;
 	public static int begintimemin[] = new int[5];
 	public static int endtimemin[] = new int[5];
@@ -48,8 +46,8 @@ public class Timetable {
 		// 载入/刷新数据
 		
 		beginDate_year = preferences.getInt("begin_date_year", getYearOfCurrentPeriod());
-		beginDate_month = preferences.getInt("begin_date_month", 1);//starting from 0
-		beginDate_day = preferences.getInt("begin_date_day", 13);
+		beginDate_month = preferences.getInt("begin_date_month", 8);//important! 从0开始 实际9月
+		beginDate_day = preferences.getInt("begin_date_day", 2);
 		
 		begintime[0] = preferences.getString("time_begin0", "08:00");
 		begintime[1] = preferences.getString("time_begin1", "10:00");

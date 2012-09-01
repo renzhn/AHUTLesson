@@ -1,11 +1,15 @@
 package com.ahutpt.lesson;
 
 import android.os.Bundle;
-import android.preference.PreferenceActivity;
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
 
-public class SettingNoticeActivity extends PreferenceActivity {
+public class SettingNoticeActivity extends SherlockPreferenceActivity {
+	
+	@SuppressWarnings("deprecation")
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.setting_notice);
 	}
+	
 }

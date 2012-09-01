@@ -3,6 +3,8 @@ package com.ahutpt.lesson;
 import com.ahutpt.lesson.network.NetworkHelper;
 import com.ahutpt.lesson.lesson.LessonManager;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -14,10 +16,12 @@ import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.widget.Toast;
 
-public class ManageDBActivity extends android.preference.PreferenceActivity {
+public class ManageDBActivity extends SherlockPreferenceActivity {
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.setting_db);
 		

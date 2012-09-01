@@ -3,25 +3,18 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical" >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:text="时间设置"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+        android:layout_height="wrap_content"
+        android:paddingTop="10dp" >
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="本学期开学日期:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etBeginDate_year"
@@ -45,7 +38,6 @@
         </EditText>
     </LinearLayout>
     
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
@@ -54,9 +46,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="载入时间表"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <Spinner
             android:id="@+id/spinnerSetMode"
@@ -73,9 +65,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="早上前两节:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/time_begin0"
@@ -100,9 +92,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="早上后两节:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/time_begin1"
@@ -127,9 +119,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="下午前两节:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/time_begin2"
@@ -154,9 +146,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="下午后两节:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/time_begin3"
@@ -181,9 +173,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="晚上:            "
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/time_begin4"
@@ -203,8 +195,8 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="20dp"
-        android:gravity="center">
+        android:gravity="center"
+        android:paddingTop="20dp" >
 
         <Button
             android:id="@+id/btnSubmitTimeTable"

@@ -2,17 +2,20 @@ package com.ahutpt.lesson;
 
 import com.ahutpt.lesson.helper.ChangeLog;
 
+import com.actionbarsherlock.app.SherlockPreferenceActivity;
+
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.preference.PreferenceActivity;
 
-public class SettingActivity extends PreferenceActivity {
+public class SettingActivity extends SherlockPreferenceActivity {
 
+	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.setting);
 		Preference setTimeTable = (Preference)findPreference("setting_timetable");

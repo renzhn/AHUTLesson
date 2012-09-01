@@ -8,16 +8,12 @@ public class Lesson {
 
 	private static Timetable timetable;
 	private Context context;
-	public String name;
-	public String alias;
-	public String place;
-	public String teacher;
-	public int week;
-	public int time;
+	public String name,alias,place,teacher;
+	public String homework = "";
+	public int week,time;
+	public boolean exist,hasHomework = false;
 
-	public boolean exist = false;
-
-	public Lesson(String name0, String alias0, String place0, String teacher0,
+	public Lesson(String name0, String alias0, String place0, String teacher0,String homework0, 
 			int week0, int time0, Context context0) {
 		context = context0;
 		name = name0;
@@ -26,6 +22,8 @@ public class Lesson {
 			alias = name;
 		place = place0;
 		teacher = teacher0;
+		homework = homework0;
+		if(homework != null && !homework.contentEquals("")) hasHomework = true;
 		week = week0;
 		time = time0;
 		exist = true;

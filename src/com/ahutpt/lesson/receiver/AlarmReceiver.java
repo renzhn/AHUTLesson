@@ -79,6 +79,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		}
 	}
 
+	@SuppressWarnings("deprecation")
 	private void pushNotification() {
 		Lesson lesson = LessonManager.getLessonAt(week, time, context);
 		if(lesson==null)return;

@@ -5,16 +5,16 @@ import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 import com.mobclick.android.MobclickAgent;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 
-public class EditLessonActivity extends Activity {
+public class EditLessonActivity extends SherlockActivity {
 	
 	Lesson lesson,prevLesson;
 	int week,time;
@@ -23,6 +23,7 @@ public class EditLessonActivity extends Activity {
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		
 		if(!LessonManager.loaded)
@@ -52,8 +53,7 @@ public class EditLessonActivity extends Activity {
 			}
 		}
 		
-		TextView tvCurrentTime = (TextView)findViewById(R.id.tvCurrentTime);
-		tvCurrentTime.setText(Timetable.weekname[week] + Timetable.lessontime_name[time]);
+		getSupportActionBar().setTitle(Timetable.weekname[week] + Timetable.lessontime_name[time]);
 		
 		etLessonName = (EditText)findViewById(R.id.etLessonName);
 		etLessonAlias = (EditText)findViewById(R.id.etLessonAlias);

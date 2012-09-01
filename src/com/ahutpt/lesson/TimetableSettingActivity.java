@@ -3,7 +3,8 @@ package com.ahutpt.lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 
-import android.app.Activity;
+import com.actionbarsherlock.app.SherlockActivity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
@@ -13,7 +14,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class TimetableSettingActivity extends Activity {
+public class TimetableSettingActivity extends SherlockActivity {
 	private static final String[] mode = {"当前", "夏季时间" , "冬季时间" };
 	private Spinner spinner;
 	private ArrayAdapter<String> adapter;
@@ -22,7 +23,7 @@ public class TimetableSettingActivity extends Activity {
 	private EditText etEnd0,etEnd1,etEnd2,etEnd3,etEnd4;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.timetable);
 		if(!Timetable.loaded)
@@ -46,6 +47,8 @@ public class TimetableSettingActivity extends Activity {
 		});
         if(etBegin0.getText().toString().contentEquals(""))
         		formatTimeTable(1);
+
+		getSupportActionBar().setTitle("时间表设置");
 	}
 	
 	protected void submitTimeTable() {
@@ -63,6 +66,7 @@ public class TimetableSettingActivity extends Activity {
 		Timetable.setEndTime(2, etEnd2.getText().toString());
 		Timetable.setEndTime(3, etEnd3.getText().toString());
 		Timetable.setEndTime(4, etEnd4.getText().toString());
+		Timetable.loadData();
 	}
 
 	private void initView() {
@@ -82,7 +86,7 @@ public class TimetableSettingActivity extends Activity {
 		etEnd2 = (EditText)findViewById(R.id.time_end2);
 		etEnd3 = (EditText)findViewById(R.id.time_end3);
 		etEnd4 = (EditText)findViewById(R.id.time_end4);
-		
+
 		etBeginDate_year.setText(Integer.toString(Timetable.getBeginDate_year()));
 		etBeginDate_month.setText(Integer.toString(Timetable.getBeginDate_month()));
 		etBeginDate_day.setText(Integer.toString(Timetable.getBeginDate_day())); 

@@ -4,15 +4,6 @@
     android:layout_height="match_parent"
     android:orientation="vertical" >
 
-    <TextView
-        android:id="@+id/tvCurrentTime"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="20dp"
-        android:gravity="center"
-        android:text="周X第XX节"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
@@ -21,9 +12,10 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingTop="10dp"
+            android:paddingLeft="10dp"
             android:text="课程名称:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etLessonName"
@@ -39,9 +31,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="课程别名:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etLessonAlias"
@@ -57,9 +49,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="上课地点:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etLessonPlace"
@@ -76,9 +68,9 @@
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:paddingLeft="10dp"
             android:text="教师姓名:"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textSize="22dp" />
+            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etTeacherName"

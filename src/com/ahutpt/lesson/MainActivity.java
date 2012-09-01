@@ -4,6 +4,11 @@ import java.text.SimpleDateFormat;
 import com.mobclick.android.MobclickAgent;
 import com.mobclick.android.UmengUpdateListener;
 
+import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+
 import com.ahutpt.lesson.R;
 import com.ahutpt.lesson.helper.ChangeLog;
 import com.ahutpt.lesson.lesson.LessonManager;
@@ -12,7 +17,6 @@ import com.ahutpt.lesson.time.Timetable;
 import com.ahutpt.lesson.view.Grid;
 import com.ahutpt.lesson.view.ScheduleView;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -23,15 +27,11 @@ import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
-public class MainActivity extends Activity{
+public class MainActivity extends SherlockActivity{
 	
 	private static ScheduleView scheduleView;
 	private Alert alert;
@@ -39,6 +39,7 @@ public class MainActivity extends Activity{
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		
 		alert = new Alert(MainActivity.this);
@@ -79,9 +80,7 @@ public class MainActivity extends Activity{
 		LinearLayout mainLayout = (LinearLayout) getLayoutInflater().inflate(
 				R.layout.main, null);
 		setContentView(mainLayout);
-		//日期信息
-		TextView tvDate = (TextView)findViewById(R.id.tvDate);
-		tvDate.setText(dateInfo());
+		
 		//绘制课表
 		scheduleView = new ScheduleView(MainActivity.this);
 		mainLayout.addView(scheduleView);
@@ -92,6 +91,10 @@ public class MainActivity extends Activity{
 	@Override
 	protected void onResume() {
 		super.onResume();
+		
+		//日期信息
+		getSupportActionBar().setSubtitle(dateInfo());
+		
 		alert.setAlarm();
 		MobclickAgent.onResume(this);
 	}
@@ -110,12 +113,14 @@ public class MainActivity extends Activity{
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("M月d日"); 
 		String  date  =  sDateFormat.format(new java.util.Date()); 
 		int numOfWeek = Timetable.getNumOfWeekSincePeriod();
-		return date + " " + Timetable.weekname[Timetable.getCurrentWeekDay()] + " " + "第" + String.valueOf(numOfWeek) + "周";
+		return date + " " + "第" + String.valueOf(numOfWeek) + "周" + " " + Timetable.weekname[Timetable.getCurrentWeekDay()];
 	}
+	
+	
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
+		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.main, menu);
 		return true;
 	}
@@ -146,7 +151,7 @@ public class MainActivity extends Activity{
 		menu.add(0, 1, 1, "删除");
 		super.onCreateContextMenu(menu, v, menuInfo);
 	}
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		switch(item.getItemId()){
 		case 0:
 			Intent i = new Intent(this,EditLessonActivity.class);

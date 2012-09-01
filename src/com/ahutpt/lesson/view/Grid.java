@@ -233,10 +233,13 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 
 		// »­¿Î³ÌÃû
-		if (busytime)
+		if (busytime){
 			paint.setColor(Color.WHITE);
-		else
+		}else if(lesson.hasHomework){
+			paint.setColor(Color.parseColor("#CE5600"));
+		}else{
 			paint.setColor(Color.BLACK);
+		}
 		
 		if (name.length() <= 2) {
 			canvas.drawText(name, textLeft, textTop, paint);

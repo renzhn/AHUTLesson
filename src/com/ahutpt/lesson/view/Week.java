@@ -27,6 +27,9 @@ public class Week extends ScheduleParent {
 
 		float left = borderMargin;
 		float top = borderMargin;
+		paint.setColor(Color.LTGRAY);
+		canvas.drawLine(0, top, canvas.getWidth(), top, paint);
+		
 		float everyWeekWidth = (view.getMeasuredWidth() - borderMargin * 2) / 7;
 		for (int i = 0; i < 7; i++) {
 			if (i == 5 || i == 6)

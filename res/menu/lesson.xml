@@ -4,11 +4,13 @@
     <item
         android:id="@+id/menu_edit_lesson"
         android:icon="@android:drawable/ic_menu_edit"
-        android:title="添加/编辑课程"></item>
+        android:title="添加/编辑课程"
+        android:showAsAction="ifRoom" ></item>
 
     <item
         android:id="@+id/menu_delete_lesson"
         android:icon="@android:drawable/ic_menu_delete"
-        android:title="删除课程"></item>
+        android:title="删除课程"
+        android:showAsAction="ifRoom" ></item>
 
 </menu>
