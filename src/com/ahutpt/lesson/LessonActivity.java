@@ -149,6 +149,14 @@ public class LessonActivity extends SherlockActivity {
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
 			tvTeacherName.setText(lesson.teacher);	
+			if(lesson.homework!= null && !lesson.homework.contentEquals("")){
+				tvHomework.setText(lesson.homework);
+			}
+			btnEditHomework.setVisibility(View.VISIBLE);
+			btnDeleteHomework.setVisibility(View.VISIBLE);
+		}else{
+			btnEditHomework.setVisibility(View.GONE);
+			btnDeleteHomework.setVisibility(View.GONE);
 		}
 	}
 	
