@@ -11,7 +11,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		super(context, name, cursorFactory, version);
 	}
 	
-	public static final int dbVersion = 2;//数据库版本
+	public static final int dbVersion = 3;//数据库版本
 	
 	public DatabaseHelper(Context baseContext, String name) {
 		super(baseContext,name,null,dbVersion);
@@ -20,7 +20,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		db.execSQL("CREATE TABLE lesson (_id INTEGER PRIMARY KEY AUTOINCREMENT, lessonname TEXT, lessonalias TEXT, teachername TEXT, lessonplace TEXT,homework TEXT, week INTEGER ,time INTEGER);");
+		db.execSQL("CREATE TABLE lesson (_id INTEGER PRIMARY KEY AUTOINCREMENT, lessonname TEXT, lessonalias TEXT, teachername TEXT, lessonplace TEXT, startweek INTEGER, endweek INTEGER, homework TEXT, week INTEGER ,time INTEGER);");
 	}
 
 	@Override
@@ -28,7 +28,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	    if (oldVersion == 1 && newVersion == 2) {
 	        db.execSQL("ALTER TABLE lesson ADD COLUMN homework TEXT");
 	    }
-
+	    if (oldVersion == 2 && newVersion == 3) {
+	        db.execSQL("ALTER TABLE lesson ADD COLUMN startweek INTEGER");
+	        db.execSQL("ALTER TABLE lesson ADD COLUMN endweek INTEGER");
+	    }
+	    if (oldVersion == 1 && newVersion == 3) {
+	    	db.execSQL("ALTER TABLE lesson ADD COLUMN homework TEXT");
+	        db.execSQL("ALTER TABLE lesson ADD COLUMN startweek INTEGER");
+	        db.execSQL("ALTER TABLE lesson ADD COLUMN endweek INTEGER");
+	    }
 	}
 
 }

@@ -10,10 +10,10 @@ public class Lesson {
 	private Context context;
 	public String name,alias,place,teacher;
 	public String homework = "";
-	public int week,time;
+	public int week,time,startweek,endweek;
 	public boolean exist,hasHomework = false;
 
-	public Lesson(String name0, String alias0, String place0, String teacher0,String homework0, 
+	public Lesson(String name0, String alias0, String place0, String teacher0,int startweek0, int endweek0, String homework0, 
 			int week0, int time0, Context context0) {
 		context = context0;
 		name = name0;
@@ -22,6 +22,8 @@ public class Lesson {
 			alias = name;
 		place = place0;
 		teacher = teacher0;
+		startweek = startweek0;
+		endweek = endweek0;
 		homework = homework0;
 		if(homework != null && !homework.contentEquals("")) hasHomework = true;
 		week = week0;

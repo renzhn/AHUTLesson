@@ -2,13 +2,11 @@ package com.ahutpt.lesson.view;
 
 import java.io.Serializable;
 
-import com.ahutpt.lesson.LessonActivity;
 import com.ahutpt.lesson.lesson.Lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -313,14 +311,6 @@ public class Grid extends ScheduleParent implements Serializable {
 			}
 		}
 		return true;
-	}
-
-	public void openLessonDetail() {
-		// 打开课程详情
-		Intent i = new Intent(context, LessonActivity.class);
-		i.putExtra("week", markWeek);
-		i.putExtra("time", markTime);
-		context.startActivity(i);
 	}
 	
 	public void markLesson(float x, float y) {

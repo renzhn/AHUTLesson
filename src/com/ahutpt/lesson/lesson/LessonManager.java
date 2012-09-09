@@ -31,9 +31,9 @@ public class LessonManager {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		
 		String name,alias,place,teacher,homework;
-		int week,time;
+		int week,time,startweek,endweek;
 		
-		String[] cols = {"lessonname","lessonalias","lessonplace","teachername","homework","week","time"};
+		String[] cols = {"lessonname","lessonalias","lessonplace","teachername","startweek","endweek","homework","week","time"};
 		Cursor lessoninfo = db.query("lesson", cols, null, null, null, null, null);
 		if(lessoninfo.getCount()==0){
 			lessoninfo.close();
@@ -46,10 +46,12 @@ public class LessonManager {
 			alias = lessoninfo.getString(1);
 			place = lessoninfo.getString(2);
 			teacher = lessoninfo.getString(3);
-			homework = lessoninfo.getString(4);
-			week = lessoninfo.getInt(5);
-			time = lessoninfo.getInt(6);
-			lessons[week][time] = new Lesson(name,alias,place,teacher,homework,week,time,context);
+			startweek = lessoninfo.getInt(4);
+			endweek = lessoninfo.getInt(5);
+			homework = lessoninfo.getString(6);
+			week = lessoninfo.getInt(7);
+			time = lessoninfo.getInt(8);
+			lessons[week][time] = new Lesson(name,alias,place,teacher,startweek,endweek,homework,week,time,context);
 		}while(lessoninfo.moveToNext());
 		lessoninfo.close();
 		db.close();
@@ -72,6 +74,7 @@ public class LessonManager {
 	}
 	
 	public static boolean updateDB(String JSONDATA) {
+		if(JSONDATA.contentEquals(""))return false;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
 		try {
@@ -89,12 +92,16 @@ public class LessonManager {
 					String teacherName = lesson.getString("teachername");
 					int week = lesson.getInt("week");
 					int time = lesson.getInt("time");
+					int startweek = lesson.getInt("startweek");
+					int endweek = lesson.getInt("endweek");
 					String lessonPlace = lesson.getString("place");
 					ContentValues cv = new ContentValues();
 					cv.put("lessonname", lessonName);
 					cv.put("lessonalias", lessonAlias);
 					cv.put("teachername", teacherName);
 					cv.put("lessonplace", lessonPlace);
+					cv.put("startweek", startweek);
+					cv.put("endweek", endweek);
 					cv.put("week", week);
 					cv.put("time", time);
 					db.insert("lesson", null, cv);
@@ -115,7 +122,7 @@ public class LessonManager {
 		}
 	}
 	
-	public static void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int week,int time){
+	public static void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int startWeek,int endWeek,int week,int time){
 		if(DBHelper==null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		if(lessonName.contentEquals(""))
@@ -130,6 +137,8 @@ public class LessonManager {
 			cv.put("lessonname", lessonName);
 			cv.put("lessonalias", lessonAlias);
 			cv.put("lessonplace", lessonPlace);
+			cv.put("startweek", startWeek);
+			cv.put("endweek", endWeek);
 			cv.put("teachername", teacherName);
 			db.insert("lesson", null, cv);
 		}else{
@@ -137,6 +146,8 @@ public class LessonManager {
 			cv.put("lessonname", lessonName);
 			cv.put("lessonalias", lessonAlias);
 			cv.put("lessonplace", lessonPlace);
+			cv.put("startweek", startWeek);
+			cv.put("endweek", endWeek);
 			cv.put("teachername", teacherName);
 			db.update("lesson", cv, "week=" + String.valueOf(week) + " AND time=" + String.valueOf(time), null);
 		}

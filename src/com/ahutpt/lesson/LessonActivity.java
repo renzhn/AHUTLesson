@@ -22,7 +22,7 @@ import android.widget.TextView;
 public class LessonActivity extends SherlockActivity {
 	private int week,time;
 	private Lesson lesson;
-	private TextView tvLessonName,tvLessonPlace,tvTeacherName,tvHomework,tvLessonTime,tvCurrentTime;
+	private TextView tvLessonName,tvLessonPlace,tvTeacherName,tvLessonWeek,tvHomework,tvLessonTime,tvCurrentTime;
 	private Button btnEditHomework,btnDeleteHomework;
 	
 	@Override
@@ -47,6 +47,7 @@ public class LessonActivity extends SherlockActivity {
 		tvLessonName = (TextView)findViewById(R.id.tvLessonName);
 		tvLessonPlace = (TextView)findViewById(R.id.tvLessonPlace);
 		tvTeacherName = (TextView)findViewById(R.id.tvTeacherName);
+		tvLessonWeek = (TextView)findViewById(R.id.tvLessonWeek);
 		tvHomework = (TextView)findViewById(R.id.tvHomework);
 		tvLessonTime = (TextView)findViewById(R.id.tvLessonTime);
 		
@@ -65,23 +66,9 @@ public class LessonActivity extends SherlockActivity {
 		btnDeleteHomework.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				// TODO Auto-generated method stub
 				deleteHomework();
 			}
 		});
-		
-		lesson = LessonManager.getLessonAt(week, time, this);
-		if(lesson != null){
-			tvLessonName.setText(lesson.name);
-			tvLessonPlace.setText(lesson.place);
-			tvTeacherName.setText(lesson.teacher);	
-			if(lesson.homework!= null && !lesson.homework.contentEquals("")){
-				tvHomework.setText(lesson.homework);
-			}
-		}else{
-			btnEditHomework.setVisibility(View.GONE);
-			btnDeleteHomework.setVisibility(View.GONE);
-		}
 		
 		tvLessonTime.setText(Timetable.begintime[time] + " ~ " +Timetable.endtime[time]);
 	}
@@ -139,16 +126,12 @@ public class LessonActivity extends SherlockActivity {
 
 		MobclickAgent.onResume(this);
 		
-		tvLessonName = (TextView)findViewById(R.id.tvLessonName);
-		tvLessonPlace = (TextView)findViewById(R.id.tvLessonPlace);
-		tvTeacherName = (TextView)findViewById(R.id.tvTeacherName);
-		tvLessonTime = (TextView)findViewById(R.id.tvLessonTime);
-		
 		lesson = LessonManager.getLessonAt(week, time, this);
 		if(lesson != null){
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
-			tvTeacherName.setText(lesson.teacher);	
+			tvLessonWeek.setText("µÚ" + lesson.startweek + "~" + lesson.endweek + "ÖÜ");
+			tvTeacherName.setText(lesson.teacher);
 			if(lesson.homework!= null && !lesson.homework.contentEquals("")){
 				tvHomework.setText(lesson.homework);
 			}

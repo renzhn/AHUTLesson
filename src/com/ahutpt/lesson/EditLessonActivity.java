@@ -17,9 +17,9 @@ import android.widget.EditText;
 public class EditLessonActivity extends SherlockActivity {
 	
 	Lesson lesson,prevLesson;
-	int week,time;
+	int week,time,startWeek,endWeek;
 	String lessonName,lessonAlias,lessonPlace,teacherName;
-	EditText etLessonName,etLessonAlias,etLessonPlace,etTeacherName;
+	EditText etLessonName,etLessonAlias,etLessonPlace,etTeacherName,etStartWeek,etEndWeek;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -46,7 +46,7 @@ public class EditLessonActivity extends SherlockActivity {
 				.setMessage("这节课的前两节有课，\n是否延续前两节课？")
 				.setPositiveButton("确定", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {
-						LessonManager.addOrEdit(prevLesson.name, "", prevLesson.place, prevLesson.teacher, week, time);
+						LessonManager.addOrEdit(prevLesson.name, "", prevLesson.place, prevLesson.teacher, prevLesson.startweek, prevLesson.endweek, week, time);
 						EditLessonActivity.this.finish();
 					}
 				}).setNegativeButton("取消", null).show();
@@ -59,6 +59,8 @@ public class EditLessonActivity extends SherlockActivity {
 		etLessonAlias = (EditText)findViewById(R.id.etLessonAlias);
 		etLessonPlace = (EditText)findViewById(R.id.etLessonPlace);
 		etTeacherName = (EditText)findViewById(R.id.etTeacherName);
+		etStartWeek = (EditText)findViewById(R.id.etStartWeek);
+		etEndWeek = (EditText)findViewById(R.id.etEndWeek);
 		
 		lesson = LessonManager.getLessonAt(week, time, this);
 		if(lesson != null){
@@ -66,6 +68,8 @@ public class EditLessonActivity extends SherlockActivity {
 			etLessonAlias.setText(lesson.alias);
 			etLessonPlace.setText(lesson.place);
 			etTeacherName.setText(lesson.teacher);	
+			etStartWeek.setText(String.valueOf(lesson.startweek));
+			etEndWeek.setText(String.valueOf(lesson.endweek));
 		}
 		
 		Button submit = (Button) findViewById(R.id.btnSubmitLesson);
@@ -95,7 +99,9 @@ public class EditLessonActivity extends SherlockActivity {
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
 		teacherName = etTeacherName.getText().toString();
-		LessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace, teacherName, week, time);
+		startWeek = Integer.valueOf(etStartWeek.getText().toString());
+		endWeek = Integer.valueOf(etEndWeek.getText().toString());
+		LessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace, teacherName, startWeek, endWeek, week, time);
 		MobclickAgent.onEvent(this, "add_lesson", lessonName + " : " + lessonPlace + " : " + teacherName);
 	}
 

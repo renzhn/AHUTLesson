@@ -11,7 +11,6 @@ import com.actionbarsherlock.view.MenuItem;
 
 import com.ahutpt.lesson.R;
 import com.ahutpt.lesson.helper.ChangeLog;
-import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Alert;
 import com.ahutpt.lesson.time.Timetable;
 import com.ahutpt.lesson.view.Grid;
@@ -26,9 +25,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.ContextMenu;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.LinearLayout;
 
 public class MainActivity extends SherlockActivity{
@@ -84,10 +81,22 @@ public class MainActivity extends SherlockActivity{
 		//绘制课表
 		scheduleView = new ScheduleView(MainActivity.this);
 		mainLayout.addView(scheduleView);
-		scheduleView.setLongClickable(true);
-		registerForContextMenu(scheduleView);
+		scheduleView.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				openLessonDetail();
+			}
+		});
 	}
-	
+
+	public void openLessonDetail() {
+		// 打开课程详情
+		Intent i = new Intent(this, LessonActivity.class);
+		i.putExtra("week", Grid.markWeek);
+		i.putExtra("time", Grid.markTime);
+		this.startActivity(i);
+	}
 	@Override
 	protected void onResume() {
 		super.onResume();
@@ -144,30 +153,6 @@ public class MainActivity extends SherlockActivity{
 		}
 	}
 
-	//长按菜单
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		menu.add(0, 0, 0, "添加/编辑");
-		menu.add(0, 1, 1, "删除");
-		super.onCreateContextMenu(menu, v, menuInfo);
-	}
-	public boolean onContextItemSelected(android.view.MenuItem item) {
-		switch(item.getItemId()){
-		case 0:
-			Intent i = new Intent(this,EditLessonActivity.class);
-			i.putExtra("week", Grid.markWeek);
-			i.putExtra("time", Grid.markTime);
-			startActivity(i);
-		break;
-		case 1:
-			if(!LessonManager.loaded)
-				new LessonManager(this);
-			LessonManager.deleteLessonAt(Grid.markWeek, Grid.markTime);
-			refresh();
-		break;
-		}
-		return super.onContextItemSelected(item);
-	}
 	
 	private void openHelpDialog() {
 		new AlertDialog.Builder(this)
