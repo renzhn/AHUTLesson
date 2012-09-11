@@ -25,7 +25,6 @@ public class Alert {
 			new LessonManager(context);
 		if(!Timetable.loaded)
 			new Timetable(context);
-		Timetable.initTime();
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
 		enableSilent = preferences.getBoolean("SilentMode", true);

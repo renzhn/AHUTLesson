@@ -25,6 +25,7 @@ public class Timetable {
 	public static int year,month,dayOfMonth,dayOfYear,weekDay;
 	public static int begintimemin[] = new int[5];
 	public static int endtimemin[] = new int[5];
+	public static int numOfWeek = -1;
 	public static String[] weekname = new String[7],lessontime_name = new String[5];
 	private static Editor edit;
 	private static final boolean DEBUG = false;
@@ -37,8 +38,8 @@ public class Timetable {
 		weekname = context.getResources().getStringArray(R.array.week_name);
 		lessontime_name = context.getResources()
 				.getStringArray(R.array.lessontime_name);
-		initTime();
 		loadData();
+		initTime();
 		loaded = true;
 	}
 	
@@ -78,6 +79,7 @@ public class Timetable {
 		dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
 		dayOfYear = cal.get(Calendar.DAY_OF_YEAR);
 		weekDay = getCurrentWeekDay();
+		numOfWeek = getNumOfWeekSincePeriod();
 	}
 	
 	public static void loadLesson(){
@@ -118,6 +120,9 @@ public class Timetable {
 
 	public static int getYearOfCurrentPeriod() {
 		// 计算当前学期的开学年份
+		cal = Calendar.getInstance();
+		year = cal.get(Calendar.YEAR);
+		month = cal.get(Calendar.MONTH);
 		if(month >= 1 && month <= 2){
 			return year - 1;
 		}else{
@@ -243,7 +248,7 @@ public class Timetable {
 		return LessonManager.getLessonAt(weekDay, getCurrentTimeBlock(advanceMode), context);
 	}
 
-	public long getCurrentLessonEndTime(int time, int advanceMode) {
+	public static long getCurrentLessonEndTime(int time, int advanceMode) {
 		// 当前时间的课结束时间
 		Calendar c = Calendar.getInstance();
 		String t = endtime[time];
@@ -260,12 +265,11 @@ public class Timetable {
 	public static Lesson getNextLesson(int advanceMode) {
 		int week;
 		int time = getNextTimeBlock(advanceMode);
-		loadLesson();
 		Lesson lesson;
 		for(week = getCurrentWeekDay();week < 7; week++){
 			while(time < 5){
 				lesson =  LessonManager.getLessonAt(week, time, context);
-				if(lesson != null&&lesson.isNowHaving()==-1&&!lesson.isAppended())
+				if(lesson != null && lesson.isInRange && lesson.isNowHaving()==-1 && !lesson.isAppended())
 					return lesson;
 				time++;
 			}

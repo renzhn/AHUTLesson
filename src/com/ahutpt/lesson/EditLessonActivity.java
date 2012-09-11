@@ -99,8 +99,20 @@ public class EditLessonActivity extends SherlockActivity {
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
 		teacherName = etTeacherName.getText().toString();
-		startWeek = Integer.valueOf(etStartWeek.getText().toString());
-		endWeek = Integer.valueOf(etEndWeek.getText().toString());
+		String startWeekText = etStartWeek.getText().toString();
+		String endWeekText = etEndWeek.getText().toString();
+		if(startWeekText.contentEquals("")){
+			startWeek = 1;
+		}else{
+			startWeek = Integer.valueOf(startWeekText);
+		}
+		
+		if(endWeekText.contentEquals("")){
+			endWeek = startWeek + 1;
+		}else{
+			endWeek = Integer.valueOf(endWeekText);
+		}
+		
 		LessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace, teacherName, startWeek, endWeek, week, time);
 		MobclickAgent.onEvent(this, "add_lesson", lessonName + " : " + lessonPlace + " : " + teacherName);
 	}

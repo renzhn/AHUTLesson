@@ -75,8 +75,6 @@ public class Grid extends ScheduleParent implements Serializable {
 		if(!Timetable.loaded)
 			new Timetable(context);
 		
-		Timetable.initTime();
-		
 		//课程名和地点
 		paint.setAntiAlias(true);
 		for(Lesson[] lessonsOfDay:LessonManager.lessons){
@@ -84,11 +82,11 @@ public class Grid extends ScheduleParent implements Serializable {
 				for(Lesson lesson:lessonsOfDay){
 					if(lesson!=null){
 						if(lesson.canAppend()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
-							drawLesson(lesson, true, lesson.appendMode());
+							drawLesson(lesson, true);
 						}else if(lesson.isAppended()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
 							//四节课的课间且是后两节课，不用画了
 						}else{
-							drawLesson(lesson, lesson.isNowHaving()==0?true:false, lesson.appendMode());
+							drawLesson(lesson, lesson.isNowHaving()==0?true:false);
 						}
 					}
 				}
@@ -195,12 +193,12 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 	}
 
-	private void drawLesson(Lesson lesson,boolean busytime,
-			int appendMode) {
+	private void drawLesson(Lesson lesson,boolean busytime) {
 		// 一般课程
 		if(lesson == null) return;
 		paint.setTextSize(lessonNameSize);
 		int week,time;
+		int appendMode = lesson.appendMode();
 		week = lesson.week;
 		time = lesson.time;
 		String name, place;
@@ -235,6 +233,8 @@ public class Grid extends ScheduleParent implements Serializable {
 			paint.setColor(Color.WHITE);
 		}else if(lesson.hasHomework){
 			paint.setColor(Color.parseColor("#CE5600"));
+		}else if(!lesson.isInRange){
+			paint.setColor(Color.parseColor("#999999"));
 		}else{
 			paint.setColor(Color.BLACK);
 		}
@@ -252,10 +252,13 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 		// 画地点
 		paint.setTextSize(lessonPlaceSize);
-		if (busytime)
+		if (busytime){
 			paint.setColor(Color.WHITE);
-		else
+		}else if(!lesson.isInRange){
+			paint.setColor(Color.parseColor("#999999"));
+		}else{
 			paint.setColor(Color.parseColor("#B22222"));
+		}
 
 		switch(appendMode){
 		case 0:

@@ -6,12 +6,11 @@ import android.content.Context;
 
 public class Lesson {
 
-	private static Timetable timetable;
 	private Context context;
 	public String name,alias,place,teacher;
 	public String homework = "";
 	public int week,time,startweek,endweek;
-	public boolean exist,hasHomework = false;
+	public boolean isInRange = true,hasHomework = false;
 
 	public Lesson(String name0, String alias0, String place0, String teacher0,int startweek0, int endweek0, String homework0, 
 			int week0, int time0, Context context0) {
@@ -28,13 +27,16 @@ public class Lesson {
 		if(homework != null && !homework.contentEquals("")) hasHomework = true;
 		week = week0;
 		time = time0;
-		exist = true;
+		
+		if(!Timetable.loaded){
+			new Timetable(context);
+		}
+		if(Timetable.numOfWeek < startweek || Timetable.numOfWeek > endweek){
+			isInRange = false;
+		}
 	}
 
 	public void loadTime(){
-		if(timetable==null){
-			timetable = new Timetable(context);
-		}
 		if(!Timetable.loaded)
 			new Timetable(context);
 	}
@@ -42,9 +44,9 @@ public class Lesson {
 	public long getCurrentLessonEndTime(int advanceMode) {
 		loadTime();
 		if(canAppend()){
-			return timetable.getCurrentLessonEndTime(time + 1, advanceMode);
+			return Timetable.getCurrentLessonEndTime(time + 1, advanceMode);
 		}else{
-			return timetable.getCurrentLessonEndTime(time, advanceMode);	
+			return Timetable.getCurrentLessonEndTime(time, advanceMode);	
 		}
 	}
 	
@@ -60,15 +62,12 @@ public class Lesson {
 	}
 
 	public int isNowHaving() {
-		// -1还没上，0正在上，1上过了, 2不存在
-		if (!exist)
-			return 2;
+		// -1还没上，0正在上，1上过了
 		return Timetable.isNowHavingLesson(week, time);
 	}
 
 	public void delete() {
 		LessonManager.deleteLessonAt(week, time);
-		exist = false;
 	}
 
 	public String toString() {

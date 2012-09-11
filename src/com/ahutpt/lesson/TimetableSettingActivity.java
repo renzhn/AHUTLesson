@@ -67,6 +67,8 @@ public class TimetableSettingActivity extends SherlockActivity {
 		Timetable.setEndTime(3, etEnd3.getText().toString());
 		Timetable.setEndTime(4, etEnd4.getText().toString());
 		Timetable.loadData();
+		Timetable.initTime();
+		new LessonManager(this);
 	}
 
 	private void initView() {
