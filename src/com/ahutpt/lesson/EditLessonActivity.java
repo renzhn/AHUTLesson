@@ -95,6 +95,9 @@ public class EditLessonActivity extends SherlockActivity {
     }
 	
 	protected void addOrEditLesson() {
+		if(!Timetable.loaded){
+			new Timetable(this );
+		}
 		lessonName = etLessonName.getText().toString();
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
@@ -102,7 +105,7 @@ public class EditLessonActivity extends SherlockActivity {
 		String startWeekText = etStartWeek.getText().toString();
 		String endWeekText = etEndWeek.getText().toString();
 		if(startWeekText.contentEquals("")){
-			startWeek = 1;
+			startWeek = Timetable.numOfWeek;
 		}else{
 			startWeek = Integer.valueOf(startWeekText);
 		}

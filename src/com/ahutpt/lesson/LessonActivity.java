@@ -92,6 +92,7 @@ public class LessonActivity extends SherlockActivity {
 			if(!value.contentEquals("")){
 				lesson.homework = value;
 				lesson.hasHomework = true;
+				LessonManager.editHomework(week, time, lesson.homework);
 				tvHomework.setText(lesson.homework);
 			}
 		  }
@@ -99,7 +100,6 @@ public class LessonActivity extends SherlockActivity {
 
 		alert.setNegativeButton("È¡Ïû", null);
 		alert.show();
-		LessonManager.editHomework(week, time, lesson.homework);
 	}
 
 	protected void deleteHomework() {
