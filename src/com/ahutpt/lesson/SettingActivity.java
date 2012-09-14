@@ -3,6 +3,7 @@ package com.ahutpt.lesson;
 import com.ahutpt.lesson.helper.ChangeLog;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
+import com.actionbarsherlock.view.MenuItem;
 
 import android.app.AlertDialog;
 import android.content.Intent;
@@ -96,12 +97,25 @@ public class SettingActivity extends SherlockPreferenceActivity {
 		});
 		
 	}
-	
+
 	public void share() {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
 		intent.putExtra(Intent.EXTRA_TEXT, "我在用安工大课程助手，挺不错的，下载地址：http://dev1994.com/ahut/app/lesson");
 		startActivity(Intent.createChooser(intent, "分享到"));
+	}
+	
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			Intent intent = new Intent(this, MainActivity.class);
+			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+			startActivity(intent);
+			return (true);
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 }

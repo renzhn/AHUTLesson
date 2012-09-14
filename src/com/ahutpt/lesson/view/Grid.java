@@ -111,7 +111,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		
 		Lesson lesson = LessonManager.getLessonAt(Timetable.weekDay,
 				Timetable.getCurrentTimeBlock(Timetable.DelayDefault), context);
-		if(lesson!=null) {
+		if(lesson!=null && lesson.isInRange) {
 			drawBackground(lesson.week, lesson.time, BUSYTIME, lesson.appendMode());
 		}else{
 			int curTimeBlock = Timetable.getCurrentTimeBlock(Timetable.DelayDefault);
@@ -230,7 +230,11 @@ public class Grid extends ScheduleParent implements Serializable {
 
 		// 画课程名
 		if (busytime){
-			paint.setColor(Color.WHITE);
+			if(lesson.isInRange){
+				paint.setColor(Color.WHITE);
+			}else{
+				paint.setColor(Color.TRANSPARENT);
+			}
 		}else if(lesson.hasHomework){
 			paint.setColor(Color.parseColor("#CE5600"));
 		}else if(!lesson.isInRange){
@@ -253,7 +257,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		// 画地点
 		paint.setTextSize(lessonPlaceSize);
 		if (busytime){
-			paint.setColor(Color.WHITE);
+			if(lesson.isInRange){
+				paint.setColor(Color.WHITE);
+			}else{
+				paint.setColor(Color.TRANSPARENT);
+			}
 		}else if(!lesson.isInRange){
 			paint.setColor(Color.parseColor("#999999"));
 		}else{

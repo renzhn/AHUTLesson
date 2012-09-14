@@ -54,6 +54,7 @@ public class EditLessonActivity extends SherlockActivity {
 		}
 		
 		getSupportActionBar().setTitle(Timetable.weekname[week] + Timetable.lessontime_name[time]);
+		getSupportActionBar().setHomeButtonEnabled(false);
 		
 		etLessonName = (EditText)findViewById(R.id.etLessonName);
 		etLessonAlias = (EditText)findViewById(R.id.etLessonAlias);

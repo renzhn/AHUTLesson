@@ -26,6 +26,7 @@ public class TimetableSettingActivity extends SherlockActivity {
 		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.timetable);
+		getSupportActionBar().setHomeButtonEnabled(false);
 		if(!Timetable.loaded)
 			new Timetable(this);
 		if(!LessonManager.loaded)

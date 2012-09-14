@@ -41,6 +41,12 @@ public class AlarmAlertActivity extends Activity {
 			this.finish();
 		}
 		
+		int curTimeBlock = Timetable.getCurrentTimeBlock(Timetable.DelayDefault);
+		if(curTimeBlock != -1 && LessonManager.lessons[lesson.week][curTimeBlock] != null){
+			this.finish();//如果现在正在上课则不提醒
+			return;
+		}
+		
 		playMusic();
 		
 		String alertMessage = preferences.getString("MessageWhenNotice", "{TIME}有{LESSON}课，该上课了！！");

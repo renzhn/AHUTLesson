@@ -46,20 +46,21 @@ public class MainActivity extends SherlockActivity {
 
 		ChangeLog cl = new ChangeLog(this);
 		if (cl.firstRun()) {
-			new AlertDialog.Builder(this)
-					.setTitle("在线下载课表")
-					.setMessage("是否进入课表下载页面？")
-					.setPositiveButton("确定",
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int which) {
-									Intent i = new Intent(MainActivity.this,
-											ManageDBActivity.class);
-									startActivity(i);
-								}
-							}).setNegativeButton("取消", null).show();
-
 			cl.getLogDialog().show();
+		}
+		if (cl.firstRunEver()) {
+			new AlertDialog.Builder(this)
+			.setTitle("在线下载课表")
+			.setMessage("是否进入课表下载页面？")
+			.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int which) {
+							Intent i = new Intent(MainActivity.this,
+									ManageDBActivity.class);
+							startActivity(i);
+						}
+					}).setNegativeButton("取消", null).show();
 		}
 
 		SharedPreferences preferences = PreferenceManager
@@ -112,7 +113,7 @@ public class MainActivity extends SherlockActivity {
 		super.onResume();
 		// 日期信息
 		getSupportActionBar().setSubtitle(dateInfo());
-		
+
 		alert.setAlarm();
 		MobclickAgent.onResume(this);
 	}
@@ -132,11 +133,11 @@ public class MainActivity extends SherlockActivity {
 		SimpleDateFormat sDateFormat = new SimpleDateFormat("M月d日");
 		String date = sDateFormat.format(new java.util.Date());
 
-		if(Timetable.numOfWeek == -1){
+		if (Timetable.numOfWeek == -1) {
 			new Timetable(this);
 		}
-		return date + " " + "第" + String.valueOf(Timetable.numOfWeek) + "周" + " "
-				+ Timetable.weekname[Timetable.getCurrentWeekDay()];
+		return date + " " + "第" + String.valueOf(Timetable.numOfWeek) + "周"
+				+ " " + Timetable.weekname[Timetable.getCurrentWeekDay()];
 	}
 
 	@Override
