@@ -41,7 +41,7 @@ public class MainActivity extends SherlockActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
-
+		getSupportActionBar().setHomeButtonEnabled(false);
 		alert = new Alert(MainActivity.this);
 
 		ChangeLog cl = new ChangeLog(this);
@@ -113,7 +113,7 @@ public class MainActivity extends SherlockActivity {
 		super.onResume();
 		// 日期信息
 		getSupportActionBar().setSubtitle(dateInfo());
-
+		scheduleView.invalidate();
 		alert.setAlarm();
 		MobclickAgent.onResume(this);
 	}

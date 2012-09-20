@@ -243,6 +243,10 @@ public class Grid extends ScheduleParent implements Serializable {
 			paint.setColor(Color.BLACK);
 		}
 		
+		if(appendMode == -1){
+			paint.setColor(Color.TRANSPARENT);//后两节课不画
+		}
+		
 		if (name.length() <= 2) {
 			canvas.drawText(name, textLeft, textTop, paint);
 		} else if (name.length() <= 4) {
@@ -268,6 +272,10 @@ public class Grid extends ScheduleParent implements Serializable {
 			paint.setColor(Color.parseColor("#B22222"));
 		}
 
+		if(appendMode == -1){
+			paint.setColor(Color.TRANSPARENT);//后两节课不画
+		}
+		
 		switch(appendMode){
 		case 0:
 			textTop = top + cellHeight * (time + 1) - cellHeight / 5;
