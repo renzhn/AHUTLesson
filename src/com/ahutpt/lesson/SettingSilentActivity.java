@@ -9,6 +9,7 @@ public class SettingSilentActivity extends SherlockPreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
+		
 		getSupportActionBar().setHomeButtonEnabled(false);
 		addPreferencesFromResource(R.xml.setting_silent);
 	}

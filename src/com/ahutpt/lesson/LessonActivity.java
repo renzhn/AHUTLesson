@@ -3,7 +3,7 @@ package com.ahutpt.lesson;
 import com.ahutpt.lesson.lesson.Lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
-import com.mobclick.android.MobclickAgent;
+import com.umeng.analytics.MobclickAgent;
 
 import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
@@ -29,7 +29,9 @@ public class LessonActivity extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
+		
 		if (!Timetable.loaded)
 			new Timetable(this);
 		if (!LessonManager.loaded)
@@ -167,10 +169,8 @@ public class LessonActivity extends SherlockActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			Intent intent = new Intent(this, MainActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
-			return (true);
+			finish();
+			return true;
 		default:
 			return super.onOptionsItemSelected(item);
 		}
@@ -185,6 +185,7 @@ public class LessonActivity extends SherlockActivity {
 			startActivity(i);
 			return true;
 		case R.id.menu_delete_lesson:
+			if(lesson == null) break;
 			new AlertDialog.Builder(LessonActivity.this)
 					.setTitle("删除课程")
 					.setMessage("确定删除本课程？")
@@ -209,6 +210,7 @@ public class LessonActivity extends SherlockActivity {
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
+		return false;
 	}
 
 }

@@ -3,14 +3,17 @@ package com.ahutpt.lesson;
 import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 
+import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
@@ -21,12 +24,17 @@ public class TimetableSettingActivity extends SherlockActivity {
 	private EditText etBeginDate_year,etBeginDate_month,etBeginDate_day;
 	private EditText etBegin0,etBegin1,etBegin2,etBegin3,etBegin4;
 	private EditText etEnd0,etEnd1,etEnd2,etEnd3,etEnd4;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
+		final ActionBar actionBar = getSupportActionBar();
+		actionBar.setTitle("时间表设置");
+		actionBar.setHomeButtonEnabled(true);
+		actionBar.setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
+		
 		setContentView(R.layout.timetable);
-		getSupportActionBar().setHomeButtonEnabled(false);
 		if(!Timetable.loaded)
 			new Timetable(this);
 		if(!LessonManager.loaded)
@@ -39,17 +47,35 @@ public class TimetableSettingActivity extends SherlockActivity {
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(new SpinnerSelectedListener()); 
-		Button btnSubmit = (Button)findViewById(R.id.btnSubmitTimeTable);
-        btnSubmit.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View arg0) {
-				submitTimeTable();
-				TimetableSettingActivity.this.finish();
-			}
-		});
         if(etBegin0.getText().toString().contentEquals(""))
         		formatTimeTable(1);
 
-		getSupportActionBar().setTitle("时间表设置");
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		MenuInflater inflater = getSupportMenuInflater();
+		inflater.inflate(R.menu.edit, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		case R.id.memu_edit_ok:
+			submitTimeTable();
+			TimetableSettingActivity.this.finish();
+			finish();
+			return true;
+		case R.id.menu_edit_cancel:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 	
 	protected void submitTimeTable() {

@@ -45,10 +45,15 @@ public class Timetable {
 	
 	public static void loadData() {
 		// 载入/刷新数据
-		
+
 		beginDate_year = preferences.getInt("begin_date_year", getYearOfCurrentPeriod());
-		beginDate_month = preferences.getInt("begin_date_month", 8);//important! 从0开始 实际9月
-		beginDate_day = preferences.getInt("begin_date_day", 2);
+		if(formerPeriodOfYear()){
+			beginDate_month = preferences.getInt("begin_date_month", 8);//important! 从0开始 实际9月
+			beginDate_day = preferences.getInt("begin_date_day", 3);
+		}else{
+			beginDate_month = preferences.getInt("begin_date_month", 1);//important! 从0开始 实际9月
+			beginDate_day = preferences.getInt("begin_date_day", 27);
+		}
 		
 		begintime[0] = preferences.getString("time_begin0", "08:00");
 		begintime[1] = preferences.getString("time_begin1", "10:00");
@@ -92,7 +97,7 @@ public class Timetable {
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);
 		int passDays = calcPassDays(beginCal);
-		if(passDays>0)
+		if(passDays > 0 && passDays <= 140)
 			return passDays / 7 +1;
 		else
 			return 0;
@@ -117,13 +122,17 @@ public class Timetable {
 		else
 			return 366;
 	}
-
-	public static int getYearOfCurrentPeriod() {
-		// 计算当前学期的开学年份
+	public static boolean formerPeriodOfYear(){
+		//true summer
+		//false spring
 		cal = Calendar.getInstance();
 		year = cal.get(Calendar.YEAR);
 		month = cal.get(Calendar.MONTH);
-		if(month >= 1 && month <= 2){
+		return ((month >= 0 && month <= 1) || (month >= 8))? true : false;
+	}
+	public static int getYearOfCurrentPeriod() {
+		// 计算当前学期的开学年份
+		if(formerPeriodOfYear()){
 			return year - 1;
 		}else{
 			return year;
@@ -225,6 +234,7 @@ public class Timetable {
 			edit.putInt("begin_date_year", beginYear);
 			edit.commit();
 		}
+		beginDate_year = beginYear;
 	}
 	public static void setBeginDate_month(int beginMonth){
 		if(beginMonth>=1 && beginMonth<=12){
@@ -233,6 +243,7 @@ public class Timetable {
 			edit.putInt("begin_date_month", beginMonth - 1);
 			edit.commit();
 		}
+		beginDate_month = beginMonth - 1;
 	}
 	public static void setBeginDate_day(int beginDay){
 		if(beginDay>=1 && beginDay<=31){
@@ -241,6 +252,7 @@ public class Timetable {
 			edit.putInt("begin_date_day", beginDay);
 			edit.commit();
 		}
+		beginDate_day = beginDay;
 	}
 	
 	public Lesson getCurrentLesson(int advanceMode) {

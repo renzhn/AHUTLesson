@@ -2,20 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <item
-        android:id="@+id/menu_setting"
-        android:icon="@android:drawable/ic_menu_preferences"
-        android:title="设置"
-        android:showAsAction="ifRoom" ></item>>
+        android:id="@+id/menu_timetableviewer"
+        android:title="课表浏览器"></item>>
     
-    <item
-        android:id="@+id/menu_help"
-        android:icon="@android:drawable/ic_menu_help"
-        android:title="帮助"
-        android:showAsAction="ifRoom" ></item>
-         
      <item
         android:id="@+id/menu_exit"
-        android:icon="@android:drawable/ic_menu_close_clear_cancel"
         android:title="退出"></item>
 
 </menu>

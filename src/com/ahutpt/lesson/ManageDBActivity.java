@@ -1,6 +1,7 @@
 package com.ahutpt.lesson;
 
 import com.ahutpt.lesson.network.NetworkHelper;
+import com.ahutpt.lesson.utils.ValidateHelper;
 import com.ahutpt.lesson.lesson.LessonManager;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
@@ -23,6 +24,7 @@ public class ManageDBActivity extends SherlockPreferenceActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
 		super.onCreate(savedInstanceState);
+		
 		addPreferencesFromResource(R.xml.setting_db);
 		
 		if(!LessonManager.loaded){
@@ -69,6 +71,10 @@ public class ManageDBActivity extends SherlockPreferenceActivity {
 		if(xh.contentEquals("")){
 			alert("请先设置学号");
 			return;
+		}		
+		if(!ValidateHelper.isXH(xh)){
+			alert("学号无效");
+			return;
 		}
 		new UpdateAsync().execute(xh);
 	}
@@ -92,12 +98,21 @@ public class ManageDBActivity extends SherlockPreferenceActivity {
 
 		@Override
 		protected void onPostExecute(String result) {
-			dialog.dismiss();
-			if(LessonManager.updateDB(result)){
-				alert("下载成功");
-			}else{
-				alert("下载失败");
+			switch(LessonManager.updateDB(result)){
+			case LessonManager.EMPTY_RESPONSE:
+				alert("服务器未返回数据");
+				break;
+			case LessonManager.EMPTY_DATA:
+				alert("未找到课表信息");
+				break;
+			case LessonManager.PARSE_ERROR:
+				alert("解析数据失败");
+				break;
+			case LessonManager.UPDATE_OK:
+				alert("数据下载成功");
+				break;
 			}
+			dialog.dismiss();
 		}
 	}
 	

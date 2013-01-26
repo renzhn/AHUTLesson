@@ -19,7 +19,7 @@
             android:title="提醒时间" />
 
         <CheckBoxPreference
-            android:defaultValue="true"
+            android:defaultValue="false"
             android:key="PlaySoundWhenNotice"
             android:summary="在提醒时播放声音"
             android:title="声音提醒" />
@@ -36,7 +36,7 @@
     <PreferenceCategory android:title="通知设置" >
         
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="SendNotificationWhenNotice"
             android:summary="在通知栏显示通知"
             android:title="发送通知" />
@@ -53,11 +53,6 @@
             android:summary="发送通知时将手机振动"
             android:title="振动" />
 
-        <CheckBoxPreference
-            android:defaultValue="true"
-            android:key="BlinkWhenNotice"
-            android:summary="发送通知时闪烁LED灯"
-            android:title="闪烁LED灯" />
         </PreferenceCategory>
 
 </PreferenceScreen>

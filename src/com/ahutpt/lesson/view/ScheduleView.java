@@ -1,5 +1,7 @@
 package com.ahutpt.lesson.view;
 
+import com.ahutpt.lesson.lesson.Lesson;
+
 import android.app.Activity;
 import android.graphics.Canvas;
 import android.view.KeyEvent;
@@ -9,10 +11,10 @@ import android.view.View;
 public class ScheduleView extends View{
 	public Schedule sch;
 
-	public ScheduleView(Activity activity) {
+	public ScheduleView(Activity activity, Lesson[][] lessons) {
 		super(activity);
 		setLongClickable(true);
-		sch = new Schedule(activity, this);
+		sch = new Schedule(activity, this, lessons);
 		
 	}
 	

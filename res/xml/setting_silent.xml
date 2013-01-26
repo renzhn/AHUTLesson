@@ -10,7 +10,7 @@
             android:title="上课静音" />
 
         <CheckBoxPreference
-            android:defaultValue="false"
+            android:defaultValue="true"
             android:key="VibrateWhenSilentMode"
             android:summary="将手机设为静音时允许振动"
             android:title="静音时允许振动" />

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <item
+        android:id="@+id/menu_edit_cancel"
+        android:showAsAction="ifRoom|withText"
+        android:title="取消">
+    </item>
+    <item
+        android:id="@+id/memu_edit_ok"
+        android:showAsAction="ifRoom|withText"
+        android:title="完成">
+    </item>
+
+</menu>

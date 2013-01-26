@@ -6,128 +6,51 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingTop="10dp"
-            android:paddingLeft="10dp"
-            android:text="课程名称:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
+        android:layout_height="match_parent"
+  		android:orientation="vertical"
+        android:padding="10dp" >
 
         <EditText
             android:id="@+id/etLessonName"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="课程名称" >
         </EditText>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:text="课程别名:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etLessonAlias"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="课程别名" >
         </EditText>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:text="上课地点:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etLessonPlace"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="上课地点" >
         </EditText>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:text="教师姓名:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etTeacherName"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="教师姓名" >
         </EditText>
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:text="起始周:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etStartWeek"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content" >
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="起始周" >
         </EditText>
-    </LinearLayout>
-    
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:paddingLeft="10dp"
-            android:text="结束周:"
-            android:textAppearance="?android:attr/textAppearanceMedium" />
 
         <EditText
             android:id="@+id/etEndWeek"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content" >
-        </EditText>
-    </LinearLayout>
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:paddingTop="20dp" >
-
-        <Button
-            android:id="@+id/btnSubmitLesson"
-            android:layout_width="150dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:text="添加/编辑课程" />
+            android:hint="结束周" >
+        </EditText>
     </LinearLayout>
 
 </LinearLayout>

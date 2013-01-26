@@ -1,6 +1,6 @@
 package com.ahutpt.lesson;
 
-import com.ahutpt.lesson.helper.ChangeLog;
+import com.ahutpt.lesson.utils.ChangeLog;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -17,7 +17,9 @@ public class SettingActivity extends SherlockPreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
+		
 		addPreferencesFromResource(R.xml.setting);
 		Preference setTimeTable = (Preference)findPreference("setting_timetable");
 		setTimeTable.setOnPreferenceClickListener(new OnPreferenceClickListener(){
@@ -55,6 +57,17 @@ public class SettingActivity extends SherlockPreferenceActivity {
 
 			public boolean onPreferenceClick(Preference preference) {
 				Intent i = new Intent(SettingActivity.this, ManageDBActivity.class);
+				startActivity(i);
+				return true;
+			}
+			
+		});
+
+		Preference wizard = (Preference)findPreference("wizard");
+		wizard.setOnPreferenceClickListener(new OnPreferenceClickListener(){
+
+			public boolean onPreferenceClick(Preference preference) {
+				Intent i = new Intent(SettingActivity.this, WizardActivity.class);
 				startActivity(i);
 				return true;
 			}
@@ -101,7 +114,7 @@ public class SettingActivity extends SherlockPreferenceActivity {
 	public void share() {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, "我在用安工大课程助手，挺不错的，下载地址：http://dev1994.com/ahut/app/lesson");
+		intent.putExtra(Intent.EXTRA_TEXT, "我在用安工大课程助手，挺不错的，下载地址：http://ahut2011.sinaapp.com/app/ahutlesson.apk");
 		startActivity(Intent.createChooser(intent, "分享到"));
 	}
 	
@@ -109,9 +122,7 @@ public class SettingActivity extends SherlockPreferenceActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case android.R.id.home:
-			Intent intent = new Intent(this, MainActivity.class);
-			intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-			startActivity(intent);
+			finish();
 			return (true);
 		default:
 			return super.onOptionsItemSelected(item);

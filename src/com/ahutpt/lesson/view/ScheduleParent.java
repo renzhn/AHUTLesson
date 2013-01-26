@@ -1,6 +1,5 @@
 package com.ahutpt.lesson.view;
 
-import com.ahutpt.lesson.interfaces.ScheduleElement;
 
 import com.ahutpt.lesson.R;
 import android.app.Activity;

@@ -10,7 +10,8 @@ public class Lesson {
 	public String name,alias,place,teacher;
 	public String homework = "";
 	public int week,time,startweek,endweek;
-	public boolean isInRange = true,hasHomework = false;
+	public boolean hasHomework = false;
+	public boolean beforeStart = false, afterEnd = false, isInRange = true;
 
 	public Lesson(String name0, String alias0, String place0, String teacher0,int startweek0, int endweek0, String homework0, 
 			int week0, int time0, Context context0) {
@@ -31,9 +32,13 @@ public class Lesson {
 		if(!Timetable.loaded){
 			new Timetable(context);
 		}
-		if(Timetable.numOfWeek < startweek || Timetable.numOfWeek > endweek){
-			isInRange = false;
+		if(Timetable.numOfWeek < startweek ){
+			beforeStart = true;
+		}else if(Timetable.numOfWeek > endweek){
+			afterEnd = true;
 		}
+		if(beforeStart || afterEnd)
+			isInRange = false;
 	}
 
 	public void loadTime(){

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahutpt.lesson"
-    android:versionCode="12"
-    android:versionName="1.4.3" >
+    android:versionCode="13"
+    android:versionName="1.5" >
 
     <application
         android:icon="@drawable/calendar"
@@ -10,12 +10,31 @@
         <activity
             android:label="@string/app_name"
             android:name=".MainActivity"
-            android:screenOrientation="portrait"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name=".WizardActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="com.ahutpt.lesson.WIZARDACTIVITY" />
+                
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:label="@string/app_name"
+            android:name=".TimetableViewerActivity"
+            android:theme="@android:style/Theme.NoTitleBar" >
+            <intent-filter >
+                <action android:name="com.ahutpt.lesson.TIMETABLEVIEWERACTIVITY" />
+                
+                <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
@@ -90,7 +109,7 @@
         </activity>
          <activity
             android:label="@string/app_name"
-            android:name=".EditLessonActivity"
+            android:name="com.ahutpt.lesson.EditLessonActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
                 <action android:name="com.ahutpt.lesson.EDITLESSONACTIVITY" />
@@ -101,7 +120,7 @@
         
         <receiver android:process=":remote" android:name=".receiver.AlarmReceiver"/>
         <receiver android:process=":remote" android:name=".receiver.SoundSilentReceiver"/>
-        <receiver android:process=":remote" android:name=".receiver.SoundNormalReceiver"/>
+        <receiver android:process=":remote" android:name="com.ahutpt.lesson.receiver.SoundNormalReceiver"/>
         
         <meta-data android:value="4f9fa64852701569cd0000e2" android:name="UMENG_APPKEY"></meta-data>
 		<meta-data android:value="Default" android:name="UMENG_CHANNEL"/>

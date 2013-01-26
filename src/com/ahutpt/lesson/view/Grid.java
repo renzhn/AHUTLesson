@@ -3,7 +3,6 @@ package com.ahutpt.lesson.view;
 import java.io.Serializable;
 
 import com.ahutpt.lesson.lesson.Lesson;
-import com.ahutpt.lesson.lesson.LessonManager;
 import com.ahutpt.lesson.time.Timetable;
 
 import android.app.Activity;
@@ -20,7 +19,7 @@ public class Grid extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Canvas canvas;
-
+	private Lesson[][] lessons;
 	float top, left;
 	float cellWidth, cellHeight;
 	float calendarWidth, calendarHeight;
@@ -33,10 +32,11 @@ public class Grid extends ScheduleParent implements Serializable {
 	public static final int BUSYTIME = 2;
 	public static final int NEXTTIME = 3;
 	
-	public Grid(Activity activity, View view) {
+	public Grid(Activity activity, View view, Lesson[][] lessons0) {
 		super(activity, view);
 		left = borderMargin;
 		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
+		lessons = lessons0;
 	}
 
 	@Override
@@ -53,11 +53,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		
 		//去掉四节课中间的线
 		paint.setColor(Color.WHITE);
-		for(Lesson[] lessonsOfDay:LessonManager.lessons){
+		for(Lesson[] lessonsOfDay : lessons){
 			if(lessonsOfDay!=null){
 				for(Lesson lesson:lessonsOfDay){
 					if(lesson!=null){
-						if(lesson.canAppend()){
+						if(lessonCanAppend(lesson,lessons)){
 						canvas.drawLine(left + cellWidth * lesson.week, top + cellHeight * (lesson.time + 1), left + cellWidth * (lesson.week + 1),
 								top + cellHeight * (lesson.time + 1), paint);
 						}
@@ -69,21 +69,18 @@ public class Grid extends ScheduleParent implements Serializable {
 		//画背景
 		drawBackgrounds();
 		
-		//载入课程
-		if(!LessonManager.loaded)
-			new LessonManager(context);
 		if(!Timetable.loaded)
 			new Timetable(context);
 		
 		//课程名和地点
 		paint.setAntiAlias(true);
-		for(Lesson[] lessonsOfDay:LessonManager.lessons){
+		for(Lesson[] lessonsOfDay : lessons){
 			if(lessonsOfDay!=null){
 				for(Lesson lesson:lessonsOfDay){
 					if(lesson!=null){
-						if(lesson.canAppend()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
+						if(lessonCanAppend(lesson,lessons)&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
 							drawLesson(lesson, true);
-						}else if(lesson.isAppended()&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
+						}else if(lessonIsAppended(lesson,lessons)&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
 							//四节课的课间且是后两节课，不用画了
 						}else{
 							drawLesson(lesson, lesson.isNowHaving()==0?true:false);
@@ -100,19 +97,18 @@ public class Grid extends ScheduleParent implements Serializable {
 		//画背景
 
 		//处理在四节课课间的情况
-		Lesson tLesson = LessonManager.getLessonAt(Timetable.weekDay, 0, context);
-		if(tLesson!=null&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(Timetable.weekDay, 0)){
-			drawBackground(tLesson.week, tLesson.time, BUSYTIME, tLesson.appendMode());
+		Lesson tLesson = lessons[Timetable.weekDay][0];
+		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && Timetable.nowIsAtLessonBreak(Timetable.weekDay, 0)){
+			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
 		}
-		tLesson = LessonManager.getLessonAt(Timetable.weekDay, 2, context);
-		if(tLesson!=null&&tLesson.canAppend()&&Timetable.nowIsAtLessonBreak(Timetable.weekDay, 2)){
-			drawBackground(tLesson.week, tLesson.time, BUSYTIME, tLesson.appendMode());
+		tLesson = lessons[Timetable.weekDay][2];
+		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && Timetable.nowIsAtLessonBreak(Timetable.weekDay, 2)){
+			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
 		}
 		
-		Lesson lesson = LessonManager.getLessonAt(Timetable.weekDay,
-				Timetable.getCurrentTimeBlock(Timetable.DelayDefault), context);
+		Lesson lesson = getLesson(Timetable.weekDay, Timetable.getCurrentTimeBlock(Timetable.DelayDefault));
 		if(lesson!=null && lesson.isInRange) {
-			drawBackground(lesson.week, lesson.time, BUSYTIME, lesson.appendMode());
+			drawBackground(lesson.week, lesson.time, BUSYTIME, lessonAppendMode(lesson,lessons));
 		}else{
 			int curTimeBlock = Timetable.getCurrentTimeBlock(Timetable.DelayDefault);
 			if(curTimeBlock != -1){
@@ -122,7 +118,7 @@ public class Grid extends ScheduleParent implements Serializable {
 
 		lesson = Timetable.getNextLesson(Timetable.DelayDefault);
 		if(lesson!=null){
-			drawBackground(lesson.week, lesson.time, NEXTTIME, lesson.appendMode());
+			drawBackground(lesson.week, lesson.time, NEXTTIME, lessonAppendMode(lesson,lessons));
 		}
 	}
 
@@ -198,7 +194,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		if(lesson == null) return;
 		paint.setTextSize(lessonNameSize);
 		int week,time;
-		int appendMode = lesson.appendMode();
+		int appendMode = lessonAppendMode(lesson,lessons);
 		week = lesson.week;
 		time = lesson.time;
 		String name, place;
@@ -213,14 +209,14 @@ public class Grid extends ScheduleParent implements Serializable {
 			+ cellHeight / 2 - paint.getTextSize();
 			break;
 		case 1:
-			mlesson = LessonManager.getLessonAt(week, time + 1, context);
+			mlesson = getLesson(week, time + 1);
 			if(mlesson==null)return;
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * time
 			+ cellHeight - paint.getTextSize();
 			break;
 		case -1:
-			mlesson = LessonManager.getLessonAt(week, time - 1, context);
+			mlesson = getLesson(week, time - 1);
 			if(mlesson==null)return;
 			if(mlesson.isNowHaving()==0)return;
 			textTop = top + cellHeight * (time - 1)
@@ -332,9 +328,46 @@ public class Grid extends ScheduleParent implements Serializable {
 		return true;
 	}
 	
+	private Lesson getLesson(int week, int time){
+		return (!Timetable.isValidWeek(week)||!Timetable.isValidTime(time))? null : lessons[week][time];
+	}
+	
+
+	public boolean lessonCanAppend(Lesson lesson,Lesson[][] lessons) {
+		// 后两节有课
+		if (lesson.time == 0 || lesson.time == 2) {
+			Lesson appendLesson =  lessons[lesson.week][lesson.time + 1];
+			if (appendLesson!=null) {
+				if (appendLesson.name.contentEquals(lesson.name)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean lessonIsAppended(Lesson lesson,Lesson[][] lessons) {
+		// 前两节有课
+		if (lesson.time == 1 || lesson.time == 3) {
+			Lesson appendLesson = lessons[lesson.week][lesson.time - 1];
+			if (appendLesson!=null) {
+				if (appendLesson.name.contentEquals(lesson.name)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public int lessonAppendMode(Lesson lesson,Lesson[][] lessons){
+		if(lessonCanAppend(lesson, lessons))return 1;
+		if(lessonIsAppended(lesson, lessons))return -1;
+		return 0;
+	}
+
+	
 	public void markLesson(float x, float y) {
 		markWeek = (int) (x / cellWidth);
 		markTime = (int) ((y - top) / cellHeight);
-		
 	}
 }

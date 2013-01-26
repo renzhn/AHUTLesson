@@ -18,6 +18,10 @@
     </PreferenceCategory>
     
     <PreferenceCategory android:title="关于" >
+        <Preference
+            android:key="wizard"
+            android:title="首次使用向导" />
+        
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="notice_update"

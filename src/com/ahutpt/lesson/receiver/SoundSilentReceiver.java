@@ -30,7 +30,7 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 			new LessonManager(context);
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableSilent = preferences.getBoolean("SilentMode", true);
-		enableVibrate = preferences.getBoolean("VibrateWhenSilentMode", false);
+		enableVibrate = preferences.getBoolean("VibrateWhenSilentMode", true);
 		
 		week = intent.getExtras().getInt("week");
 		time = intent.getExtras().getInt("time");;

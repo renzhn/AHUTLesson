@@ -5,8 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
-import com.ahutpt.lesson.helper.DatabaseHelper;
 import com.ahutpt.lesson.time.Timetable;
+import com.ahutpt.lesson.utils.DatabaseHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -15,6 +15,11 @@ import android.database.sqlite.SQLiteDatabase;
 
 public class LessonManager {
 
+	public static final int EMPTY_RESPONSE = 0;
+	public static final int EMPTY_DATA = 1;
+	public static final int PARSE_ERROR = 2;
+	public static final int UPDATE_OK = 3;
+	
 	private static Context context;
 	private static DatabaseHelper DBHelper;
 	public static Lesson lessons[][] = new Lesson[7][5];
@@ -73,8 +78,8 @@ public class LessonManager {
 		new LessonManager(context);
 	}
 	
-	public static boolean updateDB(String JSONDATA) {
-		if(JSONDATA.contentEquals(""))return false;
+	public static int updateDB(String JSONDATA) {
+		if(JSONDATA == null || JSONDATA.contentEquals(""))return EMPTY_RESPONSE;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
 		try {
@@ -83,8 +88,10 @@ public class LessonManager {
 			JSONArray lessons;
 			try{
 				lessons = (JSONArray)jsonParser.nextValue();
-				if(lessons==null)
-				return false;
+				if(lessons == null)
+					return PARSE_ERROR;
+				if(lessons.length() == 0)
+					return EMPTY_DATA;
 				for(int i = 0;i < lessons.length(); i++){
 					lesson = lessons.getJSONObject(i);
 					String lessonName = lesson.getString("lessonname");
@@ -108,17 +115,15 @@ public class LessonManager {
 				}
 			}catch(NullPointerException e){
 				e.printStackTrace();
-				return false;
+				return PARSE_ERROR;
 			}
 			db.close();
 			clean();
 			new LessonManager(context);
-			return true;
+			return UPDATE_OK;
 		} catch (JSONException ex) {
 			// 异常处理代码
-			return false;
-		} catch(ClassCastException ex){
-			return false;
+			return PARSE_ERROR;
 		}
 	}
 	
@@ -180,6 +185,22 @@ public class LessonManager {
 		if(lessons[week][time] != null){
 			lessons[week][time].homework = null;
 			lessons[week][time].hasHomework = false;
+		}
+	}
+	
+	public static void deleteAllHomework(){
+		// 删除作业
+		if(DBHelper==null)return;
+		SQLiteDatabase db = DBHelper.getWritableDatabase();
+		ContentValues cv = new ContentValues();
+		cv.put("homework", "");
+		db.update("lesson", cv, null, null);
+		for(int i = 0; i < 7; i++){
+			for(int j = 0; j < 5; j++){
+				if(lessons[i][j] == null) continue;
+				lessons[i][j].homework = null;
+				lessons[i][j].hasHomework = false;
+			}
 		}
 	}
 	

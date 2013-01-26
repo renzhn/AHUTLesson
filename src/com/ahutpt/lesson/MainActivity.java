@@ -1,164 +1,273 @@
 package com.ahutpt.lesson;
 
-import java.text.SimpleDateFormat;
-import com.mobclick.android.MobclickAgent;
-import com.mobclick.android.UmengUpdateListener;
-
-import com.actionbarsherlock.app.SherlockActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
-import com.actionbarsherlock.view.MenuItem;
-
-import com.ahutpt.lesson.R;
-import com.ahutpt.lesson.helper.ChangeLog;
-import com.ahutpt.lesson.lesson.LessonManager;
-import com.ahutpt.lesson.time.Alert;
-import com.ahutpt.lesson.time.Timetable;
-import com.ahutpt.lesson.view.Grid;
-import com.ahutpt.lesson.view.ScheduleView;
-
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.view.ContextMenu;
-import android.view.ContextMenu.ContextMenuInfo;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.support.v4.view.ViewPager;
+import android.text.InputType;
+import android.view.Gravity;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
-public class MainActivity extends SherlockActivity {
+import com.actionbarsherlock.app.ActionBar;
+import com.actionbarsherlock.app.SherlockFragmentActivity;
+import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuInflater;
+import com.actionbarsherlock.view.MenuItem;
+import com.ahutpt.lesson.fragment.HomeworkFragment;
+import com.ahutpt.lesson.fragment.LessonFragmentAdapter;
+import com.ahutpt.lesson.lesson.LessonManager;
+import com.ahutpt.lesson.time.Alert;
+import com.ahutpt.lesson.time.Timetable;
+import com.ahutpt.lesson.utils.ChangeLog;
+import com.ahutpt.lesson.view.Grid;
+import com.ahutpt.lesson.view.ScheduleView;
+import com.umeng.analytics.MobclickAgent;
+import com.umeng.update.UmengUpdateAgent;
+import com.viewpagerindicator.PageIndicator;
+import com.viewpagerindicator.TitlePageIndicator;
 
-	private static ScheduleView scheduleView;
+public class MainActivity extends SherlockFragmentActivity implements
+		ActionBar.OnNavigationListener {
+
 	private Alert alert;
 	private boolean noticeUpdate;
+
+	private static int viewMode = 0;
+
+	// ACTION
+	private static final int SETTING = 0;
+	private static final int HELP = 1;
+	private static final int CLEAR_HOMEWORK = 2;
+	
+	// VIEW
+	private static final int TODAY_VIEW = 0;
+	private static final int GRID_VIEW = 1;
+	private static final int HOMEWORK_VIEW = 2;
+
+	//TODAY_VIEW
+	private LessonFragmentAdapter mAdapter;
+	private ViewPager mPager;
+	private PageIndicator mIndicator;
+	
+	// GRID_VIEW
+	private static ScheduleView scheduleView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		setTheme(R.style.Theme_Sherlock_Light);
+		final ActionBar actionBar = getSupportActionBar();
+		actionBar.setHomeButtonEnabled(false);
+		actionBar.setDisplayShowTitleEnabled(false);
 		super.onCreate(savedInstanceState);
-		getSupportActionBar().setHomeButtonEnabled(false);
+
+		// Alert
 		alert = new Alert(MainActivity.this);
 
-		ChangeLog cl = new ChangeLog(this);
-		if (cl.firstRun()) {
-			cl.getLogDialog().show();
-		}
-		if (cl.firstRunEver()) {
-			new AlertDialog.Builder(this)
-			.setTitle("在线下载课表")
-			.setMessage("是否进入课表下载页面？")
-			.setPositiveButton("确定",
-					new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog,
-								int which) {
-							Intent i = new Intent(MainActivity.this,
-									ManageDBActivity.class);
-							startActivity(i);
-						}
-					}).setNegativeButton("取消", null).show();
-		}
+		// 准备UI
+		// List Navigation
+		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(this,
+				R.layout.sherlock_spinner_item);
+		list.add("当日课程");
+		list.add("课程总表");
+		list.add("课后作业");
+		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
+		actionBar.setListNavigationCallbacks(list, this);
 
+		// DateInfo
+		LinearLayout layoutDateInfo = (LinearLayout) getLayoutInflater()
+				.inflate(R.layout.dateinfo, null);
+		TextView text = new TextView(this);
+		text.setGravity(Gravity.CENTER);
+		text.setText(this.dateInfo());
+		text.setTextSize(15);
+		text.setTextColor(Color.BLACK);
+		text.setPadding(10, 0, 0, 0);
+		text.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				Intent i = new Intent(MainActivity.this, TimetableSettingActivity.class);
+				startActivity(i);
+			}
+		});
+		layoutDateInfo.addView(text);
+		actionBar.setCustomView(layoutDateInfo);
+		actionBar.setDisplayShowCustomEnabled(true);
+
+		// ShowView
+		showView();
+
+		// Changelog
+		openChangelogDialog();
+		
+		// Update
 		SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		noticeUpdate = preferences.getBoolean("notice_update", true);
-
-		// MobclickAgent.setDebugMode(true);
-		MobclickAgent.setUpdateOnlyWifi(false);
+		UmengUpdateAgent.setUpdateOnlyWifi(false);
 		MobclickAgent.updateOnlineConfig(this);
 		MobclickAgent.onError(this);
 		if (noticeUpdate) {
-			MobclickAgent.update(this);
-			MobclickAgent.updateAutoPopup = true;
-			MobclickAgent.setUpdateListener(new UmengUpdateListener() {
-				public void onUpdateReturned(int arg) {
+			UmengUpdateAgent.update(this);
+		}
+	}
+	
+	// 显示视图
+	public void showView() {
+		switch (viewMode) {
+		case TODAY_VIEW:
+			setContentView(R.layout.today);
 
+			mAdapter = new LessonFragmentAdapter(getSupportFragmentManager());
+			
+			mPager = (ViewPager) findViewById(R.id.pager);
+			mPager.setAdapter(mAdapter);
+
+			mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
+			mIndicator.setViewPager(mPager);
+			mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
+			break;
+		case GRID_VIEW:
+			LinearLayout mainLayout = (LinearLayout) getLayoutInflater()
+					.inflate(R.layout.main, null);
+			setContentView(mainLayout);
+
+			// 绘制课表
+			if(!LessonManager.loaded)
+				new LessonManager(MainActivity.this);
+			scheduleView = new ScheduleView(MainActivity.this, LessonManager.lessons);
+			mainLayout.addView(scheduleView);
+			scheduleView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					openLessonDetail();
 				}
 			});
+			break;
+		case HOMEWORK_VIEW:
+			setContentView(R.layout.homework);
+			
+			FragmentManager fragmentManager = getSupportFragmentManager();
+			FragmentTransaction transaction = fragmentManager.beginTransaction();
+			transaction.replace(R.id.frameLayoutFragment, HomeworkFragment.newInstance());
+			transaction.commit();
+			break;
 		}
-
-		// 主要布局
-		LinearLayout mainLayout = (LinearLayout) getLayoutInflater().inflate(
-				R.layout.main, null);
-		setContentView(mainLayout);
-
-		// 绘制课表
-		scheduleView = new ScheduleView(MainActivity.this);
-		mainLayout.addView(scheduleView);
-		scheduleView.setLongClickable(true);
-		registerForContextMenu(scheduleView);
-		scheduleView.setOnClickListener(new View.OnClickListener() {
-
-			@Override
-			public void onClick(View v) {
-				openLessonDetail();
-			}
-		});
 	}
-
-	public void openLessonDetail() {
-		// 打开课程详情
-		Intent i = new Intent(this, LessonActivity.class);
-		i.putExtra("week", Grid.markWeek);
-		i.putExtra("time", Grid.markTime);
-		this.startActivity(i);
+	
+	public void refreshTodayView(){
+		mAdapter.notifyDataSetChanged();
 	}
-
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		// 日期信息
-		getSupportActionBar().setSubtitle(dateInfo());
-		scheduleView.invalidate();
+		switch(viewMode){
+		case TODAY_VIEW:
+			refreshTodayView();
+			break;
+		}
 		alert.setAlarm();
 		MobclickAgent.onResume(this);
 	}
 
 	@Override
-	public void onPause() {
-		super.onPause();
-		MobclickAgent.onPause(this);
-	}
-
-	public static void refresh() {
-		if (scheduleView != null)
-			scheduleView.invalidate();
-	}
-
-	public String dateInfo() {
-		SimpleDateFormat sDateFormat = new SimpleDateFormat("M月d日");
-		String date = sDateFormat.format(new java.util.Date());
-
-		if (Timetable.numOfWeek == -1) {
-			new Timetable(this);
-		}
-		return date + " " + "第" + String.valueOf(Timetable.numOfWeek) + "周"
-				+ " " + Timetable.weekname[Timetable.getCurrentWeekDay()];
+	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
+		// 选择导航菜单
+		viewMode = itemPosition;
+		showView();
+		invalidateOptionsMenu();
+		return false;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		MenuInflater inflater = getSupportMenuInflater();
 		inflater.inflate(R.menu.main, menu);
+		switch (viewMode) {
+		case TODAY_VIEW:
+			menu.add(viewMode, SETTING, Menu.NONE, "设置")
+					.setIcon(android.R.drawable.ic_menu_preferences)
+					.setShowAsAction(
+							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			break;
+		case GRID_VIEW:
+			menu.add(viewMode, HELP, Menu.NONE, "帮助")
+					.setIcon(android.R.drawable.ic_menu_help)
+					.setShowAsAction(
+							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+
+			break;
+		case HOMEWORK_VIEW:
+			menu.add(viewMode, CLEAR_HOMEWORK, Menu.NONE, "清空所有作业")
+					.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+					.setShowAsAction(
+							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			break;
+
+		}
 		return true;
 	}
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_setting:
+		case SETTING:
 			Intent i = new Intent(this, SettingActivity.class);
 			startActivity(i);
 			return true;
-		case R.id.menu_help:
+		case HELP:
 			openHelpDialog();
 			return true;
+		case CLEAR_HOMEWORK:
+			new AlertDialog.Builder(MainActivity.this)
+					.setTitle("清空作业")
+					.setMessage("确定清空所有课程作业？")
+					.setPositiveButton("确定",
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int which) {
+									LessonManager.deleteAllHomework();
+									showView();
+								}
+							}).setNegativeButton("取消", null).show();
+			return true;
+		case R.id.menu_timetableviewer:
+			AlertDialog.Builder alert = new AlertDialog.Builder(this);
+
+			alert.setTitle("课表浏览器");
+			alert.setMessage("请输入学号：");
+
+			final EditText input = new EditText(this);
+			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			alert.setView(input);
+
+			alert.setPositiveButton("确定",
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String value = input.getText().toString();
+							Intent i = new Intent(MainActivity.this, TimetableViewerActivity.class);
+							i.putExtra("xh", value);
+							startActivity(i);
+						}
+					});
+
+			alert.setNegativeButton("取消", null);
+
+			alert.show();
+			return true;
 		case R.id.menu_exit:
-			super.onDestroy();
 			this.finish();
 			return true;
 		default:
@@ -166,50 +275,39 @@ public class MainActivity extends SherlockActivity {
 		}
 	}
 
-	// 长按菜单
-	public void onCreateContextMenu(ContextMenu menu, View v,
-			ContextMenuInfo menuInfo) {
-		menu.add(0, 0, 0, "添加/编辑");
-		menu.add(0, 1, 1, "删除");
-		super.onCreateContextMenu(menu, v, menuInfo);
-	}
-
-	public boolean onContextItemSelected(android.view.MenuItem item) {
-		switch (item.getItemId()) {
-		case 0:
-			Intent i = new Intent(this, EditLessonActivity.class);
-			i.putExtra("week", Grid.markWeek);
-			i.putExtra("time", Grid.markTime);
+	// Changelog Dialog
+	private void openChangelogDialog() {
+		ChangeLog cl = new ChangeLog(this);
+		if (cl.firstRunEver()) {
+			Intent i = new Intent(MainActivity.this,
+					WizardActivity.class);
 			startActivity(i);
-			break;
-		case 1:
-			if (!LessonManager.loaded)
-				new LessonManager(this);
-			LessonManager.deleteLessonAt(Grid.markWeek, Grid.markTime);
-			refresh();
-			break;
+		}else if (cl.firstRun()) {
+			cl.getLogDialog().show();
 		}
-		return super.onContextItemSelected(item);
 	}
 
+	// 日期信息
+	public String dateInfo() {
+		if (!Timetable.loaded) {
+			new Timetable(this);
+		}
+		return "第" + String.valueOf(Timetable.numOfWeek) + "周" + " " + Timetable.weekname[Timetable.weekDay];
+	}
+
+	// 课程详情
+	public void openLessonDetail() {
+		Intent i = new Intent(this, LessonActivity.class);
+		i.putExtra("week", Grid.markWeek);
+		i.putExtra("time", Grid.markTime);
+		this.startActivity(i);
+	}
+
+	// 帮助对话框
 	private void openHelpDialog() {
 		new AlertDialog.Builder(this).setTitle("使用说明")
 				.setMessage(R.string.help_message)
 				.setPositiveButton("确定", null).show();
 	}
-
-	public static String getAppVersionName(Context context) {
-		String versionName = "";
-		try {
-			PackageManager pm = context.getPackageManager();
-			PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
-			versionName = pi.versionName;
-			if (versionName == null || versionName.length() <= 0) {
-				return "";
-			}
-		} catch (Exception e) {
-			System.out.println("VersionInfo" + "Exception" + e);
-		}
-		return versionName;
-	}
+	
 }
