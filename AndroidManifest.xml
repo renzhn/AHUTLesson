@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.ahutpt.lesson"
-    android:versionCode="13"
-    android:versionName="1.5" >
+    package="com.ahutlesson.android"
+    android:versionCode="14"
+    android:versionName="1.6" >
 
     <application
         android:icon="@drawable/calendar"
@@ -22,7 +22,7 @@
             android:name=".WizardActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.WIZARDACTIVITY" />
+                <action android:name="com.ahutlesson.android.WIZARDACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -32,7 +32,7 @@
             android:name=".TimetableViewerActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.TIMETABLEVIEWERACTIVITY" />
+                <action android:name="com.ahutlesson.android.TIMETABLEVIEWERACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -42,7 +42,7 @@
             android:name=".LessonActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.LESSONACTIVITY" />
+                <action android:name="com.ahutlesson.android.LESSONACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -52,7 +52,7 @@
             android:name=".SettingActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.SETTINGACTIVITY" />
+                <action android:name="com.ahutlesson.android.SETTINGACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -62,7 +62,7 @@
             android:name=".TimetableSettingActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.TIMETABLESETTINGACTIVITY" />
+                <action android:name="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -72,7 +72,7 @@
             android:name=".ManageDBActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.MANAGEDBACTIVITY" />
+                <action android:name="com.ahutlesson.android.MANAGEDBACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -82,7 +82,7 @@
             android:name=".SettingNoticeActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.SETTINGNOTICEACTIVITY" />
+                <action android:name="com.ahutlesson.android.SETTINGNOTICEACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -92,7 +92,7 @@
             android:name=".SettingSilentActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.SETTINGSILENTACTIVITY" />
+                <action android:name="com.ahutlesson.android.SETTINGSILENTACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -102,17 +102,17 @@
             android:name=".AlarmAlertActivity"
             android:theme="@android:style/Theme.Dialog" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.ALARMALERTACTIVITY" />
+                <action android:name="com.ahutlesson.android.ALARMALERTACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
          <activity
             android:label="@string/app_name"
-            android:name="com.ahutpt.lesson.EditLessonActivity"
+            android:name="com.ahutlesson.android.EditLessonActivity"
             android:theme="@android:style/Theme.NoTitleBar" >
             <intent-filter >
-                <action android:name="com.ahutpt.lesson.EDITLESSONACTIVITY" />
+                <action android:name="com.ahutlesson.android.EDITLESSONACTIVITY" />
                 
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
@@ -120,14 +120,14 @@
         
         <receiver android:process=":remote" android:name=".receiver.AlarmReceiver"/>
         <receiver android:process=":remote" android:name=".receiver.SoundSilentReceiver"/>
-        <receiver android:process=":remote" android:name="com.ahutpt.lesson.receiver.SoundNormalReceiver"/>
+        <receiver android:process=":remote" android:name="com.ahutlesson.android.receiver.SoundNormalReceiver"/>
         
         <meta-data android:value="4f9fa64852701569cd0000e2" android:name="UMENG_APPKEY"></meta-data>
 		<meta-data android:value="Default" android:name="UMENG_CHANNEL"/>
         
     </application>
 	
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="11" />
+    <uses-sdk android:minSdkVersion="8" />
     
 	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
     <uses-permission android:name="android.permission.INTERNET" />
