@@ -1,12 +1,11 @@
 package com.ahutlesson.android;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -40,7 +39,6 @@ public class MainActivity extends SherlockFragmentActivity implements
 		ActionBar.OnNavigationListener {
 
 	private Alert alert;
-	private boolean noticeUpdate;
 	
 	private static ActionBar actionBar;
 	
@@ -66,18 +64,22 @@ public class MainActivity extends SherlockFragmentActivity implements
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		setTheme(R.style.Theme_Sherlock_Light);
 		actionBar = getSupportActionBar();
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setDisplayShowTitleEnabled(false);
 		super.onCreate(savedInstanceState);
 
-		// Alert
-		alert = new Alert(MainActivity.this);
+		Intent i = new Intent(this,
+				RegisterActivity.class);
+		startActivity(i);
+		
+		// 设置提醒
+		alert = new Alert(this);
 
 		// 准备UI
 		// List Navigation
-		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(this,
+		Context context = actionBar.getThemedContext();
+		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context,
 				R.layout.sherlock_spinner_item);
 		list.add("当日课程");
 		list.add("课程总表");
@@ -90,18 +92,18 @@ public class MainActivity extends SherlockFragmentActivity implements
 		showView();
 
 		// Changelog
-		openChangelogDialog();
+		ChangeLog cl = new ChangeLog(this);
+		if (cl.firstRun()) {
+			cl.getLogDialog().show();
+		}
 		
 		// Update
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		noticeUpdate = preferences.getBoolean("notice_update", true);
-		UmengUpdateAgent.setUpdateOnlyWifi(false);
 		MobclickAgent.updateOnlineConfig(this);
 		MobclickAgent.onError(this);
-		if (noticeUpdate) {
-			UmengUpdateAgent.update(this);
-		}
+		UmengUpdateAgent.setUpdateOnlyWifi(false);
+		UmengUpdateAgent.setUpdateAutoPopup(true);
+		UmengUpdateAgent.setUpdateListener(null);
+		UmengUpdateAgent.update(this);
 	}
 	
 	// 显示视图
@@ -120,15 +122,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 			mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
 			break;
 		case GRID_VIEW:
-			LinearLayout mainLayout = (LinearLayout) getLayoutInflater()
-					.inflate(R.layout.main, null);
-			setContentView(mainLayout);
-
 			// 绘制课表
-			if(!LessonManager.loaded)
-				new LessonManager(MainActivity.this);
-			scheduleView = new ScheduleView(MainActivity.this, LessonManager.lessons);
-			mainLayout.addView(scheduleView);
+			scheduleView = new ScheduleView(this, LessonManager.getInstance(this).lessons);
+			setContentView(scheduleView);
 			scheduleView.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
@@ -162,7 +158,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 		text.setGravity(Gravity.CENTER);
 		text.setText(this.dateInfo());
 		text.setTextSize(15);
-		text.setTextColor(Color.BLACK);
+		text.setTextColor(Color.WHITE);
 		text.setPadding(10, 0, 0, 0);
 		text.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -178,6 +174,9 @@ public class MainActivity extends SherlockFragmentActivity implements
 		switch(viewMode){
 		case TODAY_VIEW:
 			refreshTodayView();
+			break;
+		case GRID_VIEW:
+			scheduleView.invalidate();
 			break;
 		}
 		alert.setAlarm();
@@ -226,7 +225,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case SETTING:
-			Intent i = new Intent(this, SettingActivity.class);
+			Intent i = new Intent(this, PreferenceActivity.class);
 			startActivity(i);
 			return true;
 		case HELP:
@@ -240,7 +239,7 @@ public class MainActivity extends SherlockFragmentActivity implements
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
-									LessonManager.deleteAllHomework();
+									LessonManager.getInstance(MainActivity.this).deleteAllHomework();
 									showView();
 								}
 							}).setNegativeButton("取消", null).show();
@@ -278,28 +277,14 @@ public class MainActivity extends SherlockFragmentActivity implements
 		}
 	}
 
-	// Changelog Dialog
-	private void openChangelogDialog() {
-		ChangeLog cl = new ChangeLog(this);
-		if (cl.firstRunEver()) {
-			Intent i = new Intent(MainActivity.this,
-					WizardActivity.class);
-			startActivity(i);
-		}else if (cl.firstRun()) {
-			cl.getLogDialog().show();
-		}
-	}
-
 	// 日期信息
 	public String dateInfo() {
-		if (!Timetable.loaded) {
-			new Timetable(this);
-		}
-		int numOfWeek = Timetable.numOfWeek;
+		Timetable timetable = Timetable.getInstance(this);
+		int numOfWeek = timetable.numOfWeek;
 		if(numOfWeek > 0) {
-			return "第" + String.valueOf(numOfWeek) + "周" + " " + Timetable.weekname[Timetable.weekDay];
+			return "第" + String.valueOf(numOfWeek) + "周" + " " + timetable.weekname[timetable.weekDay];
 		}else{
-			return "未开学 " + Timetable.weekname[Timetable.weekDay];
+			return "未开学 " + timetable.weekname[timetable.weekDay];
 		}
 	}
 

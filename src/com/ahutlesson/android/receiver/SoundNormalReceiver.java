@@ -1,7 +1,6 @@
 package com.ahutlesson.android.receiver;
 
 import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
 import com.ahutlesson.android.time.Timetable;
 
 import android.app.AlarmManager;
@@ -20,10 +19,6 @@ public class SoundNormalReceiver extends BroadcastReceiver {
 	
 	@Override
 	public void onReceive(Context context, Intent arg1) {
-		if(!Timetable.loaded)
-			new Timetable(context);
-		if(!LessonManager.loaded)
-			new LessonManager(context);
 		
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		AudioManager am=(AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
@@ -34,8 +29,8 @@ public class SoundNormalReceiver extends BroadcastReceiver {
 		
 		//设置下一次
 		boolean enableSilent = preferences.getBoolean("SilentMode", true);
-		Lesson nextLesson = Timetable.getNextLesson(Timetable.DelaySilent);
-		if(nextLesson!=null&&enableSilent){
+		Lesson nextLesson = Timetable.getInstance(context).getNextLesson(Timetable.DelaySilent);
+		if(nextLesson!=null && enableSilent){
 			long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
 			Intent intent1 = new Intent(context,SoundSilentReceiver.class);
 			intent1.putExtra("week", nextLesson.week);

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -16,20 +15,20 @@ import com.ahutlesson.android.lesson.LessonManager;
 
 public class Timetable {
 	
-	private static Context context;
-	private static Calendar cal;
-	private static SharedPreferences preferences;
-	public static String[] begintime = new String[5];
-	public static String[] endtime = new String[5];
-	private static int beginDate_year,beginDate_month,beginDate_day;
-	public static int year,month,dayOfMonth,dayOfYear,weekDay;
-	public static int begintimemin[] = new int[5];
-	public static int endtimemin[] = new int[5];
-	public static int numOfWeek = -1;
-	public static String[] weekname = new String[7],lessontime_name = new String[5];
-	private static Editor edit;
-	private static final boolean DEBUG = false;
-	public static boolean loaded = false;
+	private static Timetable timetable;
+	
+	private Context context;
+	private Calendar cal;
+	private SharedPreferences preferences;
+	public String[] begintime = new String[5];
+	public String[] endtime = new String[5];
+	private int beginDate_year,beginDate_month,beginDate_day;
+	public int year,month,dayOfMonth,dayOfYear,weekDay;
+	public int begintimemin[] = new int[5];
+	public int endtimemin[] = new int[5];
+	public int numOfWeek = -1;
+	public String[] weekname = new String[7],lessontime_name = new String[5];
+	private Editor edit;
 	
 	public Timetable(Context context0){
 		context = context0;
@@ -40,10 +39,16 @@ public class Timetable {
 				.getStringArray(R.array.lessontime_name);
 		loadData();
 		initTime();
-		loaded = true;
 	}
 	
-	public static void loadData() {
+	public static Timetable getInstance(Context context) {
+		if(timetable == null) {
+			timetable = new Timetable(context);
+		}
+		return timetable;
+	}
+	
+	public void loadData() {
 		// 载入/刷新数据
 
 		beginDate_year = preferences.getInt("begin_date_year", getYearOfCurrentPeriod());
@@ -77,7 +82,7 @@ public class Timetable {
 		
 	}
 	
-	public static void initTime(){
+	public void initTime(){
 		cal = Calendar.getInstance();
 		year = cal.get(Calendar.YEAR);
 		month = cal.get(Calendar.MONTH);
@@ -87,12 +92,7 @@ public class Timetable {
 		numOfWeek = getNumOfWeekSincePeriod();
 	}
 	
-	public static void loadLesson(){
-		if(!LessonManager.loaded)
-			new LessonManager(context);
-	}
-
-	public static int getNumOfWeekSincePeriod() {
+	public int getNumOfWeekSincePeriod() {
 		//计算开学第几周
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);
@@ -103,7 +103,7 @@ public class Timetable {
 			return 0;
 	}
 	
-	public static int calcPassDays(Calendar cal_old){
+	public int calcPassDays(Calendar cal_old){
 		int passYear = ((year - cal_old.get(Calendar.YEAR))==1)? 1 : 0;
 		int oldday = cal_old.get(Calendar.DAY_OF_YEAR);
 		if(passYear == 0 && dayOfYear>=oldday){
@@ -115,14 +115,14 @@ public class Timetable {
 		return 0;
 	}
 	
-	public static int dayOfYear(int year) {
+	public int dayOfYear(int year) {
 		//一年中的天数
 		if((year%4==0&&year%400!=0)||year%400==0)
 			return 365;
 		else
 			return 366;
 	}
-	public static boolean formerPeriodOfYear(){
+	public boolean formerPeriodOfYear(){
 		//true summer
 		//false spring
 		cal = Calendar.getInstance();
@@ -130,7 +130,7 @@ public class Timetable {
 		month = cal.get(Calendar.MONTH);
 		return ((month >= 0 && month <= 1) || (month >= 8))? true : false;
 	}
-	public static int getYearOfCurrentPeriod() {
+	public int getYearOfCurrentPeriod() {
 		// 计算当前学期的开学年份
 		if(formerPeriodOfYear()){
 			return year - 1;
@@ -139,18 +139,21 @@ public class Timetable {
 		}
 	}
 
-	public static boolean setBeginTime(int num,String newtime){
+	public boolean setBeginTime(int num,String newtime){
 		if(!checkTime(newtime))return false;
 		begintime[num] = newtime;
+		begintimemin[num] = time2minute(newtime);
 		if(edit == null)
 			edit = preferences.edit();
 		edit.putString("time_begin" + String.valueOf(num), newtime);
 		edit.commit();
 		return true;
 	}
-	public static boolean setEndTime(int num,String newtime){
+	
+	public boolean setEndTime(int num,String newtime){
 		if(!checkTime(newtime))return false;
-		begintime[num] = newtime;
+		endtime[num] = newtime;
+		endtimemin[num] = time2minute(newtime);
 		if(edit == null)
 			edit = preferences.edit();
 		edit.putString("time_end" + String.valueOf(num), newtime);
@@ -158,7 +161,7 @@ public class Timetable {
 		return true;
 	}
 
-	public static int getTimeId(String time,int advanceMode) {
+	public int getTimeId(String time,int advanceMode) {
 		//某一时间对应的时间段
 		int min = time2minute(time);
 		for(int i = 0;i < 5;i++){
@@ -169,7 +172,7 @@ public class Timetable {
 		return -1;
 	}
 	
-	public static int getCurrentTimeBlock(int advanceMode){
+	public int getCurrentTimeBlock(int advanceMode){
 		//返回当前时间段，如果不在上课时间段，返回-1
 		SimpleDateFormat   sDateFormat   =   new   SimpleDateFormat("HH:mm");     
 		String  time  =  sDateFormat.format(new java.util.Date()); 
@@ -180,7 +183,7 @@ public class Timetable {
 	public static final int DelayAlarm = 1;
 	public static final int DelaySilent = 2;
 	
-	public static int getNextTimeBlock(int advanceMode){
+	public int getNextTimeBlock(int advanceMode){
 		//返回将要到来的时间段
 		//advanceMode:0默认 1闹钟提前时间 2静音提前时间
 		int timeInAdvance = 0;
@@ -216,18 +219,18 @@ public class Timetable {
 		return false;
 	}
 
-	public static int getBeginDate_year() {
+	public int getBeginDate_year() {
 		return beginDate_year;
 	}
 
-	public static int getBeginDate_month() {
+	public int getBeginDate_month() {
 		return beginDate_month + 1;
 	}
 
-	public static int getBeginDate_day() {
+	public int getBeginDate_day() {
 		return beginDate_day;
 	}
-	public static void setBeginDate_year(int beginYear){
+	public void setBeginDate_year(int beginYear){
 		if(beginYear==year || beginYear==year-1){
 			if(edit == null)
 				edit = preferences.edit();
@@ -236,7 +239,7 @@ public class Timetable {
 		}
 		beginDate_year = beginYear;
 	}
-	public static void setBeginDate_month(int beginMonth){
+	public void setBeginDate_month(int beginMonth){
 		if(beginMonth>=1 && beginMonth<=12){
 			if(edit == null)
 				edit = preferences.edit();
@@ -245,7 +248,7 @@ public class Timetable {
 		}
 		beginDate_month = beginMonth - 1;
 	}
-	public static void setBeginDate_day(int beginDay){
+	public void setBeginDate_day(int beginDay){
 		if(beginDay>=1 && beginDay<=31){
 			if(edit == null)
 				edit = preferences.edit();
@@ -257,10 +260,11 @@ public class Timetable {
 	
 	public Lesson getCurrentLesson(int advanceMode) {
 		// 当前时间的课
-		return LessonManager.getLessonAt(weekDay, getCurrentTimeBlock(advanceMode), context);
+		LessonManager lessonManager = LessonManager.getInstance(context);
+		return lessonManager.getLessonAt(weekDay, getCurrentTimeBlock(advanceMode));
 	}
 
-	public static long getCurrentLessonEndTime(int time, int advanceMode) {
+	public long getCurrentLessonEndTime(int time, int advanceMode) {
 		// 当前时间的课结束时间
 		Calendar c = Calendar.getInstance();
 		String t = endtime[time];
@@ -274,13 +278,14 @@ public class Timetable {
 		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
-	public static Lesson getNextLesson(int advanceMode) {
+	public Lesson getNextLesson(int advanceMode) {
 		int week;
 		int time = getNextTimeBlock(advanceMode);
 		Lesson lesson;
+		LessonManager lessonManager = LessonManager.getInstance(context);
 		for(week = getCurrentWeekDay();week < 7; week++){
 			while(time < 5){
-				lesson =  LessonManager.getLessonAt(week, time, context);
+				lesson =  lessonManager.getLessonAt(week, time);
 				if(lesson != null && lesson.isInRange && lesson.isNowHaving()==-1 && !lesson.isAppended())
 					return lesson;
 				time++;
@@ -290,7 +295,7 @@ public class Timetable {
 		return null;
 	}
 	
-	public static long getNextLessonBeginTime(int week, int time,int advanceMode) {
+	public long getNextLessonBeginTime(int week, int time,int advanceMode) {
 		//某课上课时间(毫秒)，若已上则下周
 		
 		Calendar c = Calendar.getInstance();
@@ -313,12 +318,10 @@ public class Timetable {
 		c.set(Calendar.MINUTE, min);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		if(DEBUG)
-			Log.i("ahutlesson", "下次上课时间： " + Timetable.miliTime2String(c.getTimeInMillis()));
 		return c.getTimeInMillis() - getTimeDelay(advanceMode) * 60 * 1000;
 	}
 	
-	public static long getNextLessonEndTime(int week,int time,int advanceMode){
+	public long getNextLessonEndTime(int week,int time,int advanceMode){
 		Calendar c = Calendar.getInstance();
 		String t = endtime[time];
 		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
@@ -333,12 +336,10 @@ public class Timetable {
 		c.set(Calendar.MINUTE, min);
 		c.set(Calendar.SECOND, 0);
 		c.set(Calendar.MILLISECOND, 0);
-		if(DEBUG)
-			Log.i("ahutlesson", "下课时间： " + "week: " + week + ", time: " + time + " : " + Timetable.miliTime2String(c.getTimeInMillis()));
 		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
-	public static int isNowHavingLesson(int week, int time) {
+	public int isNowHavingLesson(int week, int time) {
 		//本周本课状态
 		//-1还没上，0正在上，1上过了
 		weekDay = getCurrentWeekDay();
@@ -360,7 +361,7 @@ public class Timetable {
 	}
 
 	
-	public static int getTimeDelay(int advanceMode){
+	public int getTimeDelay(int advanceMode){
 		switch (advanceMode){
 		case DelayAlarm:
 			return Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
@@ -409,7 +410,7 @@ public class Timetable {
 		return (time >= 0&&time <= 4)?true:false;
 	}
 	
-	public static boolean nowIsAtLessonBreak(int week, int i) {
+	public boolean nowIsAtLessonBreak(int week, int i) {
 		// 0 早上四节课的课间， 2 下午四节课的课间
 		if(week != weekDay) return false;
 		int min = getCurrentMinute();

@@ -2,7 +2,7 @@ package com.ahutlesson.android.view;
 
 
 import com.ahutlesson.android.R;
-import android.app.Activity;
+import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.view.View;
@@ -12,15 +12,14 @@ import android.view.View;
  * */
 public class ScheduleParent implements ScheduleElement
 {
-	protected Activity context;
+	protected Context context;
 	protected View view;
 	protected Paint paint = new Paint();
 	protected float borderMargin;		
 	protected float weekNameMargin;
 	protected float weekNameSize,lessonNameSize,lessonPlaceSize;	
 
-    public ScheduleParent(Activity activity, View view)
-    {    	
+    public ScheduleParent(Context activity, View view) {    	
     	this.context = activity;
     	this.view = view;
 
@@ -32,8 +31,7 @@ public class ScheduleParent implements ScheduleElement
         lessonPlaceSize = activity.getResources().getDimension(R.dimen.lessonplace_size);
 
     }
-	public void draw(Canvas canvas)
-	{		
+	public void draw(Canvas canvas) {		
 		
 	}
 

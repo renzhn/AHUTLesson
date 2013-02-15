@@ -1,7 +1,6 @@
 package com.ahutlesson.android.time;
 
 import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
 import com.ahutlesson.android.receiver.AlarmReceiver;
 import com.ahutlesson.android.receiver.SoundSilentReceiver;
 
@@ -21,10 +20,6 @@ public class Alert {
 
 	public Alert(Context context0){
 		context = context0;
-		if(!LessonManager.loaded)
-			new LessonManager(context);
-		if(!Timetable.loaded)
-			new Timetable(context);
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
 		enableSilent = preferences.getBoolean("SilentMode", true);
@@ -32,8 +27,9 @@ public class Alert {
 	
 	
 	public void setAlarm(){
+		Timetable timetable = Timetable.getInstance(context);
 		am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		Lesson nextLesson = Timetable.getNextLesson(Timetable.DelayAlarm);
+		Lesson nextLesson = timetable.getNextLesson(Timetable.DelayAlarm);
 		Intent intent;
 		if(nextLesson!=null&&enableAlert){
 				long alarmTime = nextLesson.getNextTime(Timetable.DelayAlarm);
@@ -43,7 +39,7 @@ public class Alert {
 				PendingIntent sender = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 				am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 		}
-		nextLesson = Timetable.getNextLesson(Timetable.DelaySilent);
+		nextLesson = timetable.getNextLesson(Timetable.DelaySilent);
 		if(nextLesson!=null&&enableSilent){
 				long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
 				intent = new Intent(context,SoundSilentReceiver.class);

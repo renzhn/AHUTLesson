@@ -5,7 +5,6 @@ import com.ahutlesson.android.lesson.LessonManager;
 import com.ahutlesson.android.time.Timetable;
 import com.umeng.analytics.MobclickAgent;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -15,24 +14,24 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.EditText;
 
-public class EditLessonActivity extends SherlockActivity {
+public class EditLessonActivity extends BaseActivity {
 
-	Lesson lesson, prevLesson, curLesson;
-	int week, time, startWeek, endWeek;
-	String lessonName, lessonAlias, lessonPlace, teacherName;
-	EditText etLessonName, etLessonAlias, etLessonPlace, etTeacherName,
+	private Lesson lesson, prevLesson, curLesson;
+	private int week, time, startWeek, endWeek;
+	private String lessonName, lessonAlias, lessonPlace, teacherName;
+	private EditText etLessonName, etLessonAlias, etLessonPlace, etTeacherName,
 			etStartWeek, etEndWeek;
 
+	private LessonManager lessonManager;
+	private Timetable timetable;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setTheme(R.style.Theme_Sherlock_Light);
-		getSupportActionBar().setHomeButtonEnabled(true);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
 
-		if (!LessonManager.loaded)
-			new LessonManager(this);
-
+		lessonManager = LessonManager.getInstance(this);
+		timetable = Timetable.getInstance(this);
+		
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
 
@@ -44,8 +43,8 @@ public class EditLessonActivity extends SherlockActivity {
 
 		if (time == 1 || time == 3) {
 			// 是否延续前两节
-			prevLesson = LessonManager.getLessonAt(week, time - 1, this);
-			curLesson = LessonManager.getLessonAt(week, time, this);
+			prevLesson = lessonManager.getLessonAt(week, time - 1);
+			curLesson = lessonManager.getLessonAt(week, time);
 			if (prevLesson != null && curLesson == null) {
 				new AlertDialog.Builder(this)
 						.setTitle("是否延续前两节课")
@@ -54,7 +53,7 @@ public class EditLessonActivity extends SherlockActivity {
 								new DialogInterface.OnClickListener() {
 									public void onClick(DialogInterface dialog,
 											int which) {
-										LessonManager.addOrEdit(
+										lessonManager.addOrEdit(
 												prevLesson.name, "",
 												prevLesson.place,
 												prevLesson.teacher,
@@ -66,8 +65,8 @@ public class EditLessonActivity extends SherlockActivity {
 			}
 		}
 
-		getSupportActionBar().setTitle(
-				Timetable.weekname[week] + Timetable.lessontime_name[time]);
+		actionBar.setTitle(
+				timetable.weekname[week] + timetable.lessontime_name[time]);
 
 		etLessonName = (EditText) findViewById(R.id.etLessonName);
 		etLessonAlias = (EditText) findViewById(R.id.etLessonAlias);
@@ -76,7 +75,7 @@ public class EditLessonActivity extends SherlockActivity {
 		etStartWeek = (EditText) findViewById(R.id.etStartWeek);
 		etEndWeek = (EditText) findViewById(R.id.etEndWeek);
 
-		lesson = LessonManager.getLessonAt(week, time, this);
+		lesson = lessonManager.getLessonAt(week, time);
 		if (lesson != null) {
 			etLessonName.setText(lesson.name);
 			etLessonAlias.setText(lesson.alias);
@@ -110,9 +109,6 @@ public class EditLessonActivity extends SherlockActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			finish();
-			return true;
 		case R.id.memu_edit_ok:
 			addOrEditLesson();
 			finish();
@@ -126,9 +122,6 @@ public class EditLessonActivity extends SherlockActivity {
 	}
 
 	protected void addOrEditLesson() {
-		if (!Timetable.loaded) {
-			new Timetable(this);
-		}
 		lessonName = etLessonName.getText().toString();
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
@@ -136,7 +129,7 @@ public class EditLessonActivity extends SherlockActivity {
 		String startWeekText = etStartWeek.getText().toString();
 		String endWeekText = etEndWeek.getText().toString();
 		if (startWeekText.contentEquals("")) {
-			startWeek = Timetable.numOfWeek;
+			startWeek = timetable.numOfWeek;
 		} else {
 			startWeek = Integer.valueOf(startWeekText);
 		}
@@ -147,10 +140,8 @@ public class EditLessonActivity extends SherlockActivity {
 			endWeek = Integer.valueOf(endWeekText);
 		}
 
-		LessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace,
+		lessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace,
 				teacherName, startWeek, endWeek, week, time);
-		MobclickAgent.onEvent(this, "add_lesson", lessonName + " : "
-				+ lessonPlace + " : " + teacherName);
 	}
 
 }

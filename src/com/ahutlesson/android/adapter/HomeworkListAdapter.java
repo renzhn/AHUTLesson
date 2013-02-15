@@ -20,7 +20,6 @@ public class HomeworkListAdapter  extends ArrayAdapter<Lesson>{
     private LayoutInflater inflater;
 
     public HomeworkListAdapter (Context c, int resourceId, List<Lesson> objects) {
-
           super(c, resourceId, objects);
           resource = resourceId;
           inflater = LayoutInflater.from(c);
@@ -40,8 +39,9 @@ public class HomeworkListAdapter  extends ArrayAdapter<Lesson>{
           tvName.setText(lesson.name);
           if(lesson.homework != null)
         	  tvHomework.setText(lesson.homework);
-          tvTime.setText(Timetable.weekname[lesson.week]
-  				+ Timetable.lessontime_name[lesson.time]);
+          Timetable timetable = Timetable.getInstance(this.getContext());
+          tvTime.setText(timetable.weekname[lesson.week]
+  				+ timetable.lessontime_name[lesson.time]);
           
 
           return convertView;

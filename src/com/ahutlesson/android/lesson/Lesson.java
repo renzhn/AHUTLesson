@@ -18,8 +18,6 @@ public class Lesson {
 		context = context0;
 		name = name0;
 		alias = alias0;
-		if (alias.contentEquals(""))
-			alias = name;
 		place = place0;
 		teacher = teacher0;
 		startweek = startweek0;
@@ -29,50 +27,42 @@ public class Lesson {
 		week = week0;
 		time = time0;
 		
-		if(!Timetable.loaded){
-			new Timetable(context);
-		}
-		if(Timetable.numOfWeek < startweek ){
+		Timetable timetable = Timetable.getInstance(context);
+		
+		if(timetable.numOfWeek < startweek ){
 			beforeStart = true;
-		}else if(Timetable.numOfWeek > endweek){
+		}else if(timetable.numOfWeek > endweek){
 			afterEnd = true;
 		}
+		
 		if(beforeStart || afterEnd)
 			isInRange = false;
 	}
-
-	public void loadTime(){
-		if(!Timetable.loaded)
-			new Timetable(context);
-	}
 	
 	public long getCurrentLessonEndTime(int advanceMode) {
-		loadTime();
 		if(canAppend()){
-			return Timetable.getCurrentLessonEndTime(time + 1, advanceMode);
+			return Timetable.getInstance(context).getCurrentLessonEndTime(time + 1, advanceMode);
 		}else{
-			return Timetable.getCurrentLessonEndTime(time, advanceMode);	
+			return Timetable.getInstance(context).getCurrentLessonEndTime(time, advanceMode);	
 		}
 	}
 	
 	public long getNextTime(int advanceMode) {
 		// 下一次上此课的时间（毫秒）
-		loadTime();
-		return Timetable.getNextLessonBeginTime(week, time, advanceMode);
+		return Timetable.getInstance(context).getNextLessonBeginTime(week, time, advanceMode);
 	}
 
 	public long getNextEndTime(int advanceMode) {
-		loadTime();
-		return Timetable.getNextLessonEndTime(week, time, advanceMode);
+		return Timetable.getInstance(context).getNextLessonEndTime(week, time, advanceMode);
 	}
 
 	public int isNowHaving() {
 		// -1还没上，0正在上，1上过了
-		return Timetable.isNowHavingLesson(week, time);
+		return Timetable.getInstance(context).isNowHavingLesson(week, time);
 	}
 
 	public void delete() {
-		LessonManager.deleteLessonAt(week, time);
+		LessonManager.getInstance(context).deleteLessonAt(week, time);
 	}
 
 	public String toString() {
@@ -83,7 +73,7 @@ public class Lesson {
 	public boolean canAppend() {
 		// 后两节有课
 		if (time == 0 || time == 2) {
-			Lesson appendLesson =  LessonManager.getLessonAt(week, time + 1, context);
+			Lesson appendLesson =  LessonManager.getInstance(context).getLessonAt(week, time + 1);
 			if (appendLesson!=null) {
 				if (appendLesson.name.contentEquals(name)) {
 					return true;
@@ -96,7 +86,7 @@ public class Lesson {
 	public boolean isAppended() {
 		// 前两节有课
 		if (time == 1 || time == 3) {
-			Lesson appendLesson = LessonManager.getLessonAt(week, time - 1, context);
+			Lesson appendLesson = LessonManager.getInstance(context).getLessonAt(week, time - 1);
 			if (appendLesson!=null) {
 				if (appendLesson.name.contentEquals(name)) {
 					return true;

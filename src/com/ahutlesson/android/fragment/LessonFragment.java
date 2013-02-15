@@ -82,14 +82,12 @@ public class LessonFragment extends SherlockListFragment {
 			startActivity(i);
 			return true;
 		case MENU_DELETE:
-			if (!LessonManager.loaded)
-				new LessonManager(this.getActivity().getBaseContext());
-			
 			try{
 				Lesson tmpLesson = lessonList.get(info.position);
-				LessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time);
+				LessonManager lessonManager = LessonManager.getInstance(this.getActivity());
+				lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time);
 				if(tmpLesson.canAppend())
-					LessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time + 1);
+					lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time + 1);
 			}catch(IndexOutOfBoundsException ex){
 				return true;
 			}
@@ -101,10 +99,8 @@ public class LessonFragment extends SherlockListFragment {
 	}
 	
 	private void loadData(){
-		if(!LessonManager.loaded){
-			new LessonManager(getActivity());
-		}
-		todayLessons = LessonManager.lessons[weekDay];
+		LessonManager lessonManager = LessonManager.getInstance(this.getActivity());
+		todayLessons = lessonManager.lessons[weekDay];
 		lessonList = new ArrayList<Lesson>();
 		for(Lesson lesson : todayLessons){
 			if(lesson != null && !lesson.isAppended()) 

@@ -66,12 +66,9 @@ public class HomeworkFragment extends SherlockListFragment {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();		
 		switch (item.getItemId()) {
 		case MENU_DELETE:
-			if (!LessonManager.loaded)
-				new LessonManager(this.getActivity().getBaseContext());
-			
 			try{
 				Lesson tmpLesson = homeworkLessonList.get(info.position);
-				LessonManager.deleteHomework(tmpLesson.week, tmpLesson.time);
+				LessonManager.getInstance(this.getActivity()).deleteHomework(tmpLesson.week, tmpLesson.time);
 			}catch(IndexOutOfBoundsException ex){
 				return true;
 			}
@@ -83,11 +80,8 @@ public class HomeworkFragment extends SherlockListFragment {
 	}
 
 	private void loadData() {
-		if (!LessonManager.loaded) {
-			new LessonManager(getActivity());
-		}
 		homeworkLessonList = new ArrayList<Lesson>();
-		for (Lesson[] lessons : LessonManager.lessons) {
+		for (Lesson[] lessons : LessonManager.getInstance(this.getActivity()).lessons) {
 			for (Lesson lesson : lessons) {
 				if (lesson != null && lesson.hasHomework)
 					homeworkLessonList.add(lesson);

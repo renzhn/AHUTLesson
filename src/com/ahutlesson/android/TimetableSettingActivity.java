@@ -1,10 +1,7 @@
 package com.ahutlesson.android;
 
-import com.ahutlesson.android.lesson.LessonManager;
 import com.ahutlesson.android.time.Timetable;
 
-import com.actionbarsherlock.app.ActionBar;
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -17,7 +14,8 @@ import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.Spinner;
 
-public class TimetableSettingActivity extends SherlockActivity {
+public class TimetableSettingActivity extends BaseActivity {
+	
 	private static final String[] mode = {"当前", "夏季时间" , "冬季时间" };
 	private Spinner spinner;
 	private ArrayAdapter<String> adapter;
@@ -25,20 +23,15 @@ public class TimetableSettingActivity extends SherlockActivity {
 	private EditText etBegin0,etBegin1,etBegin2,etBegin3,etBegin4;
 	private EditText etEnd0,etEnd1,etEnd2,etEnd3,etEnd4;
 	
+	private Timetable timetable;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setTheme(R.style.Theme_Sherlock_Light);
-		final ActionBar actionBar = getSupportActionBar();
-		actionBar.setTitle("时间表设置");
-		actionBar.setHomeButtonEnabled(true);
-		actionBar.setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.timetable);
-		if(!Timetable.loaded)
-			new Timetable(this);
-		if(!LessonManager.loaded)
-			new LessonManager(this);
+		
+		timetable = Timetable.getInstance(this);
 		
 		initView();
 		spinner = (Spinner) findViewById(R.id.spinnerSetMode);
@@ -62,9 +55,6 @@ public class TimetableSettingActivity extends SherlockActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case android.R.id.home:
-			finish();
-			return true;
 		case R.id.memu_edit_ok:
 			submitTimeTable();
 			TimetableSettingActivity.this.finish();
@@ -80,22 +70,20 @@ public class TimetableSettingActivity extends SherlockActivity {
 	
 	protected void submitTimeTable() {
 		// 更新时间表
-		Timetable.setBeginDate_year(Integer.valueOf(etBeginDate_year.getText().toString()));
-		Timetable.setBeginDate_month(Integer.valueOf(etBeginDate_month.getText().toString()));
-		Timetable.setBeginDate_day(Integer.valueOf(etBeginDate_day.getText().toString()));
-		Timetable.setBeginTime(0, etBegin0.getText().toString());
-		Timetable.setBeginTime(1, etBegin1.getText().toString());
-		Timetable.setBeginTime(2, etBegin2.getText().toString());
-		Timetable.setBeginTime(3, etBegin3.getText().toString());
-		Timetable.setBeginTime(4, etBegin4.getText().toString());
-		Timetable.setEndTime(0, etEnd0.getText().toString());
-		Timetable.setEndTime(1, etEnd1.getText().toString());
-		Timetable.setEndTime(2, etEnd2.getText().toString());
-		Timetable.setEndTime(3, etEnd3.getText().toString());
-		Timetable.setEndTime(4, etEnd4.getText().toString());
-		Timetable.loadData();
-		Timetable.initTime();
-		new LessonManager(this);
+		timetable.setBeginDate_year(Integer.valueOf(etBeginDate_year.getText().toString()));
+		timetable.setBeginDate_month(Integer.valueOf(etBeginDate_month.getText().toString()));
+		timetable.setBeginDate_day(Integer.valueOf(etBeginDate_day.getText().toString()));
+		timetable.setBeginTime(0, etBegin0.getText().toString());
+		timetable.setBeginTime(1, etBegin1.getText().toString());
+		timetable.setBeginTime(2, etBegin2.getText().toString());
+		timetable.setBeginTime(3, etBegin3.getText().toString());
+		timetable.setBeginTime(4, etBegin4.getText().toString());
+		timetable.setEndTime(0, etEnd0.getText().toString());
+		timetable.setEndTime(1, etEnd1.getText().toString());
+		timetable.setEndTime(2, etEnd2.getText().toString());
+		timetable.setEndTime(3, etEnd3.getText().toString());
+		timetable.setEndTime(4, etEnd4.getText().toString());
+		timetable.initTime();
 	}
 
 	private void initView() {
@@ -116,21 +104,21 @@ public class TimetableSettingActivity extends SherlockActivity {
 		etEnd3 = (EditText)findViewById(R.id.time_end3);
 		etEnd4 = (EditText)findViewById(R.id.time_end4);
 
-		etBeginDate_year.setText(Integer.toString(Timetable.getBeginDate_year()));
-		etBeginDate_month.setText(Integer.toString(Timetable.getBeginDate_month()));
-		etBeginDate_day.setText(Integer.toString(Timetable.getBeginDate_day())); 
+		etBeginDate_year.setText(Integer.toString(timetable.getBeginDate_year()));
+		etBeginDate_month.setText(Integer.toString(timetable.getBeginDate_month()));
+		etBeginDate_day.setText(Integer.toString(timetable.getBeginDate_day())); 
 		
-		etBegin0.setText(Timetable.begintime[0]);
-		etBegin1.setText(Timetable.begintime[1]);
-		etBegin2.setText(Timetable.begintime[2]);
-		etBegin3.setText(Timetable.begintime[3]);
-		etBegin4.setText(Timetable.begintime[4]);
+		etBegin0.setText(timetable.begintime[0]);
+		etBegin1.setText(timetable.begintime[1]);
+		etBegin2.setText(timetable.begintime[2]);
+		etBegin3.setText(timetable.begintime[3]);
+		etBegin4.setText(timetable.begintime[4]);
 	
-		etEnd0.setText(Timetable.endtime[0]);
-		etEnd1.setText(Timetable.endtime[1]);
-		etEnd2.setText(Timetable.endtime[2]);
-		etEnd3.setText(Timetable.endtime[3]);
-		etEnd4.setText(Timetable.endtime[4]);
+		etEnd0.setText(timetable.endtime[0]);
+		etEnd1.setText(timetable.endtime[1]);
+		etEnd2.setText(timetable.endtime[2]);
+		etEnd3.setText(timetable.endtime[3]);
+		etEnd4.setText(timetable.endtime[4]);
 	
 	}
 

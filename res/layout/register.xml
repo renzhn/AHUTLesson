@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="安工大课程助手改名为“课友”并推出在线版网站“课友网”（ahutlesson.com），为大家提供一个网上课程讨论平台。与同一节课的课友发帖讨论交流，从此你不再孤单！还有更多功能期待你的发现！"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+                       <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="与此同时，手机版课程助手也增加了课程讨论功能，在手机上也能方便地与课友们在线交流。赶快注册一个帐号吧！"
+                android:textAppearance="?android:attr/textAppearanceMedium" /> 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="10dp"
+                android:text="注册新帐号"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="3dp"
+                android:text="此帐号与课友网（ahutlesson.com）互通" />
+            
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="3dp"
+                android:gravity="center" >
+
+                <EditText
+                    android:id="@+id/etRegisterXH"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:ems="9"
+                    android:hint="学号"
+                    android:inputType="number"
+                    android:singleLine="true" >
+                </EditText>
+
+                <EditText
+                    android:id="@+id/etRegisterPassword"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="密码"
+                    android:inputType="textPassword" >
+                </EditText>
+
+                <EditText
+                    android:id="@+id/etRegisterConfirmPassword"
+                    android:layout_width="150dp"
+                    android:layout_height="wrap_content"
+                    android:ems="10"
+                    android:hint="确认密码"
+                    android:inputType="textPassword" >
+                </EditText>
+
+                <Button
+                    android:id="@+id/btnRegister"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:text="注册"
+                    android:textSize="18sp" />
+
+            </LinearLayout>
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingBottom="10dp"
+                android:paddingTop="10dp"
+                android:text="登录已有账号"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+                <Button
+                    android:id="@+id/btnToLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:paddingBottom="5dp"
+                    android:paddingLeft="10dp"
+                    android:paddingRight="10dp"
+                    android:paddingTop="5dp"
+                    android:text="已有账号?点此登录"
+                    android:textSize="18sp" />
+            
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

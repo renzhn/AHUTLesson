@@ -4,7 +4,6 @@ import com.ahutlesson.android.lesson.Lesson;
 
 import android.app.Activity;
 import android.graphics.Canvas;
-import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -15,14 +14,11 @@ public class ScheduleView extends View{
 		super(activity);
 		setLongClickable(true);
 		sch = new Schedule(activity, this, lessons);
-		
 	}
 	
 	@Override
 	protected void onDraw(Canvas canvas) {
-
 		sch.draw(canvas);
-
 	}
 
 	@Override
@@ -32,9 +28,4 @@ public class ScheduleView extends View{
 		return super.onTouchEvent(event);
 	}
 
-	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-
-		return true;
-	}
 }

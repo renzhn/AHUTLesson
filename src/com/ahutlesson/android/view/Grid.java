@@ -20,6 +20,8 @@ public class Grid extends ScheduleParent implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private Canvas canvas;
 	private Lesson[][] lessons;
+	private Timetable timetable;
+	
 	float top, left;
 	float cellWidth, cellHeight;
 	float calendarWidth, calendarHeight;
@@ -37,6 +39,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		left = borderMargin;
 		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
 		lessons = lessons0;
+		timetable = Timetable.getInstance(context);
 	}
 
 	@Override
@@ -69,18 +72,15 @@ public class Grid extends ScheduleParent implements Serializable {
 		//画背景
 		drawBackgrounds();
 		
-		if(!Timetable.loaded)
-			new Timetable(context);
-		
 		//课程名和地点
 		paint.setAntiAlias(true);
 		for(Lesson[] lessonsOfDay : lessons){
 			if(lessonsOfDay!=null){
 				for(Lesson lesson:lessonsOfDay){
 					if(lesson!=null){
-						if(lessonCanAppend(lesson,lessons)&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
+						if(lessonCanAppend(lesson,lessons)&&timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
 							drawLesson(lesson, true);
-						}else if(lessonIsAppended(lesson,lessons)&&Timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
+						}else if(lessonIsAppended(lesson,lessons)&&timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
 							//四节课的课间且是后两节课，不用画了
 						}else{
 							drawLesson(lesson, lesson.isNowHaving()==0?true:false);
@@ -97,26 +97,26 @@ public class Grid extends ScheduleParent implements Serializable {
 		//画背景
 
 		//处理在四节课课间的情况
-		Lesson tLesson = lessons[Timetable.weekDay][0];
-		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && Timetable.nowIsAtLessonBreak(Timetable.weekDay, 0)){
+		Lesson tLesson = lessons[timetable.weekDay][0];
+		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && timetable.nowIsAtLessonBreak(timetable.weekDay, 0)){
 			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
 		}
-		tLesson = lessons[Timetable.weekDay][2];
-		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && Timetable.nowIsAtLessonBreak(Timetable.weekDay, 2)){
+		tLesson = lessons[timetable.weekDay][2];
+		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && timetable.nowIsAtLessonBreak(timetable.weekDay, 2)){
 			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
 		}
 		
-		Lesson lesson = getLesson(Timetable.weekDay, Timetable.getCurrentTimeBlock(Timetable.DelayDefault));
+		Lesson lesson = getLesson(timetable.weekDay, timetable.getCurrentTimeBlock(Timetable.DelayDefault));
 		if(lesson!=null && lesson.isInRange) {
 			drawBackground(lesson.week, lesson.time, BUSYTIME, lessonAppendMode(lesson,lessons));
 		}else{
-			int curTimeBlock = Timetable.getCurrentTimeBlock(Timetable.DelayDefault);
+			int curTimeBlock = timetable.getCurrentTimeBlock(Timetable.DelayDefault);
 			if(curTimeBlock != -1){
-				drawBackground(Timetable.weekDay, curTimeBlock, FREETIME, 0);
+				drawBackground(timetable.weekDay, curTimeBlock, FREETIME, 0);
 			}
 		}
 
-		lesson = Timetable.getNextLesson(Timetable.DelayDefault);
+		lesson = timetable.getNextLesson(Timetable.DelayDefault);
 		if(lesson!=null){
 			drawBackground(lesson.week, lesson.time, NEXTTIME, lessonAppendMode(lesson,lessons));
 		}
@@ -197,8 +197,8 @@ public class Grid extends ScheduleParent implements Serializable {
 		int appendMode = lessonAppendMode(lesson,lessons);
 		week = lesson.week;
 		time = lesson.time;
-		String name, place;
-		name = lesson.alias;
+		String place;
+		LessonName name = (lesson.alias.contentEquals("")) ? new LessonName(lesson.name) : new LessonName(lesson.alias);
 		place = lesson.place;
 		textLeft = left + cellWidth * week
 				+ cellWidth / 2 - paint.getTextSize();
@@ -243,9 +243,11 @@ public class Grid extends ScheduleParent implements Serializable {
 			paint.setColor(Color.TRANSPARENT);//后两节课不画
 		}
 		
-		if (name.length() <= 2) {
-			canvas.drawText(name, textLeft, textTop, paint);
-		} else if (name.length() <= 4) {
+		float length = name.length();
+		
+		if (length <= 2) {
+			canvas.drawText(name.toString(), textLeft, textTop, paint);
+		} else if (length <= 4) {
 			canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
 			canvas.drawText(name.substring(2), textLeft,
 					textTop + (paint.getTextSize() + 5), paint);

@@ -23,17 +23,12 @@ public class AlarmReceiver extends BroadcastReceiver {
 	private Context context;
 	private int week, time;
 	private boolean enableAlert, enableNotification, enableSound,
-			enableNotificationSound, enableVibrate;
+			enableNotificationSound;
 
 	@Override
 	public void onReceive(Context context0, Intent intent0) {
 		// 接到上课广播
 		context = context0;
-
-		if (!Timetable.loaded)
-			new Timetable(context);
-		if (!LessonManager.loaded)
-			new LessonManager(context);
 
 		preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
@@ -45,7 +40,6 @@ public class AlarmReceiver extends BroadcastReceiver {
 		enableSound = preferences.getBoolean("PlaySoundWhenNotice", false);
 		enableNotificationSound = preferences.getBoolean(
 				"NotificationSoundWhenNotice", false);
-		enableVibrate = preferences.getBoolean("VibrateWhenNotice", true);
 
 		week = intent0.getExtras().getInt("week");
 		time = intent0.getExtras().getInt("time");
@@ -68,7 +62,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	private void addNextLessonAlarm() {
 		// 设置下节课闹钟
-		Lesson nextLesson = Timetable.getNextLesson(Timetable.DelayAlarm);
+		Lesson nextLesson = Timetable.getInstance(context).getNextLesson(Timetable.DelayAlarm);
 		if (nextLesson != null) {
 			AlarmManager alarm = (AlarmManager) context
 					.getSystemService(Context.ALARM_SERVICE);
@@ -83,38 +77,36 @@ public class AlarmReceiver extends BroadcastReceiver {
 		}
 	}
 
-	@SuppressWarnings("deprecation")
 	private void pushNotification() {
-		Lesson lesson = LessonManager.getLessonAt(week, time, context);
+		Lesson lesson = LessonManager.getInstance(context).getLessonAt(week, time);
 		if (lesson == null)
 			return;
-		String notice = Timetable.lessontime_name[time] + "有" + lesson.alias
-				+ "课，地点：" + lesson.place;
-		NotificationManager nm = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification n = new Notification(R.drawable.calendar, notice,
-				System.currentTimeMillis());
-		n.flags = Notification.FLAG_AUTO_CANCEL;
-		if (enableNotificationSound) {
-			n.defaults |= Notification.DEFAULT_SOUND;
-		}
-		if (enableVibrate) {
-			n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
-		}
-		n.flags |= Notification.FLAG_SHOW_LIGHTS;
-		n.ledARGB = 0xff00ff00;
-		n.ledOnMS = 300;
-		n.ledOffMS = 1000;// LED
 		
 		Intent i = new Intent(context, LessonActivity.class);
 		i.putExtra("week", week);
 		i.putExtra("time", time);
-		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
-				| Intent.FLAG_ACTIVITY_NEW_TASK);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context,
-				R.string.app_name, i, PendingIntent.FLAG_UPDATE_CURRENT);
-
-		n.setLatestEventInfo(context, "上课提醒", notice, pendingIntent);
-		nm.notify(R.string.app_name, n);
+		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
+		
+		String notice = Timetable.getInstance(context).lessontime_name[time] + "有" + lesson.alias
+				+ "课，地点：" + lesson.place;
+		NotificationManager nm = (NotificationManager) context
+				.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification n = new Notification.Builder(context)
+	        .setContentTitle("上课提醒")
+	        .setContentText(notice)
+	        .setContentIntent(pendingIntent)
+	        .setSmallIcon(R.drawable.calendar)
+			.build();
+		n.flags = Notification.FLAG_AUTO_CANCEL;
+		if (enableNotificationSound) {
+			n.defaults |= Notification.DEFAULT_SOUND;
+		}
+		n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
+		n.flags |= Notification.FLAG_SHOW_LIGHTS;
+		n.ledARGB = 0xff00ff00;
+		n.ledOnMS = 300;
+		n.ledOffMS = 1000;// LED
+		nm.notify(0, n);
 	}
 }

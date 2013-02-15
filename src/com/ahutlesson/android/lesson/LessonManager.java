@@ -14,22 +14,29 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 public class LessonManager {
+	
+	private static LessonManager lessonManager;
 
 	public static final int EMPTY_RESPONSE = 0;
 	public static final int EMPTY_DATA = 1;
 	public static final int PARSE_ERROR = 2;
 	public static final int UPDATE_OK = 3;
 	
-	private static Context context;
-	private static DatabaseHelper DBHelper;
-	public static Lesson lessons[][] = new Lesson[7][5];
-	public static boolean loaded = false;
+	private Context context;
+	private DatabaseHelper DBHelper;
+	public Lesson lessons[][] = new Lesson[7][5];
 	
 	public LessonManager(Context context0){
 		context = context0;
 		DBHelper = new DatabaseHelper(context, "ahutlesson");
 		getAllLessons();
-		loaded = true;
+	}
+	
+	public static LessonManager getInstance(Context context) {
+		if(lessonManager == null) {
+			lessonManager = new LessonManager(context);
+		}
+		return lessonManager;
 	}
 	
 	public void getAllLessons(){
@@ -63,12 +70,12 @@ public class LessonManager {
 		return;
 	}
 	
-	public static Lesson getLessonAt(int week0, int time0, Context context0){
+	public Lesson getLessonAt(int week0, int time0){
 		if(!Timetable.isValidWeek(week0)||!Timetable.isValidTime(time0))return null;
 		return lessons[week0][time0];
 	}
 	
-	public static void deleteLessonAt(int week0, int time0){
+	public void deleteLessonAt(int week0, int time0){
 		if(DBHelper==null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", "week=" + week0 + " and time="
@@ -78,7 +85,7 @@ public class LessonManager {
 		new LessonManager(context);
 	}
 	
-	public static int updateDB(String JSONDATA) {
+	public int updateDB(String JSONDATA) {
 		if(JSONDATA == null || JSONDATA.contentEquals(""))return EMPTY_RESPONSE;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
@@ -118,8 +125,7 @@ public class LessonManager {
 				return PARSE_ERROR;
 			}
 			db.close();
-			clean();
-			new LessonManager(context);
+			lessonManager = new LessonManager(context);
 			return UPDATE_OK;
 		} catch (JSONException ex) {
 			// 异常处理代码
@@ -127,8 +133,8 @@ public class LessonManager {
 		}
 	}
 	
-	public static void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int startWeek,int endWeek,int week,int time){
-		if(DBHelper==null)return;
+	public void addOrEdit(String lessonName,String lessonAlias,String lessonPlace,String teacherName,int startWeek,int endWeek,int week,int time){
+		if(DBHelper == null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		if(lessonName.contentEquals(""))
 			return ;
@@ -158,10 +164,14 @@ public class LessonManager {
 		}
 		result.close();
 		db.close();
-		new LessonManager(context);
+		LessonManager lessonManager = LessonManager.getInstance(context);
+		Lesson lesson = lessonManager.getLessonAt(week, time);
+		String homework = (lesson != null && lesson.homework != null) ? lesson.homework : "";
+		Lesson tmpLesson = new Lesson(lessonName, lessonAlias, lessonPlace, teacherName, startWeek, endWeek, homework, week, time, context);
+		lessonManager.lessons[week][time] = tmpLesson;
 	}
 	
-	public static void editHomework(int week, int time, String input) {
+	public void editHomework(int week, int time, String input) {
 		// 编辑作业
 		if(DBHelper==null)return;
 		if(input == null || input.contentEquals(""))return;
@@ -175,7 +185,7 @@ public class LessonManager {
 		}
 	}
 	
-	public static void deleteHomework(int week, int time){
+	public void deleteHomework(int week, int time){
 		// 删除作业
 		if(DBHelper==null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
@@ -188,7 +198,7 @@ public class LessonManager {
 		}
 	}
 	
-	public static void deleteAllHomework(){
+	public void deleteAllHomework(){
 		// 删除作业
 		if(DBHelper==null)return;
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
@@ -204,16 +214,11 @@ public class LessonManager {
 		}
 	}
 	
-	public static void deleteDB() {
+	public void deleteDB() {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		db.delete("lesson", null, null);
 		db.close();
-		clean();
-		new LessonManager(context);
-	}
-	
-	public static void clean(){
-		lessons = new Lesson[7][5];
+		lessonManager = new LessonManager(context);
 	}
 	
 }

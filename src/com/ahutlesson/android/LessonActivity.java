@@ -5,7 +5,6 @@ import com.ahutlesson.android.lesson.LessonManager;
 import com.ahutlesson.android.time.Timetable;
 import com.umeng.analytics.MobclickAgent;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
@@ -19,23 +18,22 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-public class LessonActivity extends SherlockActivity {
+public class LessonActivity extends BaseActivity {
 	private int week, time;
 	private Lesson lesson;
 	private TextView tvLessonName, tvLessonPlace, tvTeacherName, tvLessonWeek,
 			tvHomework, tvLessonTime, tvCurrentTime;
 	private Button btnEditHomework, btnDeleteHomework;
 
+	private LessonManager lessonManager;
+	private Timetable timetable;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setTheme(R.style.Theme_Sherlock_Light);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
 		
-		if (!Timetable.loaded)
-			new Timetable(this);
-		if (!LessonManager.loaded)
-			new LessonManager(this);
+		lessonManager = LessonManager.getInstance(this);
+		timetable = Timetable.getInstance(this);
 
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
@@ -55,8 +53,8 @@ public class LessonActivity extends SherlockActivity {
 		tvLessonTime = (TextView) findViewById(R.id.tvLessonTime);
 
 		tvCurrentTime = (TextView) findViewById(R.id.tvCurrentTime);
-		tvCurrentTime.setText(Timetable.weekname[week]
-				+ Timetable.lessontime_name[time]);
+		tvCurrentTime.setText(timetable.weekname[week]
+				+ timetable.lessontime_name[time]);
 
 		btnEditHomework = (Button) findViewById(R.id.btnEditHomework);
 		btnDeleteHomework = (Button) findViewById(R.id.btnDeleteHomework);
@@ -74,8 +72,8 @@ public class LessonActivity extends SherlockActivity {
 			}
 		});
 
-		tvLessonTime.setText(Timetable.begintime[time] + " ~ "
-				+ Timetable.endtime[time]);
+		tvLessonTime.setText(timetable.begintime[time] + " ~ "
+				+ timetable.endtime[time]);
 	}
 
 	protected void editHomework() {
@@ -99,7 +97,7 @@ public class LessonActivity extends SherlockActivity {
 				if (!value.contentEquals("")) {
 					lesson.homework = value;
 					lesson.hasHomework = true;
-					LessonManager.editHomework(week, time, lesson.homework);
+					lessonManager.editHomework(week, time, lesson.homework);
 					tvHomework.setText(lesson.homework);
 				}
 			}
@@ -121,7 +119,7 @@ public class LessonActivity extends SherlockActivity {
 					public void onClick(DialogInterface dialog, int which) {
 						lesson.homework = null;
 						lesson.hasHomework = false;
-						LessonManager.deleteHomework(week, time);
+						lessonManager.deleteHomework(week, time);
 						tvHomework.setText("无");
 					}
 
@@ -132,10 +130,7 @@ public class LessonActivity extends SherlockActivity {
 	protected void onResume() {
 		// 删除或修改后重新载入
 		super.onResume();
-
-		MobclickAgent.onResume(this);
-
-		lesson = LessonManager.getLessonAt(week, time, this);
+		lesson = lessonManager.getLessonAt(week, time);
 		if (lesson != null) {
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
@@ -151,6 +146,8 @@ public class LessonActivity extends SherlockActivity {
 			btnEditHomework.setVisibility(View.GONE);
 			btnDeleteHomework.setVisibility(View.GONE);
 		}
+		
+		MobclickAgent.onResume(this);
 	}
 
 	@Override

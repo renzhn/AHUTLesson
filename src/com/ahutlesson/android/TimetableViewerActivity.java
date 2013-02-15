@@ -12,10 +12,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.InputType;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
-import com.actionbarsherlock.app.SherlockActivity;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.lesson.Lesson;
@@ -23,23 +21,17 @@ import com.ahutlesson.android.utils.NetworkHelper;
 import com.ahutlesson.android.utils.ValidateHelper;
 import com.ahutlesson.android.view.ScheduleView;
 
-public class TimetableViewerActivity extends SherlockActivity {
+public class TimetableViewerActivity extends BaseActivity {
 
 	private Lesson lessons[][] = new Lesson[7][5];
 	private ScheduleView scheduleView;
-	private LinearLayout mainLayout;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		setTheme(R.style.Theme_Sherlock_Light);
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
-		mainLayout = (LinearLayout) getLayoutInflater()
-				.inflate(R.layout.main, null);
-		setContentView(mainLayout);
 
 		String xh = getIntent().getExtras().getString("xh");
-		getSupportActionBar().setTitle(xh + "的课程表");
+		actionBar.setTitle(xh + "的课程表");
 		if(ValidateHelper.isXH(xh)){
 			new getDataAsync().execute(xh);
 		}else{
@@ -109,9 +101,7 @@ public class TimetableViewerActivity extends SherlockActivity {
 			}
 
 			scheduleView = new ScheduleView(TimetableViewerActivity.this, lessons);
-			mainLayout.removeAllViews();
-			mainLayout.addView(scheduleView);
-			mainLayout.invalidate();
+			setContentView(scheduleView);
 			return true;
 		} catch (JSONException ex) {
 			return false;

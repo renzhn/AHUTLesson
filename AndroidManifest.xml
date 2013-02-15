@@ -6,134 +6,93 @@
 
     <application
         android:icon="@drawable/calendar"
-        android:label="@string/app_name" >
-        <activity
-            android:label="@string/app_name"
-            android:name=".MainActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Sherlock.Light.DarkActionBar" >
+        <activity android:name=".MainActivity" >
+            <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".WizardActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.WIZARDACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:name=".RegisterActivity"
+            android:label="新用户注册向导"
+            android:windowSoftInputMode="stateHidden" >
         </activity>
         <activity
-            android:label="@string/app_name"
+            android:name=".LoginActivity"
+            android:label="登录账号"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+        <activity
             android:name=".TimetableViewerActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.TIMETABLEVIEWERACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="课表浏览器" >
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".LessonActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.LESSONACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="课程详情" >
         </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".SettingActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.SETTINGACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:name=".PreferenceActivity"
+            android:label="设置" >
         </activity>
         <activity
-            android:label="@string/app_name"
             android:name=".TimetableSettingActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
+            android:label="时间表设置"
+            android:windowSoftInputMode="stateHidden" >
+            <intent-filter>
                 <action android:name="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
-                
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".ManageDBActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.MANAGEDBACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity> 
+            android:name=".EditLessonActivity"
+            android:label="编辑课程" >
+        </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".SettingNoticeActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.SETTINGNOTICEACTIVITY" />
-                
+            android:name=".AboutActivity"
+            android:label="关于" >
+            <intent-filter>
+                <action android:name="com.ahutlesson.android.ABOUTACTIVITY" />
+
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
-            android:label="@string/app_name"
-            android:name=".SettingSilentActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.SETTINGSILENTACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:label="@string/app_name"
             android:name=".AlarmAlertActivity"
-            android:theme="@android:style/Theme.Dialog" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.ALARMALERTACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
+            android:label="上课提醒"
+            android:theme="@style/Theme.Sherlock.Light.Dialog" >
         </activity>
-         <activity
-            android:label="@string/app_name"
-            android:name="com.ahutlesson.android.EditLessonActivity"
-            android:theme="@android:style/Theme.NoTitleBar" >
-            <intent-filter >
-                <action android:name="com.ahutlesson.android.EDITLESSONACTIVITY" />
-                
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        
-        <receiver android:process=":remote" android:name=".receiver.AlarmReceiver"/>
-        <receiver android:process=":remote" android:name=".receiver.SoundSilentReceiver"/>
-        <receiver android:process=":remote" android:name="com.ahutlesson.android.receiver.SoundNormalReceiver"/>
-        
-        <meta-data android:value="4f9fa64852701569cd0000e2" android:name="UMENG_APPKEY"></meta-data>
-		<meta-data android:value="Default" android:name="UMENG_CHANNEL"/>
-        
+
+        <receiver
+            android:name=".receiver.AlarmReceiver"
+            android:process=":remote" />
+        <receiver
+            android:name=".receiver.SoundSilentReceiver"
+            android:process=":remote" />
+        <receiver
+            android:name="com.ahutlesson.android.receiver.SoundNormalReceiver"
+            android:process=":remote" />
+
+        <meta-data
+            android:name="UMENG_APPKEY"
+            android:value="511dbbfd52701523af00002e" >
+        </meta-data>
+        <meta-data
+            android:name="UMENG_CHANNEL"
+            android:value="Default" />
     </application>
-	
+
     <uses-sdk android:minSdkVersion="8" />
-    
-	<uses-permission android:name="android.permission.VIBRATE"></uses-permission>
+
+    <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-	<uses-permission android:name="android.permission.READ_PHONE_STATE"></uses-permission>
-	<uses-permission android:name="android.permission.READ_LOGS"></uses-permission>
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"></uses-permission>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_LOGS" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
 </manifest>

@@ -37,13 +37,14 @@ public class LessonListAdapter extends ArrayAdapter<Lesson> {
           TextView tvName = (TextView) convertView.findViewById(R.id.lessonItemName);
           TextView tvPlace = (TextView) convertView.findViewById(R.id.lessonItemPlace);
           TextView tvTime = (TextView) convertView.findViewById(R.id.lessonItemTime);
-          
+
+          Timetable timetable = Timetable.getInstance(this.getContext());
           if(!lesson.isAppended()){
-              tvTime.setText(Timetable.begintime[lesson.time] + " ~ "
-        				+ Timetable.endtime[lesson.time]);
+              tvTime.setText(timetable.begintime[lesson.time] + " ~ "
+        				+ timetable.endtime[lesson.time]);
           }else{
-              tvTime.setText(Timetable.begintime[lesson.time] + " ~ "
-        				+ Timetable.endtime[lesson.time + 1]);
+              tvTime.setText(timetable.begintime[lesson.time] + " ~ "
+        				+ timetable.endtime[lesson.time + 1]);
           }
           tvPlace.setText(lesson.place);
           
