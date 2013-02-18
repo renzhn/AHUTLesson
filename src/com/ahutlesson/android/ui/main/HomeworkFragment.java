@@ -1,4 +1,4 @@
-package com.ahutlesson.android.fragment;
+package com.ahutlesson.android.ui.main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,9 +19,8 @@ import android.widget.AdapterView.AdapterContextMenuInfo;
 import com.actionbarsherlock.app.SherlockListFragment;
 import com.ahutlesson.android.LessonActivity;
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.adapter.HomeworkListAdapter;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
 
 public class HomeworkFragment extends SherlockListFragment {
 

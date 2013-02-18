@@ -1,4 +1,4 @@
-package com.ahutlesson.android.fragment;
+package com.ahutlesson.android.ui.main;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,11 +20,11 @@ import com.ahutlesson.android.EditLessonActivity;
 import com.ahutlesson.android.LessonActivity;
 import com.ahutlesson.android.MainActivity;
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.adapter.LessonListAdapter;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
 
-public class LessonFragment extends SherlockListFragment {
+public class LessonListFragment extends SherlockListFragment {
 
 	private static final int MENU_EDIT = 0;
 	private static final int MENU_DELETE = 1;
@@ -33,8 +33,8 @@ public class LessonFragment extends SherlockListFragment {
 	private Lesson[] todayLessons;
 	private List<Lesson> lessonList;
 	
-	public static LessonFragment newInstance(int weekDay0) {
-		LessonFragment fragment = new LessonFragment();
+	public static LessonListFragment newInstance(int weekDay0) {
+		LessonListFragment fragment = new LessonListFragment();
 		fragment.weekDay = weekDay0;
 		return fragment;
 	}
@@ -86,7 +86,7 @@ public class LessonFragment extends SherlockListFragment {
 				Lesson tmpLesson = lessonList.get(info.position);
 				LessonManager lessonManager = LessonManager.getInstance(this.getActivity());
 				lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time);
-				if(tmpLesson.canAppend())
+				if(Timetable.getInstance(this.getActivity()).canAppend(tmpLesson))
 					lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time + 1);
 			}catch(IndexOutOfBoundsException ex){
 				return true;
@@ -103,7 +103,7 @@ public class LessonFragment extends SherlockListFragment {
 		todayLessons = lessonManager.lessons[weekDay];
 		lessonList = new ArrayList<Lesson>();
 		for(Lesson lesson : todayLessons){
-			if(lesson != null && !lesson.isAppended()) 
+			if(lesson != null && !Timetable.getInstance(this.getActivity()).isAppended(lesson)) 
 				lessonList.add(lesson);
 		}
 	}

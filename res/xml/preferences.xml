@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="设置" >
+    <PreferenceCategory android:title="基本设置" >
         <Preference
             android:key="setting_timetable"
             android:title="时间表设置" >
-			<intent android:action="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
-          </Preference>
+            <intent android:action="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
+        </Preference>
 
         <PreferenceScreen android:title="提醒设置" >
             <PreferenceCategory android:title="提醒设置" >
@@ -14,43 +14,41 @@
                     android:defaultValue="true"
                     android:key="NoticeBeforeLesson"
                     android:title="启用提醒" />
-
                 <ListPreference
-                	android:dependency="NoticeBeforeLesson"
                     android:defaultValue="20"
+                    android:dependency="NoticeBeforeLesson"
                     android:dialogTitle="提醒时间"
                     android:entries="@array/NoticeTimeBeforeLesson_entries"
                     android:entryValues="@array/NoticeTimeBeforeLesson_entries"
                     android:key="NoticeTimeBeforeLesson"
                     android:summary="提前几分钟提醒"
                     android:title="提醒时间" />
-
             </PreferenceCategory>
             <PreferenceCategory android:title="发送通知提醒" >
                 <CheckBoxPreference
-                	android:dependency="NoticeBeforeLesson"
                     android:defaultValue="true"
+                    android:dependency="NoticeBeforeLesson"
                     android:key="SendNotificationWhenNotice"
                     android:summary="在通知栏显示通知"
                     android:title="发送通知" />
                 <CheckBoxPreference
-                	android:dependency="NoticeBeforeLesson"
                     android:defaultValue="true"
+                    android:dependency="NoticeBeforeLesson"
                     android:key="NotificationSoundWhenNotice"
                     android:summary="发送通知时声音提示"
                     android:title="声音提示" />
             </PreferenceCategory>
             <PreferenceCategory android:title="播放声音提醒" >
                 <CheckBoxPreference
-                	android:dependency="NoticeBeforeLesson"
                     android:defaultValue="false"
+                    android:dependency="NoticeBeforeLesson"
                     android:key="PlaySoundWhenNotice"
                     android:summary="在提醒时播放声音"
                     android:title="声音提醒" />
 
                 <EditTextPreference
-                	android:dependency="NoticeBeforeLesson"
                     android:defaultValue="{TIME}有{LESSON}课，该上课了！！"
+                    android:dependency="NoticeBeforeLesson"
                     android:dialogMessage="{TIME}表示时间段,{LESSON}表示课程名"
                     android:dialogTitle="自定义提醒信息"
                     android:key="MessageWhenNotice"
@@ -81,33 +79,40 @@
                     android:title="提前/滞后时间" />
             </PreferenceCategory>
         </PreferenceScreen>
+    </PreferenceCategory>
+    <PreferenceCategory android:title="数据管理" >
         <PreferenceScreen android:title="课表管理" >
             <PreferenceCategory android:title="课表管理" >
-                <EditTextPreference
-                    android:dialogTitle="请输入学号"
-                    android:key="down_xh"
-                    android:summary="下载课表前请先设置学号"
-                    android:title="学号设置" />
-
                 <Preference
-                    android:key="down_db"
-                    android:title="下载课程表" />
+                    android:key="down_lesson"
+                    android:summary="从课友网获取最新课表信息"
+                    android:title="下载课表" />
                 <Preference
                     android:key="delete_db"
                     android:title="清空课表" />
             </PreferenceCategory>
         </PreferenceScreen>
-
+        <PreferenceScreen android:title="帐号管理" >
+            <PreferenceCategory android:title="帐号管理" >
+                <Preference
+                    android:key="user_info"
+                    android:title="用户信息"
+                    android:summary="获取本地用户信息" />
+                <Preference
+                    android:key="user_down"
+                    android:title="下载用户信息"
+                    android:summary="获取课友网用户信息" />
+                <Preference
+                    android:key="user_logout"
+                    android:summary="将会清除本地所有信息"
+                    android:title="注销" />
+            </PreferenceCategory>
+        </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="关于" >
         <Preference
-            android:key="wizard"
-            android:title="首次使用向导" />
-
-        <Preference
             android:key="check_update"
             android:title="检查更新" />
-
         <Preference
             android:key="changelog"
             android:title="更新日志" />
@@ -117,7 +122,7 @@
         <Preference
             android:key="about"
             android:title="关于" >
-			<intent android:action="com.ahutlesson.android.ABOUTACTIVITY" />
+            <intent android:action="com.ahutlesson.android.ABOUTACTIVITY" />
         </Preference>
     </PreferenceCategory>
 

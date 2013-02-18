@@ -1,4 +1,4 @@
-package com.ahutlesson.android.time;
+package com.ahutlesson.android.model;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,8 +10,6 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
 
 public class Timetable {
 	
@@ -278,6 +276,58 @@ public class Timetable {
 		return c.getTimeInMillis() + getTimeDelay(advanceMode) * 60 * 1000;
 	}
 
+	public long getCurrentLessonEndTime(Lesson lesson, int advanceMode) {
+		if(canAppend(lesson)){
+			return Timetable.getInstance(context).getCurrentLessonEndTime(lesson.time + 1, advanceMode);
+		}else{
+			return Timetable.getInstance(context).getCurrentLessonEndTime(lesson.time, advanceMode);	
+		}
+		
+	}
+
+	public long getNextTime(Lesson lesson, int advanceMode) {
+		// 下一次上此课的时间（毫秒）
+		return Timetable.getInstance(context).getNextLessonBeginTime(lesson, advanceMode);
+	}
+	public long getNextEndTime(Lesson lesson, int advanceMode) {
+		return Timetable.getInstance(context).getNextLessonEndTime(lesson, advanceMode);
+	}
+
+	
+	public boolean canAppend(Lesson lesson) {
+		// 后两节有课
+		if (lesson.time == 0 || lesson.time == 2) {
+			Lesson appendLesson =  LessonManager.getInstance(context).getLessonAt(lesson.week, lesson.time + 1);
+			if (appendLesson!=null) {
+				if (appendLesson.lid == lesson.lid) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+
+	public boolean isAppended(Lesson lesson) {
+		// 前两节有课
+		if (lesson.time == 1 || lesson.time == 3) {
+			Lesson appendLesson = LessonManager.getInstance(context).getLessonAt(lesson.week, lesson.time - 1);
+			if (appendLesson!=null) {
+				if (appendLesson.lid == lesson.lid) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+	
+	public int appendMode(Lesson lesson){
+		if(canAppend(lesson))return 1;
+		if(isAppended(lesson))return -1;
+		return 0;
+	}
+
+	
 	public Lesson getNextLesson(int advanceMode) {
 		int week;
 		int time = getNextTimeBlock(advanceMode);
@@ -286,7 +336,7 @@ public class Timetable {
 		for(week = getCurrentWeekDay();week < 7; week++){
 			while(time < 5){
 				lesson =  lessonManager.getLessonAt(week, time);
-				if(lesson != null && lesson.isInRange && lesson.isNowHaving()==-1 && !lesson.isAppended())
+				if(lesson != null && lesson.isInRange(context) && isNowHavingLesson(lesson) == -1 && !isAppended(lesson))
 					return lesson;
 				time++;
 			}
@@ -295,9 +345,10 @@ public class Timetable {
 		return null;
 	}
 	
-	public long getNextLessonBeginTime(int week, int time,int advanceMode) {
+	public long getNextLessonBeginTime(Lesson lesson,int advanceMode) {
 		//某课上课时间(毫秒)，若已上则下周
-		
+		int week = lesson.week;
+		int time = lesson.time;
 		Calendar c = Calendar.getInstance();
 		String t = begintime[time];
 		int weekOfMonth = c.get(Calendar.WEEK_OF_MONTH);
@@ -321,7 +372,9 @@ public class Timetable {
 		return c.getTimeInMillis() - getTimeDelay(advanceMode) * 60 * 1000;
 	}
 	
-	public long getNextLessonEndTime(int week,int time,int advanceMode){
+	public long getNextLessonEndTime(Lesson lesson,int advanceMode){
+		int week = lesson.week;
+		int time = lesson.time;
 		Calendar c = Calendar.getInstance();
 		String t = endtime[time];
 		int dayOfYear = c.get(Calendar.DAY_OF_YEAR);
@@ -359,7 +412,9 @@ public class Timetable {
 			}
 		}
 	}
-
+	public int isNowHavingLesson(Lesson lesson) {
+		return isNowHavingLesson(lesson.week, lesson.time);
+	}
 	
 	public int getTimeDelay(int advanceMode){
 		switch (advanceMode){

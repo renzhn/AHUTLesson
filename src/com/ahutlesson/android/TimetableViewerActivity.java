@@ -16,10 +16,10 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.utils.NetworkHelper;
+import com.ahutlesson.android.api.AHUTAPIAccessor;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.ui.main.ScheduleView;
 import com.ahutlesson.android.utils.ValidateHelper;
-import com.ahutlesson.android.view.ScheduleView;
 
 public class TimetableViewerActivity extends BaseActivity {
 
@@ -51,8 +51,7 @@ public class TimetableViewerActivity extends BaseActivity {
 
 		@Override
 		protected String doInBackground(String... para) {
-			return NetworkHelper
-					.readURL("http://ahut2011.sinaapp.com/lesson/getdata.php?xh="
+			return AHUTAPIAccessor.getURL("http://ahut2011.sinaapp.com/lesson/getdata.php?xh="
 							+ para[0]);
 		}
 
@@ -84,6 +83,7 @@ public class TimetableViewerActivity extends BaseActivity {
 				}
 				for (int i = 0; i < lessonsArray.length(); i++) {
 					lesson = lessonsArray.getJSONObject(i);
+					int lid = lesson.getInt("lid");
 					String lessonName = lesson.getString("lessonname");
 					String lessonAlias = lesson.getString("lessonalias");
 					String teacherName = lesson.getString("teachername");
@@ -92,7 +92,7 @@ public class TimetableViewerActivity extends BaseActivity {
 					int startweek = lesson.getInt("startweek");
 					int endweek = lesson.getInt("endweek");
 					String lessonPlace = lesson.getString("place");
-					lessons[week][time] = new Lesson(lessonName, lessonAlias, lessonPlace, teacherName, startweek, endweek, null, week, time, this);
+					lessons[week][time] = new Lesson(lid, lessonName, lessonAlias, lessonPlace, teacherName, startweek, endweek, null, week, time);
 				}
 				
 			} catch (NullPointerException e) {
@@ -106,10 +106,6 @@ public class TimetableViewerActivity extends BaseActivity {
 		} catch (JSONException ex) {
 			return false;
 		} 
-	}
-	
-	private void alert(String notice){
-		Toast.makeText(this, notice, Toast.LENGTH_LONG).show();
 	}
 	
 	public void exit(String notice){

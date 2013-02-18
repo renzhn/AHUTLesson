@@ -1,6 +1,6 @@
 package com.ahutlesson.android;
 
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Timetable;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
@@ -55,7 +55,7 @@ public class TimetableSettingActivity extends BaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.memu_edit_ok:
+		case R.id.menu_edit_ok:
 			submitTimeTable();
 			TimetableSettingActivity.this.finish();
 			finish();

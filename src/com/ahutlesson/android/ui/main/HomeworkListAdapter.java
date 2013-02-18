@@ -1,4 +1,4 @@
-package com.ahutlesson.android.adapter;
+package com.ahutlesson.android.ui.main;
 
 import java.util.List;
 
@@ -11,8 +11,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.Timetable;
 
 public class HomeworkListAdapter  extends ArrayAdapter<Lesson>{
 	

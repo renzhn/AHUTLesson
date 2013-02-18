@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="TabPage" parent="Theme.Sherlock.Light">
+        <item name="vpiTabPageIndicatorStyle">@style/TabPageIndicator</item>
+        
+    </style>
+    
+    <style name="TabPageIndicator" parent="Widget.TabPageIndicator">
+        <item name="android:background">@drawable/vpi__tab_indicator</item>
+        <item name="android:textAppearance">@style/TabPageIndicator.Text</item>
+    </style>
+
+    <style name="TabPageIndicator.Text" parent="android:TextAppearance.Medium">
+        <item name="android:typeface">monospace</item>
+        <item name="android:textColor">@color/vpi__light_theme</item>
+    </style>
+</resources>

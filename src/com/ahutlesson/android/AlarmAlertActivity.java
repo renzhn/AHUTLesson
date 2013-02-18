@@ -2,9 +2,9 @@ package com.ahutlesson.android;
 
 import java.io.IOException;
 
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
 
 import android.app.AlertDialog;
 import android.content.Context;

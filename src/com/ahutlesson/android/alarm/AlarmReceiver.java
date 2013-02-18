@@ -1,11 +1,11 @@
-package com.ahutlesson.android.receiver;
+package com.ahutlesson.android.alarm;
 
 import com.ahutlesson.android.AlarmAlertActivity;
 import com.ahutlesson.android.LessonActivity;
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -66,7 +66,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		if (nextLesson != null) {
 			AlarmManager alarm = (AlarmManager) context
 					.getSystemService(Context.ALARM_SERVICE);
-			long alarmTime = nextLesson.getNextTime(Timetable.DelayAlarm);
+			long alarmTime = Timetable.getInstance(context).getNextTime(nextLesson, Timetable.DelayAlarm);
 			Intent intent = new Intent(context, AlarmReceiver.class);
 			intent.putExtra("week", nextLesson.week);
 			intent.putExtra("time", nextLesson.time);

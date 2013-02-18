@@ -1,10 +1,10 @@
-package com.ahutlesson.android.adapter;
+package com.ahutlesson.android.ui.main;
 
 import java.util.List;
 
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.Timetable;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -17,14 +17,15 @@ import android.widget.TextView;
 
 public class LessonListAdapter extends ArrayAdapter<Lesson> {
 	
+	private Context context;
     private int resource;
     private LayoutInflater inflater;
 
-    public LessonListAdapter (Context c, int resourceId, List<Lesson> objects) {
-
-          super(c, resourceId, objects);
+    public LessonListAdapter (Context context0, int resourceId, List<Lesson> objects) {
+          super(context0, resourceId, objects);
+          context = context0;
           resource = resourceId;
-          inflater = LayoutInflater.from(c);
+          inflater = LayoutInflater.from(context0);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class LessonListAdapter extends ArrayAdapter<Lesson> {
           TextView tvTime = (TextView) convertView.findViewById(R.id.lessonItemTime);
 
           Timetable timetable = Timetable.getInstance(this.getContext());
-          if(!lesson.isAppended()){
+          if(!timetable.isAppended(lesson)){
               tvTime.setText(timetable.begintime[lesson.time] + " ~ "
         				+ timetable.endtime[lesson.time]);
           }else{
@@ -48,13 +49,13 @@ public class LessonListAdapter extends ArrayAdapter<Lesson> {
           }
           tvPlace.setText(lesson.place);
           
-          if(lesson.beforeStart){
+          if(lesson.beforeStart(context)){
               tvName.setText(lesson.name + " (未开始)");
               tvName.setTextColor(Color.parseColor("#666666"));
           }else if(lesson.hasHomework){
         	  tvName.setText(lesson.name + " (有作业)");
               tvName.setTextColor(Color.parseColor("#CE5600"));
-          }else if(lesson.afterEnd){
+          }else if(lesson.afterEnd(context)){
               tvName.setText(lesson.name + " (已结课)");
               tvName.setTextColor(Color.parseColor("#666666"));
           }else{

@@ -6,6 +6,8 @@
     
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
+    <string name="cancel">取消</string>
+    <string name="ok">确定</string>
     
 	<string name="app_name">课友</string>
 	<string name="about">关于</string>

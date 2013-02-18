@@ -1,22 +1,20 @@
 package com.ahutlesson.android;
 
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.lesson.LessonManager;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
 import com.umeng.analytics.MobclickAgent;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.widget.EditText;
 
 public class EditLessonActivity extends BaseActivity {
 
-	private Lesson lesson, prevLesson, curLesson;
+	private Lesson lesson;
 	private int week, time, startWeek, endWeek;
 	private String lessonName, lessonAlias, lessonPlace, teacherName;
 	private EditText etLessonName, etLessonAlias, etLessonPlace, etTeacherName,
@@ -40,30 +38,6 @@ public class EditLessonActivity extends BaseActivity {
 		}
 
 		setContentView(R.layout.edit_lesson);
-
-		if (time == 1 || time == 3) {
-			// 是否延续前两节
-			prevLesson = lessonManager.getLessonAt(week, time - 1);
-			curLesson = lessonManager.getLessonAt(week, time);
-			if (prevLesson != null && curLesson == null) {
-				new AlertDialog.Builder(this)
-						.setTitle("是否延续前两节课")
-						.setMessage("这节课的前两节有课，\n是否延续前两节课？")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										lessonManager.addOrEdit(
-												prevLesson.name, "",
-												prevLesson.place,
-												prevLesson.teacher,
-												prevLesson.startweek,
-												prevLesson.endweek, week, time);
-										EditLessonActivity.this.finish();
-									}
-								}).setNegativeButton("取消", null).show();
-			}
-		}
 
 		actionBar.setTitle(
 				timetable.weekname[week] + timetable.lessontime_name[time]);
@@ -109,8 +83,8 @@ public class EditLessonActivity extends BaseActivity {
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.memu_edit_ok:
-			addOrEditLesson();
+		case R.id.menu_edit_ok:
+			EditLesson();
 			finish();
 			return true;
 		case R.id.menu_edit_cancel:
@@ -121,7 +95,7 @@ public class EditLessonActivity extends BaseActivity {
 		}
 	}
 
-	protected void addOrEditLesson() {
+	protected void EditLesson() {
 		lessonName = etLessonName.getText().toString();
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
@@ -140,7 +114,7 @@ public class EditLessonActivity extends BaseActivity {
 			endWeek = Integer.valueOf(endWeekText);
 		}
 
-		lessonManager.addOrEdit(lessonName, lessonAlias, lessonPlace,
+		lessonManager.EditLessonAt(lessonName, lessonAlias, lessonPlace,
 				teacherName, startWeek, endWeek, week, time);
 	}
 

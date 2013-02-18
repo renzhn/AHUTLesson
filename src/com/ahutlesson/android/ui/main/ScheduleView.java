@@ -1,6 +1,6 @@
-package com.ahutlesson.android.view;
+package com.ahutlesson.android.ui.main;
 
-import com.ahutlesson.android.lesson.Lesson;
+import com.ahutlesson.android.model.Lesson;
 
 import android.app.Activity;
 import android.graphics.Canvas;

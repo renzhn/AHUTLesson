@@ -1,9 +1,9 @@
-package com.ahutlesson.android.view;
+package com.ahutlesson.android.ui.main;
 
 import java.io.Serializable;
 
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.Timetable;
 
 import android.app.Activity;
 import android.graphics.Canvas;
@@ -83,7 +83,7 @@ public class Grid extends ScheduleParent implements Serializable {
 						}else if(lessonIsAppended(lesson,lessons)&&timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
 							//四节课的课间且是后两节课，不用画了
 						}else{
-							drawLesson(lesson, lesson.isNowHaving()==0?true:false);
+							drawLesson(lesson, timetable.isNowHavingLesson(lesson)==0?true:false);
 						}
 					}
 				}
@@ -107,7 +107,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 		
 		Lesson lesson = getLesson(timetable.weekDay, timetable.getCurrentTimeBlock(Timetable.DelayDefault));
-		if(lesson!=null && lesson.isInRange) {
+		if(lesson!=null && lesson.isInRange(context)) {
 			drawBackground(lesson.week, lesson.time, BUSYTIME, lessonAppendMode(lesson,lessons));
 		}else{
 			int curTimeBlock = timetable.getCurrentTimeBlock(Timetable.DelayDefault);
@@ -211,14 +211,14 @@ public class Grid extends ScheduleParent implements Serializable {
 		case 1:
 			mlesson = getLesson(week, time + 1);
 			if(mlesson==null)return;
-			if(mlesson.isNowHaving()==0)return;
+			if(timetable.isNowHavingLesson(mlesson) == 0)return;
 			textTop = top + cellHeight * time
 			+ cellHeight - paint.getTextSize();
 			break;
 		case -1:
 			mlesson = getLesson(week, time - 1);
 			if(mlesson==null)return;
-			if(mlesson.isNowHaving()==0)return;
+			if(timetable.isNowHavingLesson(mlesson) == 0)return;
 			textTop = top + cellHeight * (time - 1)
 			+ cellHeight - paint.getTextSize();
 			break;
@@ -226,14 +226,14 @@ public class Grid extends ScheduleParent implements Serializable {
 
 		// 画课程名
 		if (busytime){
-			if(lesson.isInRange){
+			if(lesson.isInRange(context)){
 				paint.setColor(Color.WHITE);
 			}else{
 				paint.setColor(Color.TRANSPARENT);
 			}
 		}else if(lesson.hasHomework){
 			paint.setColor(Color.parseColor("#CE5600"));
-		}else if(!lesson.isInRange){
+		}else if(!lesson.isInRange(context)){
 			paint.setColor(Color.parseColor("#999999"));
 		}else{
 			paint.setColor(Color.BLACK);
@@ -259,12 +259,12 @@ public class Grid extends ScheduleParent implements Serializable {
 		// 画地点
 		paint.setTextSize(lessonPlaceSize);
 		if (busytime){
-			if(lesson.isInRange){
+			if(lesson.isInRange(context)){
 				paint.setColor(Color.WHITE);
 			}else{
 				paint.setColor(Color.TRANSPARENT);
 			}
-		}else if(!lesson.isInRange){
+		}else if(!lesson.isInRange(context)){
 			paint.setColor(Color.parseColor("#999999"));
 		}else{
 			paint.setColor(Color.parseColor("#B22222"));

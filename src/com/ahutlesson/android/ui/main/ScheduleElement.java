@@ -1,4 +1,4 @@
-package com.ahutlesson.android.view;
+package com.ahutlesson.android.ui.main;
 
 import android.graphics.Canvas;
 

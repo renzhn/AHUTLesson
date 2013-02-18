@@ -1,7 +1,7 @@
-package com.ahutlesson.android.receiver;
+package com.ahutlesson.android.alarm;
 
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.Timetable;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -31,7 +31,7 @@ public class SoundNormalReceiver extends BroadcastReceiver {
 		boolean enableSilent = preferences.getBoolean("SilentMode", true);
 		Lesson nextLesson = Timetable.getInstance(context).getNextLesson(Timetable.DelaySilent);
 		if(nextLesson!=null && enableSilent){
-			long alarmTime = nextLesson.getNextTime(Timetable.DelaySilent);
+			long alarmTime = Timetable.getInstance(context).getNextTime(nextLesson, Timetable.DelaySilent);
 			Intent intent1 = new Intent(context,SoundSilentReceiver.class);
 			intent1.putExtra("week", nextLesson.week);
 			intent1.putExtra("time", nextLesson.time);

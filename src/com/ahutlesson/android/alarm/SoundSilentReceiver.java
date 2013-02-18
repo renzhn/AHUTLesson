@@ -1,7 +1,7 @@
-package com.ahutlesson.android.receiver;
+package com.ahutlesson.android.alarm;
 
-import com.ahutlesson.android.lesson.Lesson;
-import com.ahutlesson.android.time.Timetable;
+import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.Timetable;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -48,8 +48,8 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 		// 恢复正常音量
 		Timetable timetable = Timetable.getInstance(context);
 		Lesson curLesson = timetable.getCurrentLesson(Timetable.DelaySilent);
-		if(curLesson == null)return;//手动更改时间，执行时并无课
-		long alarmTime = curLesson.getCurrentLessonEndTime(Timetable.DelaySilent);
+		if(curLesson == null) return; //手动更改时间，执行时并无课
+		long alarmTime = timetable.getCurrentLessonEndTime(curLesson, Timetable.DelaySilent);
 		AlarmManager am = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 		Intent intent = new Intent(context,SoundNormalReceiver.class);
 		intent.putExtra("week", week);

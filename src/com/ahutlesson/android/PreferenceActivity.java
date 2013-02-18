@@ -1,9 +1,8 @@
 package com.ahutlesson.android;
 
-import com.ahutlesson.android.lesson.LessonManager;
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.utils.ChangeLog;
-import com.ahutlesson.android.utils.NetworkHelper;
-import com.ahutlesson.android.utils.ValidateHelper;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -15,13 +14,10 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
-import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceClickListener;
-import android.widget.Toast;
 
 public class PreferenceActivity extends SherlockPreferenceActivity {
 
@@ -54,21 +50,17 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 
 		});
 
-		Preference downDB = (Preference) findPreference("down_db");
+		Preference downDB = (Preference) findPreference("down_lesson");
 		downDB.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 			public boolean onPreferenceClick(Preference preference) {
-				new AlertDialog.Builder(PreferenceActivity.this)
-						.setTitle("清空确认")
-						.setMessage("下载课表前会清空以前的课表\n是否继续？")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										beginUpdate();
-									}
-
-								}).setNegativeButton("取消", null).show();
+				confirm("下载课表会清空现有的课表，继续吗？", new Runnable() {
+					@Override
+					public void run() {
+						new DownLessonTask().execute();
+					}
+					
+				});
 				return true;
 			}
 
@@ -77,17 +69,13 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		delDB.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 			public boolean onPreferenceClick(Preference preference) {
-				new AlertDialog.Builder(PreferenceActivity.this)
-						.setTitle("清空确认")
-						.setMessage("确定要清空课表吗？")
-						.setPositiveButton("确定",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int which) {
-										LessonManager.getInstance(PreferenceActivity.this).deleteDB();
-									}
-
-								}).setNegativeButton("取消", null).show();
+				confirm("确定要清空课表吗？", new Runnable() {
+					@Override
+					public void run() {
+						LessonManager.getInstance(PreferenceActivity.this).deleteDB();
+					}
+					
+				});
 				return true;
 			}
 
@@ -125,68 +113,42 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 
 	}
 
-	private void beginUpdate() {
-		SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
-		String xh = preferences.getString("down_xh", "");
-		if (xh.contentEquals("")) {
-			alert("请先设置学号");
-			return;
-		}
-		if (!ValidateHelper.isXH(xh)) {
-			alert("学号无效");
-			return;
-		}
-		new UpdateAsync().execute(xh);
-	}
-
-	class UpdateAsync extends AsyncTask<String, String, String> {
-		ProgressDialog dialog;
-
+	class DownLessonTask extends AsyncTask<Integer, Integer, String> {
+		
+		ProgressDialog progressDialog;
+		
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			dialog = ProgressDialog.show(PreferenceActivity.this, "",
-					"数据下载中...", true);
+			progressDialog = ProgressDialog.show(PreferenceActivity.this, "请稍等","数据下载中...", true);
 		}
 
 		@Override
-		protected String doInBackground(String... para) {
-			return NetworkHelper
-					.readURL("http://ahut2011.sinaapp.com/lesson/getdata.php?xh="
-							+ para[0]);
-		}
-
-		@Override
-		protected void onPostExecute(String result) {
-			switch (LessonManager.getInstance(PreferenceActivity.this).updateDB(result)) {
-			case LessonManager.EMPTY_RESPONSE:
-				alert("服务器未返回数据");
-				break;
-			case LessonManager.EMPTY_DATA:
-				alert("未找到课表信息");
-				break;
-			case LessonManager.PARSE_ERROR:
-				alert("解析数据失败");
-				break;
-			case LessonManager.UPDATE_OK:
-				alert("数据下载成功");
-				break;
+		protected String doInBackground(Integer... para) {
+			try {
+				UserManager.getInstance(PreferenceActivity.this).updateLessonDB();
+			} catch (Exception e) {
+				return e.getMessage();
 			}
-			dialog.dismiss();
+			return null;
+		}
+
+		@Override
+		protected void onPostExecute(String ret) {
+			progressDialog.dismiss();
+			if(ret != null) {
+				alert(ret);
+			}else{
+				alert("下载成功！");
+			}
 		}
 	}
 
 	public void share() {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT,
-				"我在用安工大课程助手，挺不错的，下载地址：http://ahutapp.com/lesson");
+		intent.putExtra(Intent.EXTRA_TEXT, "课友下载地址：http://ahutapp.com/lesson");
 		startActivity(Intent.createChooser(intent, "分享到"));
-	}
-
-	public void alert(String notice) {
-		Toast.makeText(this, notice, Toast.LENGTH_LONG).show();
 	}
 
 	@Override
@@ -199,5 +161,24 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	public void confirm(String message, final Runnable r) {
+		new AlertDialog.Builder(PreferenceActivity.this)
+		.setMessage(message)
+		.setPositiveButton("确定",
+				new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog,
+							int which) {
+						r.run();
+					}
 
+				}).setNegativeButton("取消", null).show();
+	}
+	
+	public void alert(String message) {
+		new AlertDialog.Builder(this)
+		.setMessage(message)
+		.setPositiveButton("确定", null).show();
+	}
+	
 }

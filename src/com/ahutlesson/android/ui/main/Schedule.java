@@ -1,8 +1,8 @@
-package com.ahutlesson.android.view;
+package com.ahutlesson.android.ui.main;
 
 import java.util.ArrayList;
 
-import com.ahutlesson.android.lesson.Lesson;
+import com.ahutlesson.android.model.Lesson;
 
 
 import android.app.Activity;
