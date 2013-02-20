@@ -45,7 +45,7 @@ public class BaseActivity extends SherlockActivity {
 	public void alert(String message) {
 		new AlertDialog.Builder(this)
 			.setTitle(R.string.app_name)
-			.setIcon(R.drawable.error)
+			.setIcon(R.drawable.ahutlesson)
 			.setMessage(message)
 			.setPositiveButton(R.string.ok, null).show();
 	}

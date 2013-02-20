@@ -170,14 +170,14 @@ public class LessonDetailActivity extends BaseActivity {
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
 		case 0:
+			if (lesson == null) return true;
 			Intent i = new Intent(this, EditLessonActivity.class);
 			i.putExtra("week", week);
 			i.putExtra("time", time);
 			startActivity(i);
 			return true;
 		case 1:
-			if (lesson == null)
-				break;
+			if (lesson == null) return true;
 			new AlertDialog.Builder(LessonDetailActivity.this)
 					.setTitle("删除课程")
 					.setMessage("确定删除本课程？")
@@ -198,7 +198,6 @@ public class LessonDetailActivity extends BaseActivity {
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
-		return false;
 	}
 	
 	
