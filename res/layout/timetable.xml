@@ -28,23 +28,26 @@
 
                 <EditText
                     android:id="@+id/etBeginDate_year"
-                    android:layout_width="70dp"
+                    android:layout_width="65dp"
                     android:layout_height="wrap_content"
                     android:inputType="time" >
+
                 </EditText>
 
                 <EditText
                     android:id="@+id/etBeginDate_month"
-                    android:layout_width="40dp"
+                    android:layout_width="45dp"
                     android:layout_height="wrap_content"
                     android:inputType="time" >
+
                 </EditText>
 
                 <EditText
                     android:id="@+id/etBeginDate_day"
-                    android:layout_width="40dp"
+                    android:layout_width="45dp"
                     android:layout_height="wrap_content"
                     android:inputType="time" >
+
                 </EditText>
             </LinearLayout>
 

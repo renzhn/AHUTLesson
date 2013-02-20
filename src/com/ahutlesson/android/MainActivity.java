@@ -9,11 +9,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.text.InputType;
-import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -24,11 +23,14 @@ import com.ahutlesson.android.alarm.Alert;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
-import com.ahutlesson.android.ui.main.Grid;
+import com.ahutlesson.android.ui.main.GridView;
 import com.ahutlesson.android.ui.main.HomeworkFragment;
 import com.ahutlesson.android.ui.main.LessonListFragmentAdapter;
 import com.ahutlesson.android.ui.main.ScheduleView;
 import com.ahutlesson.android.utils.ChangeLog;
+import com.nostra13.universalimageloader.core.DisplayImageOptions;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
 import com.viewpagerindicator.PageIndicator;
@@ -45,6 +47,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	private static final int HOMEWORK_VIEW = 2;
 
 	//TODAY_VIEW
+	private static View todayView;
 	private LessonListFragmentAdapter mLessonListFragmentAdapter;
 	private ViewPager mPager;
 	private PageIndicator mIndicator;
@@ -82,16 +85,35 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(list, this);
+		
+		//Today View
+		todayView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+				.inflate(R.layout.today, null, false);
+		mLessonListFragmentAdapter = new LessonListFragmentAdapter(getSupportFragmentManager());
 
-		// ShowView
-		showView();
+		mPager = (ViewPager) todayView.findViewById(R.id.pager);
+		mPager.setAdapter(mLessonListFragmentAdapter);
 
+		mIndicator = (TitlePageIndicator) todayView.findViewById(R.id.indicator);
+		mIndicator.setViewPager(mPager);
+		mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
+		
 		// Changelog
 		ChangeLog cl = new ChangeLog(this);
 		if (cl.firstRun()) {
 			cl.getLogDialog().show();
 		}
 		
+		//ImageLoader
+		DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
+	        .cacheInMemory()
+	        .cacheOnDisc()
+	        .build();
+		ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())
+	        .defaultDisplayImageOptions(defaultOptions)
+	        .build();
+		ImageLoader.getInstance().init(config); 
+        
 		// Update
 		MobclickAgent.updateOnlineConfig(this);
 		MobclickAgent.onError(this);
@@ -105,16 +127,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	public void showView() {
 		switch (viewMode) {
 		case TODAY_VIEW:
-			setContentView(R.layout.today);
-
-			mLessonListFragmentAdapter = new LessonListFragmentAdapter(getSupportFragmentManager());
-			
-			mPager = (ViewPager) findViewById(R.id.pager);
-			mPager.setAdapter(mLessonListFragmentAdapter);
-
-			mIndicator = (TitlePageIndicator) findViewById(R.id.indicator);
-			mIndicator.setViewPager(mPager);
-			mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
+			setContentView(todayView);
 			break;
 		case GRID_VIEW:
 			// 绘制课表
@@ -132,7 +145,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			
 			FragmentManager fragmentManager = getSupportFragmentManager();
 			FragmentTransaction transaction = fragmentManager.beginTransaction();
-			transaction.replace(R.id.frameLayoutFragment, HomeworkFragment.newInstance());
+			transaction.replace(R.id.frameLayoutFragment, new HomeworkFragment());
 			transaction.commit();
 			break;
 		}
@@ -158,21 +171,18 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	}
 	
 	private void setDateInfo() {
-		LinearLayout layoutDateInfo = (LinearLayout) getLayoutInflater().inflate(R.layout.dateinfo, null);
-		TextView text = new TextView(this);
-		text.setGravity(Gravity.CENTER);
-		text.setText(dateInfo());
-		text.setTextSize(15);
-		text.setPadding(10, 0, 0, 0);
-		text.setOnClickListener(new View.OnClickListener() {
+		View custumView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+				.inflate(R.layout.actionbar_customview, null, false);
+		TextView tvCustomView = (TextView) custumView.findViewById(R.id.tvCumstomView);
+		tvCustomView.setText(dateInfo());
+		tvCustomView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
 				Intent i = new Intent(MainActivity.this, TimetableSettingActivity.class);
 				startActivity(i);
 			}
 		});
-		layoutDateInfo.addView(text);
-		actionBar.setCustomView(layoutDateInfo);
+		actionBar.setCustomView(custumView);
 		actionBar.setDisplayShowCustomEnabled(true);
 	}
 
@@ -245,7 +255,6 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			final EditText input = new EditText(this);
 			input.setInputType(InputType.TYPE_CLASS_NUMBER);
 			alert.setView(input);
-
 			alert.setPositiveButton(R.string.ok,
 					new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog,
@@ -279,9 +288,9 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 
 	// 课程详情
 	public void openLessonDetail() {
-		Intent i = new Intent(this, LessonActivity.class);
-		i.putExtra("week", Grid.markWeek);
-		i.putExtra("time", Grid.markTime);
+		Intent i = new Intent(this, LessonDetailActivity.class);
+		i.putExtra("week", GridView.markWeek);
+		i.putExtra("time", GridView.markTime);
 		this.startActivity(i);
 	}
 

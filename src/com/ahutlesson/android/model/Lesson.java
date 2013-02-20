@@ -36,4 +36,12 @@ public class Lesson {
 		return !beforeStart(context) && !afterEnd(context);
 	}
 
+	public String getTitle() {
+		return name + "(" + teacher + ")";
+	}
+
+	public String getDuration() {
+		return "µÚ" + startweek + "~" + endweek + "ÖÜ";
+	}
+
 }

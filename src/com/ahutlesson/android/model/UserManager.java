@@ -2,7 +2,7 @@ package com.ahutlesson.android.model;
 
 import java.util.ArrayList;
 
-import com.ahutlesson.android.api.AHUTAPIAccessor;
+import com.ahutlesson.android.api.AHUTAccessor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,7 +12,7 @@ public class UserManager {
 
 	private static UserManager userManager;
 
-	public static String userCookie;
+	private static String userCookie;
 	
 	private Context context;
 	private SharedPreferences prefs;
@@ -67,11 +67,11 @@ public class UserManager {
 	}
 	
 	public void registerUser(String uxh, String password) throws Exception {
-		String ret = AHUTAPIAccessor.regsterUser(uxh, password);
+		String ret = AHUTAccessor.getInstance(context).regsterUser(uxh, password);
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAPIAccessor.getUserInfo();
+			User user = AHUTAccessor.getInstance(context).getUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
 			Exception ex = new Exception(ret.substring(2));
@@ -84,11 +84,11 @@ public class UserManager {
 	}
 	
 	public void verifyUser(String uxh, String password) throws Exception {
-		String ret = AHUTAPIAccessor.validateUser(uxh, password);
+		String ret = AHUTAccessor.getInstance(context).validateUser(uxh, password);
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAPIAccessor.getUserInfo();
+			User user = AHUTAccessor.getInstance(context).getUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
 			Exception ex = new Exception(ret.substring(2));
@@ -107,13 +107,20 @@ public class UserManager {
 	}
 	
 	public String getCookie() {
-		return prefs.getString("ck", null);
+		if(userCookie == null) {
+			loadCookie();
+		}
+		return userCookie;
+	}
+	
+	public void loadCookie() {
+		userCookie = prefs.getString("ck", null);
 	}
 
 	public void updateLessonDB() throws Exception {
 		String uxh = getUserXH();
 		if(uxh == null) throw new Exception("Î´µÇÂ¼");
-		ArrayList<Lesson> lessonlist = AHUTAPIAccessor.getLessonList(uxh);
+		ArrayList<Lesson> lessonlist = AHUTAccessor.getInstance(context).getLessonList(uxh);
 		if(lessonlist == null) throw new Exception("ÏÂÔØÊ§°Ü£¬Çë¼ì²éÍøÂçÁ¬½Ó");
 		LessonManager.getInstance(context).lessonlistToDB(lessonlist);
 	}

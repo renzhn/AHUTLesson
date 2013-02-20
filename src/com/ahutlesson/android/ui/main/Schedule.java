@@ -15,12 +15,12 @@ import android.view.View;
 public class Schedule extends ScheduleParent {
 	
 	private ArrayList<ScheduleElement> elements = new ArrayList<ScheduleElement>();
-	public Grid grid;
+	public GridView grid;
 
 	public Schedule(Activity activity, View view, Lesson[][] lessons) {
 		super(activity, view);
 		elements.add(new Week(activity, view));
-		grid = new Grid(activity, view, lessons);
+		grid = new GridView(activity, view, lessons);
 		elements.add(grid);
 	}
 

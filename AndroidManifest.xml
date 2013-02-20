@@ -32,7 +32,16 @@
         <activity
             android:name=".LessonActivity"
             android:label="课程讨论" 
-            android:theme="@style/TabPage"
+			android:uiOptions="splitActionBarWhenNarrow" >
+        </activity>
+        <activity
+            android:name=".ThreadActivity"
+            android:label="查看帖子"
+            android:windowSoftInputMode="stateHidden" >
+        </activity>
+        <activity
+            android:name=".NewThreadActivity"
+            android:label="发表帖子" 
 			android:uiOptions="splitActionBarWhenNarrow" >
         </activity>
         <activity

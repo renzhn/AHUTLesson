@@ -44,14 +44,16 @@ public class BaseActivity extends SherlockActivity {
 	
 	public void alert(String message) {
 		new AlertDialog.Builder(this)
-		.setMessage(message)
-		.setPositiveButton(R.string.cancel, null).show();
+			.setTitle(R.string.app_name)
+			.setIcon(R.drawable.error)
+			.setMessage(message)
+			.setPositiveButton(R.string.ok, null).show();
 	}
 	
 	public void alert(String title, String message) {
 		new AlertDialog.Builder(this)
-		.setTitle(title)
-		.setMessage(message)
-		.setPositiveButton(R.string.cancel, null).show();
+			.setTitle(title)
+			.setMessage(message)
+			.setPositiveButton(R.string.ok, null).show();
 	}
 }

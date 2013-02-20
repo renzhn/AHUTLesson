@@ -28,11 +28,6 @@ public class HomeworkFragment extends SherlockListFragment {
 	
 	private List<Lesson> homeworkLessonList;
 	
-	public static HomeworkFragment newInstance() {
-		HomeworkFragment fragment = new HomeworkFragment();
-		return fragment;
-	}
-	
     @Override  
     public void onCreate(Bundle savedInstanceState) {  
         super.onCreate(savedInstanceState);  
@@ -92,7 +87,7 @@ public class HomeworkFragment extends SherlockListFragment {
 		loadData();
 		FragmentManager fragmentManager = this.getFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.replace(R.id.frameLayoutFragment, HomeworkFragment.newInstance());
+		transaction.replace(R.id.frameLayoutFragment, new HomeworkFragment());
 		transaction.commit();
 	}
 	

@@ -15,7 +15,7 @@ import android.view.View;
  * 绘制日期和网格
  * 
  * */
-public class Grid extends ScheduleParent implements Serializable {
+public class GridView extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	private Canvas canvas;
@@ -34,7 +34,7 @@ public class Grid extends ScheduleParent implements Serializable {
 	public static final int BUSYTIME = 2;
 	public static final int NEXTTIME = 3;
 	
-	public Grid(Activity activity, View view, Lesson[][] lessons0) {
+	public GridView(Activity activity, View view, Lesson[][] lessons0) {
 		super(activity, view);
 		left = borderMargin;
 		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;

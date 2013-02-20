@@ -7,11 +7,12 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-  		android:orientation="vertical"
+        android:orientation="vertical"
         android:padding="10dp" >
 
         <EditText
             android:id="@+id/etLessonName"
+            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="课程名称" >
@@ -19,6 +20,7 @@
 
         <EditText
             android:id="@+id/etLessonAlias"
+            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="课程别名" >
@@ -26,6 +28,7 @@
 
         <EditText
             android:id="@+id/etLessonPlace"
+            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="上课地点" >
@@ -33,24 +36,50 @@
 
         <EditText
             android:id="@+id/etTeacherName"
+            android:inputType="textNoSuggestions"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="教师姓名" >
         </EditText>
 
-        <EditText
-            android:id="@+id/etStartWeek"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="起始周" >
-        </EditText>
-
-        <EditText
-            android:id="@+id/etEndWeek"
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="起始周:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+            
+            <EditText
+                android:id="@+id/etStartWeek"
+            	android:inputType="textNoSuggestions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="起始周" >
+            </EditText>
+        </LinearLayout>
+        
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="结束周" >
-        </EditText>
+            android:orientation="horizontal" >
+            
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="结束周:"
+                android:textAppearance="?android:attr/textAppearanceMedium" />
+	        <EditText
+	            android:id="@+id/etEndWeek"
+            	android:inputType="textNoSuggestions"
+	            android:layout_width="match_parent"
+	            android:layout_height="wrap_content"
+	            android:hint="结束周" >
+	        </EditText>
+        </LinearLayout>
     </LinearLayout>
 
 </LinearLayout>

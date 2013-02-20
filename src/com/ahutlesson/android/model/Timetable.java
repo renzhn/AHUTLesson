@@ -452,17 +452,21 @@ public class Timetable {
 		return systemWeek2NormalWeek(calendar.get(Calendar.DAY_OF_WEEK));
 	}
 	
-	public static int getCurrentMinute(){
+	public static int getCurrentMinute() {
 		Calendar calendar = Calendar.getInstance();
 		return calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE);
 	}
 	
-	public static boolean isValidWeek(int week){
+	public static boolean isValidWeek(int week) {
 		return (week >= 0&&week <= 6)?true:false;
 	}
 	
-	public static boolean isValidTime(int time){
+	public static boolean isValidTime(int time) {
 		return (time >= 0&&time <= 4)?true:false;
+	}
+	
+	public static boolean isValidWeekTime(int week, int time) {
+		return isValidWeek(week) && isValidTime(time);
 	}
 	
 	public boolean nowIsAtLessonBreak(int week, int i) {

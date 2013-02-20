@@ -37,9 +37,8 @@
 
                 <EditText
                     android:id="@+id/etLoginXH"
-                    android:layout_width="150dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:ems="9"
                     android:hint="学号"
                     android:inputType="number"
                     android:singleLine="true" >
@@ -47,9 +46,8 @@
 
                 <EditText
                     android:id="@+id/etLoginPassword"
-                    android:layout_width="150dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="密码"
                     android:inputType="textPassword" >
                 </EditText>

@@ -71,11 +71,11 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 
 	public void alert(String message) {
 		new AlertDialog.Builder(this).setMessage(message)
-				.setPositiveButton(R.string.cancel, null).show();
+				.setPositiveButton(R.string.ok, null).show();
 	}
 
 	public void alert(String title, String message) {
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
-				.setPositiveButton(R.string.cancel, null).show();
+				.setPositiveButton(R.string.ok, null).show();
 	}
 }

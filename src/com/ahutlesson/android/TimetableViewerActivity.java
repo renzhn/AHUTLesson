@@ -16,7 +16,7 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ahutlesson.android.api.AHUTAPIAccessor;
+import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.ui.main.ScheduleView;
 import com.ahutlesson.android.utils.ValidateHelper;
@@ -51,7 +51,7 @@ public class TimetableViewerActivity extends BaseActivity {
 
 		@Override
 		protected String doInBackground(String... para) {
-			return AHUTAPIAccessor.getURL("http://ahut2011.sinaapp.com/lesson/getdata.php?xh="
+			return AHUTAccessor.getInstance(TimetableViewerActivity.this).getURL("http://ahut2011.sinaapp.com/lesson/getdata.php?xh="
 							+ para[0]);
 		}
 

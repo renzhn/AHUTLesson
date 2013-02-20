@@ -14,8 +14,6 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
-import com.ahutlesson.android.model.User;
-import com.ahutlesson.android.model.UserManager;
 import com.umeng.analytics.MobclickAgent;
 
 public class LessonDetailActivity extends BaseActivity {
@@ -28,9 +26,6 @@ public class LessonDetailActivity extends BaseActivity {
 	
 	private LessonManager lessonManager;
 	private Timetable timetable;
-	private UserManager userManager;
-	private User user;
-
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +34,7 @@ public class LessonDetailActivity extends BaseActivity {
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
 
-		if (!((week >= 0 && week <= 6) && (time >= 0 && time <= 4))) {
+		if(!Timetable.isValidWeekTime(week, time)) {
 			this.finish();
 			return;
 		}
@@ -80,8 +75,6 @@ public class LessonDetailActivity extends BaseActivity {
 		
 		lessonManager = LessonManager.getInstance(this);
 		timetable = Timetable.getInstance(this);
-		userManager = UserManager.getInstance(this);
-		user = userManager.getUser();
 
 		tvCurrentTime.setText(timetable.weekname[week]
 				+ timetable.lessontime_name[time]);
@@ -93,8 +86,7 @@ public class LessonDetailActivity extends BaseActivity {
 		if (lesson != null) {
 			tvLessonName.setText(lesson.name);
 			tvLessonPlace.setText(lesson.place);
-			tvLessonWeek.setText("µÚ" + lesson.startweek + "~" + lesson.endweek
-					+ "ÖÜ");
+			tvLessonWeek.setText(lesson.getDuration());
 			tvTeacherName.setText(lesson.teacher);
 			if (lesson.homework != null && !lesson.homework.contentEquals("")) {
 				tvHomework.setText(lesson.homework);
@@ -166,26 +158,24 @@ public class LessonDetailActivity extends BaseActivity {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(R.string.edit)
-			.setIcon(android.R.drawable.ic_menu_edit)
+		menu.add(0, 0, Menu.NONE, R.string.edit)
+			.setIcon(R.drawable.edit)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(user.uname)
-			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-		menu.add(R.string.delete)
-			.setIcon(android.R.drawable.ic_menu_delete)
+		menu.add(0, 1, Menu.NONE, R.string.delete)
+			.setIcon(R.drawable.delete)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
 	}
 
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
-		case R.id.menu_edit_lesson:
+		case 0:
 			Intent i = new Intent(this, EditLessonActivity.class);
 			i.putExtra("week", week);
 			i.putExtra("time", time);
 			startActivity(i);
 			return true;
-		case R.id.menu_delete_lesson:
+		case 1:
 			if (lesson == null)
 				break;
 			new AlertDialog.Builder(LessonDetailActivity.this)

@@ -3,6 +3,8 @@ package com.ahutlesson.android.ui.main;
 import java.util.ArrayList;
 import java.util.List;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.ContextMenu;
@@ -61,7 +63,7 @@ public class LessonListFragment extends SherlockListFragment {
 	
 	public void onListItemClick(ListView parent, View v, int position, long id) {
 		Lesson l = lessonList.get(position);
-		openLessonDetail(l.week, l.time);
+		openLessonForum(l);
 	}
 	
 	public void onCreateContextMenu(ContextMenu menu, View v,
@@ -73,7 +75,7 @@ public class LessonListFragment extends SherlockListFragment {
 	
 	public boolean onContextItemSelected(MenuItem item) {
 		if(item.getGroupId() != weekDay + 100) return false;
-		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();		
+		final AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();		
 		switch (item.getItemId()) {
 		case MENU_EDIT:
 			Intent i = new Intent(this.getActivity().getBaseContext(), EditLessonActivity.class);
@@ -82,17 +84,25 @@ public class LessonListFragment extends SherlockListFragment {
 			startActivity(i);
 			return true;
 		case MENU_DELETE:
-			try{
-				Lesson tmpLesson = lessonList.get(info.position);
-				LessonManager lessonManager = LessonManager.getInstance(this.getActivity());
-				lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time);
-				if(Timetable.getInstance(this.getActivity()).canAppend(tmpLesson))
-					lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time + 1);
-			}catch(IndexOutOfBoundsException ex){
-				return true;
-			}
+			new AlertDialog.Builder(LessonListFragment.this.getActivity()).setTitle("清空作业")
+			.setMessage("确定清空本课程作业？")
+			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog, int which) {
+					try{
+						Lesson tmpLesson = lessonList.get(info.position);
+						LessonManager lessonManager = LessonManager.getInstance(LessonListFragment.this.getActivity());
+						lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time);
+						if(Timetable.getInstance(LessonListFragment.this.getActivity()).canAppend(tmpLesson))
+							lessonManager.deleteLessonAt(tmpLesson.week, tmpLesson.time + 1);
+					}catch(IndexOutOfBoundsException ex){
+						return;
+					}
+					reload();
+				}
+
+			}).setNegativeButton(R.string.cancel, null).show();
+
 			
-			reload();
 			return true;
 		}
 		return super.onContextItemSelected(item);
@@ -114,11 +124,12 @@ public class LessonListFragment extends SherlockListFragment {
 		mainActiivty.refreshTodayView();
 	}
 	
-	// 课程详情
-	public void openLessonDetail(int week,int time) {
+	public void openLessonForum(Lesson l) {
 		Intent i = new Intent(this.getActivity(), LessonActivity.class);
-		i.putExtra("week", week);
-		i.putExtra("time", time);
+		i.putExtra("lid", l.lid);
+		i.putExtra("week", l.week);
+		i.putExtra("time", l.time);
+		i.putExtra("title", l.getTitle());
 		this.startActivity(i);
 	}
 }

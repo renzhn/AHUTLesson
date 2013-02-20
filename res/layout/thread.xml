@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical" >
+
+    <LinearLayout
+        android:id="@+id/layoutLoading"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:orientation="vertical" >
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" >
+        </ProgressBar>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layoutThread"
+        android:layout_weight="1"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone" >
+
+        <ListView
+            android:id="@+id/lvPostList"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:cacheColorHint="@android:color/transparent"
+            android:divider="#DDD"
+            android:dividerHeight="1px"
+            android:fadingEdge="none"
+            android:persistentDrawingCache="scrolling" >
+        </ListView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/footerPanel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="2px"
+            android:layout_alignParentTop="true"
+            android:layout_centerVertical="true"
+            android:background="#DDD" />
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="50dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="2dp"
+            android:paddingLeft="5dp" 
+            android:paddingRight="5dp"
+            android:paddingBottom="5dp"
+            android:gravity="center_vertical"
+            android:background="#FFF" >
+
+            <ImageButton
+                android:id="@+id/ibSend"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_alignParentRight="true"
+            	android:layout_alignParentBottom="true"
+                android:background="@drawable/listitem"
+                android:src="@drawable/send" />
+
+            <EditText
+                android:id="@+id/etContent"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_alignParentBottom="true"
+                android:layout_marginRight="3dp"
+                android:layout_toLeftOf="@+id/ibSend"
+                android:gravity="left"
+		        android:scrollHorizontally="false"
+		        android:scrollbars="vertical"
+                android:hint="输入回复内容"
+                android:inputType="textMultiLine|textNoSuggestions" >
+
+            </EditText>
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>

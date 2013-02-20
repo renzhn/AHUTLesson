@@ -47,28 +47,26 @@
 
                 <EditText
                     android:id="@+id/etRegisterXH"
-                    android:layout_width="150dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:ems="9"
                     android:hint="学号"
                     android:inputType="number"
                     android:singleLine="true" >
+
                 </EditText>
 
                 <EditText
                     android:id="@+id/etRegisterPassword"
-                    android:layout_width="150dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="密码"
                     android:inputType="textPassword" >
                 </EditText>
 
                 <EditText
                     android:id="@+id/etRegisterConfirmPassword"
-                    android:layout_width="150dp"
+                    android:layout_width="115dp"
                     android:layout_height="wrap_content"
-                    android:ems="10"
                     android:hint="确认密码"
                     android:inputType="textPassword" >
                 </EditText>
