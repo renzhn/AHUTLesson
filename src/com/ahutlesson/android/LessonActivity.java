@@ -238,7 +238,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		protected void onPostExecute(ArrayList<ForumThread> ret) {
 			if(ret == null) {
 				alert("获取数据失败，请检查手机网络设置");
-				LessonActivity.this.finish();
+				layoutLoading.setVisibility(View.GONE);
 				return;
 			}
 
