@@ -24,6 +24,7 @@ import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.User;
 import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.ui.lesson.ForumThread;
+import com.ahutlesson.android.ui.lesson.Lessonmate;
 import com.ahutlesson.android.ui.message.Message;
 import com.ahutlesson.android.ui.notice.Notice;
 import com.ahutlesson.android.ui.thread.Post;
@@ -180,6 +181,7 @@ public class AHUTAccessor {
 				t.uname = thread.getString("uname");
 				t.view = thread.getInt("view");
 				t.reply = thread.getInt("reply");
+				t.top = (thread.getInt("top") == 1);
 				t.setReplyTime(thread.getString("lastreply_time"));
 				threadList.add(t);
 			}
@@ -318,6 +320,31 @@ public class AHUTAccessor {
 		params.add(new BasicNameValuePair("t", title));
 		params.add(new BasicNameValuePair("c", content));
 		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
+	}
+
+	public ArrayList<Lessonmate> getLessonmateList(int lid,int page) {
+		String ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid + "&page=" + page);
+		ArrayList<Lessonmate> list = new ArrayList<Lessonmate>();
+		try {
+			JSONTokener jsonParser = new JSONTokener(ret);
+			JSONArray lessonmates = (JSONArray)jsonParser.nextValue();
+			JSONObject lessonmate;
+			for(int i = 0; i < lessonmates.length(); i++) {
+				lessonmate = lessonmates.getJSONObject(i);
+				Lessonmate l = new Lessonmate();
+				l.xh = lessonmate.getString("xh");
+				l.xm = lessonmate.getString("xm");
+				l.zy = lessonmate.getString("zy");
+				l.bj = lessonmate.getString("bj");
+				l.registered = (lessonmate.getInt("registered") == 1);
+				l.hasAvatar = (lessonmate.getInt("has_avatar") == 1);
+				list.add(l);
+			}
+			return list;
+		} catch (Exception ex) {
+			ex.printStackTrace();
+			return null;
+		}
 	}
 	
 }

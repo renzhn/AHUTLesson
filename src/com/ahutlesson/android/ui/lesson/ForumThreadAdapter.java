@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -32,6 +33,10 @@ public class ForumThreadAdapter extends ArrayAdapter<ForumThread> {
         TextView time = (TextView) forumThreadItem.findViewById(R.id.tvForumThreadItemTime);
         TextView reply = (TextView) forumThreadItem.findViewById(R.id.tvForumThreadItemReply);
         subject.setText(String.valueOf(thread.subject));
+        if(thread.top) {
+        	ImageView ivTopThread = (ImageView)forumThreadItem.findViewById(R.id.ivTopThread);
+        	ivTopThread.setVisibility(View.VISIBLE);
+        }
         uname.setText(String.valueOf(thread.uname));
         time.setText(thread.getReplyTime());
         reply.setText(String.valueOf(thread.reply));

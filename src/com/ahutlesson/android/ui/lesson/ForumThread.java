@@ -11,6 +11,7 @@ public class ForumThread {
 	public int tid, lid, view, reply;
 	public String subject, uxh, uname;
 	public Date replyTime;
+	public boolean top;
 	
 	public void setReplyTime(String replyTime0) {
 		SimpleDateFormat  format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  

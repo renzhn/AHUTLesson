@@ -31,11 +31,10 @@
             android:id="@+id/lvList"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:cacheColorHint="@android:color/transparent"
             android:divider="#DDD"
             android:dividerHeight="1px"
             android:fadingEdge="none"
-            android:persistentDrawingCache="scrolling" >
+            android:persistentDrawingCache="none" >
         </ListView>
     </LinearLayout>
     
