@@ -24,9 +24,11 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 		super.onCreate(savedInstanceState);
 
+		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+		getSupportActionBar().setIcon(R.drawable.preference);
+		
 		addPreferencesFromResource(R.xml.preferences);
 
 		Preference changelog = (Preference) findPreference("changelog");

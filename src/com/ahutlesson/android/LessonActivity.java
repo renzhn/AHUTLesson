@@ -7,10 +7,10 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.model.ForumThread;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.User;
 import com.ahutlesson.android.model.UserManager;
+import com.ahutlesson.android.ui.lesson.ForumThread;
 import com.ahutlesson.android.ui.lesson.ForumThreadAdapter;
 
 import android.content.Context;
@@ -171,7 +171,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 					.setIcon(R.drawable.refresh)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			
-			actionBar.setLogo(R.drawable.comment);
+			actionBar.setLogo(R.drawable.forum);
 			break;
 		}
 		return true;
@@ -207,6 +207,9 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		switch (item.getItemId()) {
 		case MENU_REFRESH:
 			new loadLessonForum().execute();
+			return true;
+		case MENU_UNAME:
+			openActivity(ProfileActivity.class);
 			return true;
 		case MENU_COMPOSE:
 			Intent i = new Intent(LessonActivity.this, NewThreadActivity.class);

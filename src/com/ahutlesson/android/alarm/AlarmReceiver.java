@@ -19,7 +19,6 @@ import android.app.Notification;
 
 public class AlarmReceiver extends BroadcastReceiver {
 
-	private SharedPreferences preferences;
 	private Context context;
 	private int week, time;
 	private boolean enableAlert, enableNotification, enableSound,
@@ -30,16 +29,14 @@ public class AlarmReceiver extends BroadcastReceiver {
 		// 接到上课广播
 		context = context0;
 
-		preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
 		enableAlert = preferences.getBoolean("NoticeBeforeLesson", true);
 		if (!enableAlert)
 			return;
 
-		enableNotification = preferences.getBoolean(
-				"SendNotificationWhenNotice", false);
+		enableNotification = preferences.getBoolean("SendNotificationWhenNotice", false);
 		enableSound = preferences.getBoolean("PlaySoundWhenNotice", false);
-		enableNotificationSound = preferences.getBoolean(
-				"NotificationSoundWhenNotice", false);
+		enableNotificationSound = preferences.getBoolean("NotificationSoundWhenNotice", false);
 
 		week = intent0.getExtras().getInt("week");
 		time = intent0.getExtras().getInt("time");
@@ -96,17 +93,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 	        .setContentTitle("上课提醒")
 	        .setContentText(notice)
 	        .setContentIntent(pendingIntent)
-	        .setSmallIcon(R.drawable.calendar)
+	        .setSmallIcon(R.drawable.ahutlesson)
+	        .setAutoCancel(true)
+	        .setLights(0xff00ff00, 300, 1000)
 			.build();
 		n.flags = Notification.FLAG_AUTO_CANCEL;
 		if (enableNotificationSound) {
 			n.defaults |= Notification.DEFAULT_SOUND;
 		}
-		n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
-		n.flags |= Notification.FLAG_SHOW_LIGHTS;
-		n.ledARGB = 0xff00ff00;
-		n.ledOnMS = 300;
-		n.ledOffMS = 1000;// LED
+		n.defaults |= Notification.DEFAULT_VIBRATE;
 		nm.notify(0, n);
 	}
 }

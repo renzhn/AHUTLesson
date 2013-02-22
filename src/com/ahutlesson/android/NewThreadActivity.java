@@ -56,11 +56,11 @@ public class NewThreadActivity extends BaseActivity {
 		if(subject.contentEquals("") || content.contentEquals("")) {
 			alert("标题或内容为空！");
 		}else{
-			new postNewThread().execute();
+			new PostThread().execute();
 		}
 	}
 
-	private class postNewThread extends AsyncTask<Integer, Integer, String> {
+	private class PostThread extends AsyncTask<Integer, Integer, String> {
 		
 		ProgressDialog progressDialog;
 		
@@ -71,7 +71,7 @@ public class NewThreadActivity extends BaseActivity {
 		
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			return AHUTAccessor.getInstance(NewThreadActivity.this).postNewThread(lid, subject, content);
+			return AHUTAccessor.getInstance(NewThreadActivity.this).postThread(lid, subject, content);
 		}
 
 		@Override
@@ -91,7 +91,6 @@ public class NewThreadActivity extends BaseActivity {
 				alert("连接服务器失败，请检查手机网络设置");
 			}
 		}
-
 	}
 	
 }

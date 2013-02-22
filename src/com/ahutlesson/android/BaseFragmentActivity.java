@@ -69,6 +69,11 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 		}
 	}
 
+	public void openActivity(Class<?> cls) {
+		Intent i = new Intent(this, cls);
+		startActivity(i);
+	}
+	
 	public void alert(String message) {
 		new AlertDialog.Builder(this).setMessage(message)
 				.setPositiveButton(R.string.ok, null).show();

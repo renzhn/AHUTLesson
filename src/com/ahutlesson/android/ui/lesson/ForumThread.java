@@ -1,4 +1,4 @@
-package com.ahutlesson.android.model;
+package com.ahutlesson.android.ui.lesson;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

@@ -65,12 +65,14 @@
                     android:title="上课静音" />
                 <CheckBoxPreference
                     android:defaultValue="true"
+                    android:dependency="SilentMode"
                     android:key="VibrateWhenSilentMode"
                     android:summary="将手机设为静音时允许振动"
                     android:title="静音时允许振动" />
 
                 <ListPreference
                     android:defaultValue="10"
+                    android:dependency="SilentMode"
                     android:dialogTitle="提前/滞后时间"
                     android:entries="@array/SilentDelay_entries"
                     android:entryValues="@array/SilentDelay_entries"

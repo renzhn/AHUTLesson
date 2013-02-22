@@ -23,6 +23,7 @@ import com.ahutlesson.android.alarm.Alert;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
+import com.ahutlesson.android.service.CheckUnreadService;
 import com.ahutlesson.android.ui.main.GridView;
 import com.ahutlesson.android.ui.main.HomeworkFragment;
 import com.ahutlesson.android.ui.main.LessonListFragmentAdapter;
@@ -56,10 +57,12 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	private static ScheduleView scheduleView;
 
 	// MENU
-	private static final int SETTING = 0;
-	private static final int HELP = 1;
-	private static final int CLEAR_HOMEWORK = 2;
-	private static final int TIMETABLEVIEWER = 3;
+	private static final int MENU_SETTING = 0;
+	private static final int MENU_CLEAR_HOMEWORK = 1;
+	private static final int MENU_TIMETABLEVIEWER = 2;
+	private static final int MENU_PROFILE = 3;
+	private static final int MENU_MESSAGE = 4;
+	private static final int MENU_NOTICE = 5;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -70,8 +73,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		//if Not Login
 		UserManager userManager = UserManager.getInstance(this);
 		if(!userManager.hasLocalUser()) {
-			Intent i = new Intent(this,RegisterActivity.class);
-			startActivity(i);
+			openActivity(RegisterActivity.class);
 			finish();
 			return;
 		}
@@ -114,6 +116,9 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	        .build();
 		ImageLoader.getInstance().init(config); 
         
+		//CheckUnread
+		startService(new Intent(this, CheckUnreadService.class));
+		
 		// Update
 		MobclickAgent.updateOnlineConfig(this);
 		MobclickAgent.onError(this);
@@ -123,6 +128,12 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		UmengUpdateAgent.update(this);
 	}
 	
+	@Override
+	protected void onDestroy() {
+		super.onDestroy();
+		stopService(new Intent(this, CheckUnreadService.class));
+	}
+
 	// 显示视图
 	public void showView() {
 		switch (viewMode) {
@@ -178,8 +189,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		tvCustomView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				Intent i = new Intent(MainActivity.this, TimetableSettingActivity.class);
-				startActivity(i);
+				openActivity(TimetableSettingActivity.class);
 			}
 		});
 		actionBar.setCustomView(custumView);
@@ -199,41 +209,51 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	public boolean onCreateOptionsMenu(Menu menu) {
 		switch (viewMode) {
 		case TODAY_VIEW:
-			menu.add(viewMode, SETTING, Menu.NONE, "设置")
-					.setIcon(android.R.drawable.ic_menu_preferences)
+			menu.add(viewMode, MENU_PROFILE, Menu.NONE, "个人中心")
+					.setIcon(R.drawable.account)
 					.setShowAsAction(
 							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-			break;
-		case GRID_VIEW:
-			menu.add(viewMode, HELP, Menu.NONE, "帮助")
-					.setIcon(android.R.drawable.ic_menu_help)
+			menu.add(viewMode, MENU_MESSAGE, Menu.NONE, "我的消息")
+			.setIcon(R.drawable.message)
+			.setShowAsAction(
+					MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			menu.add(viewMode, MENU_NOTICE, Menu.NONE, "我的提醒")
+			.setIcon(R.drawable.forum)
+			.setShowAsAction(
+					MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+			menu.add(viewMode, MENU_SETTING, Menu.NONE, "设置")
+					.setIcon(R.drawable.preference)
 					.setShowAsAction(
 							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
-
 			break;
 		case HOMEWORK_VIEW:
-			menu.add(viewMode, CLEAR_HOMEWORK, Menu.NONE, "清空所有作业")
-					.setIcon(android.R.drawable.ic_menu_close_clear_cancel)
+			menu.add(viewMode, MENU_CLEAR_HOMEWORK, Menu.NONE, "清空所有作业")
+					.setIcon(R.drawable.delete)
 					.setShowAsAction(
 							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			break;
 
 		}
-		menu.add(0, TIMETABLEVIEWER, Menu.NONE, "课表浏览器");
+		menu.add(0, MENU_TIMETABLEVIEWER, Menu.NONE, "课表浏览器");
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
-		case SETTING:
-			Intent i = new Intent(this, PreferenceActivity.class);
-			startActivity(i);
+		case MENU_PROFILE:
+			openActivity(ProfileActivity.class);
 			return true;
-		case HELP:
-			openHelpDialog();
+		case MENU_MESSAGE:
+			openActivity(MessageActivity.class);
 			return true;
-		case CLEAR_HOMEWORK:
+		case MENU_NOTICE:
+			openActivity(NoticeActivity.class);
+			return true;
+		case MENU_SETTING:
+			openActivity(PreferenceActivity.class);
+			return true;
+		case MENU_CLEAR_HOMEWORK:
 			new AlertDialog.Builder(MainActivity.this)
 					.setTitle("清空作业")
 					.setMessage("确定清空所有课程作业？")
@@ -246,7 +266,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 								}
 							}).setNegativeButton(R.string.cancel, null).show();
 			return true;
-		case TIMETABLEVIEWER:
+		case MENU_TIMETABLEVIEWER:
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
 			alert.setTitle("课表浏览器");
@@ -292,13 +312,6 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		i.putExtra("week", GridView.markWeek);
 		i.putExtra("time", GridView.markTime);
 		this.startActivity(i);
-	}
-
-	// 帮助对话框
-	private void openHelpDialog() {
-		new AlertDialog.Builder(this).setTitle("使用说明")
-				.setMessage(R.string.help_message)
-				.setPositiveButton("确定", null).show();
 	}
 
 	public void refreshTodayView() {

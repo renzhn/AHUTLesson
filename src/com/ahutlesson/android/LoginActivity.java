@@ -3,7 +3,6 @@ package com.ahutlesson.android;
 import com.ahutlesson.android.model.UserManager;
 
 import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -42,9 +41,7 @@ public class LoginActivity extends BaseActivity {
 		btnToRegister.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent i = new Intent(LoginActivity.this,
-						RegisterActivity.class);
-				startActivity(i);
+				openActivity(RegisterActivity.class);
 				LoginActivity.this.finish();
 			}
 		});
@@ -67,8 +64,7 @@ public class LoginActivity extends BaseActivity {
                 			progressDialog.dismiss();
                 		}
                 	});
-    				Intent i = new Intent(LoginActivity.this, MainActivity.class);
-    				startActivity(i);
+    				openActivity(MainActivity.class);
     				LoginActivity.this.finish();
                 }catch(final Exception e) {
 	            	e.printStackTrace();

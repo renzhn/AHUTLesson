@@ -1,7 +1,9 @@
 package com.ahutlesson.android;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -42,6 +44,11 @@ public class BaseActivity extends SherlockActivity {
 		}
 	}
 	
+	public void openActivity(Class<?> cls) {
+		Intent i = new Intent(this, cls);
+		startActivity(i);
+	}
+	
 	public void alert(String message) {
 		new AlertDialog.Builder(this)
 			.setTitle(R.string.app_name)
@@ -55,5 +62,9 @@ public class BaseActivity extends SherlockActivity {
 			.setTitle(title)
 			.setMessage(message)
 			.setPositiveButton(R.string.ok, null).show();
+	}
+	
+	public void makeToast(String message) {
+		Toast.makeText(this, message, Toast.LENGTH_LONG);
 	}
 }

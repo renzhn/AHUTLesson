@@ -20,11 +20,13 @@ import org.json.JSONTokener;
 import android.content.Context;
 import android.util.Log;
 
-import com.ahutlesson.android.model.ForumThread;
 import com.ahutlesson.android.model.Lesson;
-import com.ahutlesson.android.model.Post;
 import com.ahutlesson.android.model.User;
 import com.ahutlesson.android.model.UserManager;
+import com.ahutlesson.android.ui.lesson.ForumThread;
+import com.ahutlesson.android.ui.message.Message;
+import com.ahutlesson.android.ui.notice.Notice;
+import com.ahutlesson.android.ui.thread.Post;
 
 public class AHUTAccessor {
 	
@@ -60,11 +62,11 @@ public class AHUTAccessor {
 				strResult = new String(strResult.getBytes("ISO-8859-1"),"UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
+			log(URL);
+			log(strResult);
 		}catch(Exception e) {
 			return "";
 		}
-		log(URL);
-		log(strResult);
 		return strResult;
 	}
 
@@ -84,11 +86,11 @@ public class AHUTAccessor {
 				strResult = new String(strResult.getBytes("ISO-8859-1"),"UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
+			log(URL);
+			log(strResult);
 		}catch(Exception e) {
 			return "";
 		}
-		log(URL);
-		log(strResult);
 		return strResult;
 	}
 	
@@ -204,6 +206,7 @@ public class AHUTAccessor {
 				p.uname = post.getString("uname");
 				p.content = post.getString("content");
 				p.floor = post.getInt("floor");
+				p.hasAvatar = (post.getInt("has_avatar") == 1);
 				p.setPostTime(post.getString("post_time"));
 				postList.add(p);
 			}
@@ -217,7 +220,7 @@ public class AHUTAccessor {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
-	public String postNewThread(int lid, String subject, String content) {
+	public String postThread(int lid, String subject, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("l", String.valueOf(lid)));
 		params.add(new BasicNameValuePair("s", subject));
@@ -225,11 +228,96 @@ public class AHUTAccessor {
 		return postURL(SERVER_URL + "api/thread.handler.php?act=new&from=mobile", params);
 	}
 	
-	public String postNewReply(int tid, String content) {
+	public String postReply(int tid, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
 		params.add(new BasicNameValuePair("c", content));
 		return postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile", params);
 	}
+	
+	public int[] getUnreadCount() {
+		int[] ret = {0, 0};
+		String uxh = UserManager.getInstance(context).getUserXH();
+		if(uxh == null) return ret;
+		String result = getURL(SERVER_URL + "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
+		if(result.contentEquals("")) return ret;
+		try {
+			JSONTokener jsonParser = new JSONTokener(result);
+			JSONArray retArray = (JSONArray)jsonParser.nextValue();
+			ret[0] = retArray.getInt(0);
+			ret[1] = retArray.getInt(1);
+		} catch (Exception ex) {
+			return ret;
+		}
+		return ret;
+	}
 
+	public ArrayList<Notice> getNoticeList(int page) {
+		String ret = getURL(SERVER_URL + "api/notice.handler.php?act=getnotice&page=" + page);
+		ArrayList<Notice> list = new ArrayList<Notice>();
+		try {
+			JSONTokener jsonParser = new JSONTokener(ret);
+			JSONArray notices = (JSONArray)jsonParser.nextValue();
+			JSONObject notice;
+			for(int i = 0; i < notices.length(); i++) {
+				notice = notices.getJSONObject(i);
+				Notice n = new Notice();
+				n.nid = notice.getInt("nid");
+				n.tid = notice.getInt("tid");
+				n.pid = notice.getInt("pid");
+				n.subject = notice.getString("subject");
+				n.type = notice.getString("type");
+				n.read = (notice.getInt("read") == 1);
+				n.toUxh = notice.getString("to_uxh");
+				n.fromUxh = notice.getString("from_uxh");
+				n.uname = notice.getString("uname");
+				n.hasAvatar = (notice.getInt("has_avatar") == 1);
+				n.setPostTime(notice.getString("post_time"));
+				list.add(n);
+			}
+			return list;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
+	public ArrayList<Message> getMessageList(int page) {
+		String ret = getURL(SERVER_URL + "api/notice.handler.php?act=getmessage&page=" + page);
+		ArrayList<Message> list = new ArrayList<Message>();
+		try {
+			JSONTokener jsonParser = new JSONTokener(ret);
+			JSONArray messages = (JSONArray)jsonParser.nextValue();
+			JSONObject message;
+			for(int i = 0; i < messages.length(); i++) {
+				message = messages.getJSONObject(i);
+				Message m = new Message();
+				m.mid = message.getInt("mid");
+				m.title = message.getString("title");
+				m.content = message.getString("content");
+				m.read = (message.getInt("read") == 1);
+				m.toUxh = message.getString("to_uxh");
+				m.fromUxh = message.getString("from_uxh");
+				m.uname = message.getString("uname");
+				m.hasAvatar = (message.getInt("has_avatar") == 1);
+				m.setPostTime(message.getString("post_time"));
+				list.add(m);
+			}
+			return list;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
+
+	public String deleteMessage(int mid) {
+		return getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid=" + mid);
+	}
+
+	public void sendMessage(String uxh, String title, String content) {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("u", uxh));
+		params.add(new BasicNameValuePair("t", title));
+		params.add(new BasicNameValuePair("c", content));
+		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
+	}
+	
 }

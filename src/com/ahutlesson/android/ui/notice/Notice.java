@@ -1,4 +1,4 @@
-package com.ahutlesson.android.model;
+package com.ahutlesson.android.ui.notice;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -6,14 +6,18 @@ import java.util.Date;
 
 import com.ahutlesson.android.utils.DateHelper;
 
-public class Post {
+public class Notice {
 
+	public int nid;
 	public int pid;
 	public int tid;
-	public String uxh;
+	public String subject;
+	public String type;
+	public boolean read;
+	public String toUxh;
+	public String fromUxh;
 	public String uname;
-	public String content;
-	public int floor;
+	public boolean hasAvatar;
 	public Date postTime;
 
 	public void setPostTime(String postTime0) {

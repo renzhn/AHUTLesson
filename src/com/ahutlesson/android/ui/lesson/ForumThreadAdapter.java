@@ -3,7 +3,6 @@ package com.ahutlesson.android.ui.lesson;
 import java.util.ArrayList;
 
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.model.ForumThread;
 
 import android.content.Context;
 import android.view.LayoutInflater;

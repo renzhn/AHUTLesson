@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.model.Post;
-import com.ahutlesson.android.thread.PostAdapter;
+import com.ahutlesson.android.ui.thread.Post;
+import com.ahutlesson.android.ui.thread.PostAdapter;
 
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -47,7 +47,7 @@ public class ThreadActivity extends BaseActivity {
 			return;
 		}
 		
-		actionBar.setLogo(R.drawable.comment);
+		actionBar.setLogo(R.drawable.forum);
 		
 		setContentView(R.layout.thread);
 		
@@ -83,7 +83,7 @@ public class ThreadActivity extends BaseActivity {
 			public void onClick(View arg0) {
 				replyContent = etReplyContent.getText().toString();
 				if(replyContent == null || replyContent.contentEquals("")) {
-					alert("请输入回复内容!");
+					return;
 				}else{
 					new postNewReply().execute();
 				}
@@ -133,13 +133,14 @@ public class ThreadActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(ArrayList<Post> ret) {
+			layoutLoading.setVisibility(View.GONE);
 			if(ret == null) {
 				alert("获取数据失败，请检查手机网络设置");
 				return;
 			}
 
 			if(ret.size() == 0) {
-				layoutLoading.setVisibility(View.GONE);
+				
 			}else if(ret.size() > 0) {
 				tvNextPage.setText("加载更多");
 				postList.addAll(ret);
@@ -192,7 +193,7 @@ public class ThreadActivity extends BaseActivity {
 		
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			return AHUTAccessor.getInstance(ThreadActivity.this).postNewReply(tid, replyContent);
+			return AHUTAccessor.getInstance(ThreadActivity.this).postReply(tid, replyContent);
 		}
 
 		@Override

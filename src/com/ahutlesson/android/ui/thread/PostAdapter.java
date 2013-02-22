@@ -1,4 +1,4 @@
-package com.ahutlesson.android.thread;
+package com.ahutlesson.android.ui.thread;
 
 import java.util.ArrayList;
 
@@ -13,7 +13,6 @@ import android.widget.TextView;
 
 import com.ahutlesson.android.R;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.model.Post;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 public class PostAdapter extends ArrayAdapter<Post> {
@@ -35,8 +34,13 @@ public class PostAdapter extends ArrayAdapter<Post> {
         TextView content = (TextView) postItem.findViewById(R.id.tvPostItemContent);
         TextView floor = (TextView) postItem.findViewById(R.id.tvPostItemFloor);
         TextView time = (TextView) postItem.findViewById(R.id.tvPostItemTime);
-        ImageView avatar = (ImageView) postItem.findViewById(R.id.imagePostItemAvatar);
-        ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(post.uxh), avatar);
+        ImageView avatar = (ImageView) postItem.findViewById(R.id.ivPostItemAvatar);
+        if(post.hasAvatar) {
+        	ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(post.uxh), avatar);
+        }else{
+        	avatar.setImageResource(R.drawable.noavatar);
+        }
+        
         uname.setText(String.valueOf(post.uname));
         content.setText(String.valueOf(post.content));
         floor.setText(post.floor + "¥");
