@@ -125,12 +125,6 @@
         android:layout_height="40dp"
         android:layout_gravity="center"
         android:layout_marginTop="15dp"
-        android:background="@drawable/button"
-        android:gravity="center"
-        android:paddingLeft="10dp"
-        android:paddingRight="10dp"
-        android:text="上传头像"
-        android:textColor="@color/font_color"
-        android:textSize="16sp" />
+        android:text="上传头像" />
 
 </LinearLayout>

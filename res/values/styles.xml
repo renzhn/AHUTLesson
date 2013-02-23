@@ -5,6 +5,7 @@
     
     <style name="AHUTLesson" parent="Theme.Sherlock.Light.DarkActionBar">
 	    <item name="android:windowBackground">@color/background_color</item>
+        <item name="android:buttonStyle">@style/AHUTLessonButton</item> 
         <item name="android:actionBarStyle">@style/Widget.Styled.ActionBar</item>
         <item name="android:homeAsUpIndicator">@drawable/ic_ab_back_holo_dark</item>
         <item name="homeAsUpIndicator">@drawable/ic_ab_back_holo_dark</item>
@@ -14,5 +15,12 @@
         <item name="android:background">@drawable/bg_actionbar</item>
         <item name="backgroundSplit">@drawable/bg_actionbar</item>
         <item name="android:backgroundSplit">@drawable/bg_actionbar</item>
+    </style>
+    <style name="AHUTLessonButton" parent="@android:style/Widget.Button"> 
+        <item name="android:background">@drawable/button</item>
+        <item name="android:gravity">center</item>tem>
+        <item name="android:padding">10dp</item>
+        <item name="android:textColor">@color/font_color</item>
+        <item name="android:textSize">16sp</item>
     </style>
 </resources>

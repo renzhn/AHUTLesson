@@ -14,6 +14,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -85,6 +86,10 @@ public class ThreadActivity extends BaseActivity {
 				if(replyContent == null || replyContent.contentEquals("")) {
 					return;
 				}else{
+					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+					if(imm != null) {
+					        imm.hideSoftInputFromWindow(etReplyContent.getWindowToken(), 0);
+					}
 					new postNewReply().execute();
 				}
 			}
@@ -201,7 +206,6 @@ public class ThreadActivity extends BaseActivity {
 			progressDialog.dismiss();
 			if(ret.startsWith("0")) {
 				etReplyContent.setText("");
-				alert("发布成功!");
 				new loadThread().execute();
 			}else if(ret.startsWith("1")){
 				alert(ret.substring(2));

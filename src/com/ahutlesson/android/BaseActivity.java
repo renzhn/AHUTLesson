@@ -3,7 +3,6 @@ package com.ahutlesson.android;
 import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockActivity;
@@ -66,7 +65,4 @@ public class BaseActivity extends SherlockActivity {
 			.setPositiveButton(R.string.ok, null).show();
 	}
 	
-	public void makeToast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_LONG);
-	}
 }

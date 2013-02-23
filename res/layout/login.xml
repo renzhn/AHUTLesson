@@ -56,28 +56,20 @@
                     android:id="@+id/btnLogin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:layout_marginTop="5dp"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="5dp"
+                    android:layout_marginTop="8dp"
                     android:text="登录"
                     android:textSize="18sp" />
 
-            </LinearLayout>
-            
                 <Button
                     android:id="@+id/btnToRegister"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_gravity="center_horizontal"
-                    android:paddingBottom="5dp"
-                    android:paddingLeft="10dp"
-                    android:paddingRight="10dp"
-                    android:paddingTop="5dp"
+                    android:layout_marginTop="10dp"
                     android:text="注册新帐号"
                     android:textSize="18sp" />
+                
+            </LinearLayout>
+            
             
         </LinearLayout>
     </ScrollView>
