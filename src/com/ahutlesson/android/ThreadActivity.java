@@ -206,6 +206,7 @@ public class ThreadActivity extends BaseActivity {
 			progressDialog.dismiss();
 			if(ret.startsWith("0")) {
 				etReplyContent.setText("");
+				makeToast("发布成功!");
 				new loadThread().execute();
 			}else if(ret.startsWith("1")){
 				alert(ret.substring(2));
