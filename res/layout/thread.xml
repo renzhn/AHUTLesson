@@ -50,35 +50,36 @@
 
         <View
             android:layout_width="fill_parent"
-            android:layout_height="2px"
+            android:layout_height="1px"
             android:layout_alignParentTop="true"
             android:layout_centerVertical="true"
             android:background="#DDD" />
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="50dp"
+            android:layout_height="45dp"
             android:layout_alignParentTop="true"
             android:layout_marginTop="2dp"
-            android:paddingLeft="5dp" 
-            android:paddingRight="5dp"
-            android:paddingBottom="5dp"
+            android:background="#FFF"
             android:gravity="center_vertical"
-            android:background="#FFF" >
+            android:paddingBottom="1dp"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp" >
 
             <ImageButton
                 android:id="@+id/ibSend"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
+                android:layout_width="45dp"
+                android:layout_height="45dp"
+                android:layout_alignParentBottom="true"
                 android:layout_alignParentRight="true"
-            	android:layout_alignParentBottom="true"
                 android:background="@drawable/listitem"
-                android:src="@drawable/send" />
+                android:scaleType="fitCenter"
+                android:src="@drawable/send_black" />
 
             <EditText
                 android:id="@+id/etContent"
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="45dp"
                 android:layout_alignParentBottom="true"
                 android:layout_marginRight="3dp"
                 android:layout_toLeftOf="@+id/ibSend"

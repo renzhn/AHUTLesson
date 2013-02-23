@@ -10,8 +10,25 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:paddingTop="10dp" 
+        android:paddingLeft="15dp" 
+        android:paddingRight="15dp" >
 
+        <TextView
+            android:id="@+id/tvTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="5dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="2dp"
+            android:textSize="16sp" />
+        
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:layout_marginBottom="3dp"
+            android:background="#DDD" />
+        
         <EditText
             android:id="@+id/etLessonName"
             android:inputType="textNoSuggestions"
@@ -53,7 +70,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="起始周:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#333" />
             
             <EditText
                 android:id="@+id/etStartWeek"
@@ -73,7 +91,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="结束周:"
-                android:textAppearance="?android:attr/textAppearanceMedium" />
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#333" />
+
 	        <EditText
 	            android:id="@+id/etEndWeek"
             	android:inputType="textNoSuggestions"

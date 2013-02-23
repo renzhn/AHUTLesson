@@ -4,8 +4,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -18,11 +16,13 @@ import com.umeng.analytics.MobclickAgent;
 
 public class LessonDetailActivity extends BaseActivity {
 	
+	private static final int MENU_EDIT = 0;
+	private static final int MENU_EDITHOMEWORK = 1;
+	private static final int MENU_DELETE = 2;
 	private int week, time;
 	private Lesson lesson;
 	private TextView tvLessonName, tvLessonPlace, tvTeacherName, tvLessonWeek,
 			tvHomework, tvLessonTime, tvCurrentTime;
-	private Button btnEditHomework, btnDeleteHomework;
 	
 	private LessonManager lessonManager;
 	private Timetable timetable;
@@ -50,22 +50,6 @@ public class LessonDetailActivity extends BaseActivity {
 
 		tvCurrentTime = (TextView) findViewById(R.id.tvCurrentTime);
 
-		btnEditHomework = (Button) findViewById(R.id.btnEditHomework);
-		btnDeleteHomework = (Button) findViewById(R.id.btnDeleteHomework);
-
-		btnEditHomework.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				editHomework();
-			}
-		});
-		btnDeleteHomework.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				deleteHomework();
-			}
-		});
-
 	}
 
 	@Override
@@ -91,11 +75,7 @@ public class LessonDetailActivity extends BaseActivity {
 			if (lesson.homework != null && !lesson.homework.contentEquals("")) {
 				tvHomework.setText(lesson.homework);
 			}
-			btnEditHomework.setVisibility(View.VISIBLE);
-			btnDeleteHomework.setVisibility(View.VISIBLE);
 		} else {
-			btnEditHomework.setVisibility(View.GONE);
-			btnDeleteHomework.setVisibility(View.GONE);
 		}
 
 		MobclickAgent.onResume(this);
@@ -133,35 +113,27 @@ public class LessonDetailActivity extends BaseActivity {
 				}
 			}
 		});
-
-		alert.setNegativeButton("取消", null);
+		alert.setNegativeButton("清空", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int whichButton) {
+				String value = input.getText().toString();
+				if (!value.contentEquals("")) {
+					lesson.homework = null;
+					lesson.hasHomework = false;
+					lessonManager.deleteHomework(week, time);
+					tvHomework.setText("无");
+				}
+			}
+		});
 		alert.show();
 	}
 
-	protected void deleteHomework() {
-		// 清空作业
-		if (lesson == null)
-			return;
-		if (!lesson.hasHomework)
-			return;
-		new AlertDialog.Builder(LessonDetailActivity.this).setTitle("清空作业")
-				.setMessage("确定清空本课程作业？")
-				.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int which) {
-						lesson.homework = null;
-						lesson.hasHomework = false;
-						lessonManager.deleteHomework(week, time);
-						tvHomework.setText("无");
-					}
-
-				}).setNegativeButton(R.string.cancel, null).show();
-	}
-
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(0, 0, Menu.NONE, R.string.edit)
+		menu.add(0, MENU_EDIT, Menu.NONE, R.string.edit)
 			.setIcon(R.drawable.edit)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-		menu.add(0, 1, Menu.NONE, R.string.delete)
+		menu.add(0, MENU_EDITHOMEWORK, Menu.NONE, "编辑作业")
+		.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(0, MENU_DELETE, Menu.NONE, R.string.delete)
 			.setIcon(R.drawable.delete)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
@@ -177,6 +149,9 @@ public class LessonDetailActivity extends BaseActivity {
 			startActivity(i);
 			return true;
 		case 1:
+			editHomework();
+			return true;
+		case 2:
 			if (lesson == null) return true;
 			new AlertDialog.Builder(LessonDetailActivity.this)
 					.setTitle("删除课程")

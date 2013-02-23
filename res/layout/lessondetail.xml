@@ -28,7 +28,7 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="1dp"
+                android:layout_height="1px"
                 android:background="#FFCDCDCD" />
 
             <TextView
@@ -104,42 +104,16 @@
 
             <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="1dp"
+                android:layout_height="1px"
                 android:background="#FFCDCDCD" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
+            <TextView
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:paddingTop="10dp" >
+            	android:paddingTop="6dp" 
+                android:text="作业:"
+                android:textAppearance="?android:attr/textAppearanceLarge" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="作业:"
-                    android:textAppearance="?android:attr/textAppearanceLarge" />
-
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:gravity="right" >
-
-                    <Button
-                        android:id="@+id/btnEditHomework"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="编辑"
-                        android:textSize="12sp" />
-
-                    <Button
-                        android:id="@+id/btnDeleteHomework"
-                        style="?android:attr/buttonStyleSmall"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="清空"
-                        android:textSize="12sp" />
-                </LinearLayout>
-            </LinearLayout>
 
             <TextView
                 android:id="@+id/tvHomework"

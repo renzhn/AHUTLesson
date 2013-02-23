@@ -3,8 +3,7 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_gravity="fill_horizontal"
-    android:gravity="center"
-    android:background="@drawable/listitem" >
+    android:gravity="center" >
 
     <TextView
         android:id="@+id/tvCumstomView"
@@ -12,7 +11,8 @@
         android:layout_height="wrap_content"
         android:singleLine="true"
         android:ellipsize="end"
-        android:textSize="16sp" >
+		android:textSize="16sp"
+		android:textColor="#fff" >
     </TextView>
 
 </RelativeLayout>

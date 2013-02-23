@@ -11,6 +11,7 @@ import com.actionbarsherlock.view.MenuItem;
 
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.TextView;
 
 public class EditLessonActivity extends BaseActivity {
 
@@ -39,8 +40,8 @@ public class EditLessonActivity extends BaseActivity {
 
 		setContentView(R.layout.edit_lesson);
 
-		actionBar.setTitle(
-				timetable.weekname[week] + timetable.lessontime_name[time]);
+		TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
+		tvTitle.setText(timetable.weekname[week] + timetable.lessontime_name[time]);
 
 		etLessonName = (EditText) findViewById(R.id.etLessonName);
 		etLessonAlias = (EditText) findViewById(R.id.etLessonAlias);

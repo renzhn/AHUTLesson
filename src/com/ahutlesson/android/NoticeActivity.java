@@ -70,6 +70,7 @@ public class NoticeActivity extends BaseActivity {
 				Notice n = list.get(position);
 				Intent i = new Intent(NoticeActivity.this, ThreadActivity.class);
 				i.putExtra("tid", n.tid);
+				i.putExtra("subject", n.subject);
 				startActivity(i);
 			}
 		});

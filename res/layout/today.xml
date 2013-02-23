@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_width="fill_parent"
         android:textColor="#666"
-        app:selectedColor="#000"
+        app:selectedColor="#111"
         app:selectedBold="false"
         app:footerLineHeight="2dp"
         app:footerIndicatorHeight="2dp"

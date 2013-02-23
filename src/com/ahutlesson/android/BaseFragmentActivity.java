@@ -75,11 +75,13 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 	}
 	
 	public void alert(String message) {
+		if(!this.hasWindowFocus()) return;
 		new AlertDialog.Builder(this).setMessage(message)
 				.setPositiveButton(R.string.ok, null).show();
 	}
 
 	public void alert(String title, String message) {
+		if(!this.hasWindowFocus()) return;
 		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
 				.setPositiveButton(R.string.ok, null).show();
 	}

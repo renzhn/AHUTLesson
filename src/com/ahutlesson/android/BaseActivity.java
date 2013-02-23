@@ -50,6 +50,7 @@ public class BaseActivity extends SherlockActivity {
 	}
 	
 	public void alert(String message) {
+		if(!this.hasWindowFocus()) return;
 		new AlertDialog.Builder(this)
 			.setTitle(R.string.app_name)
 			.setIcon(R.drawable.ahutlesson)
@@ -58,6 +59,7 @@ public class BaseActivity extends SherlockActivity {
 	}
 	
 	public void alert(String title, String message) {
+		if(!this.hasWindowFocus()) return;
 		new AlertDialog.Builder(this)
 			.setTitle(title)
 			.setMessage(message)
