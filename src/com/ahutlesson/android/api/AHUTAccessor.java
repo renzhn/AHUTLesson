@@ -18,7 +18,6 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.json.JSONTokener;
 
@@ -29,6 +28,7 @@ import android.util.Log;
 
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.User;
+import com.ahutlesson.android.model.UserInfo;
 import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.ui.lesson.ForumThread;
 import com.ahutlesson.android.ui.lesson.Lessonmate;
@@ -55,7 +55,7 @@ public class AHUTAccessor {
 		return accessor;
 	}
 
-	public String getURL(String URL) {
+	public String getURL(String URL) throws Exception {
 		HttpGet request = new HttpGet(URL);
 		String cookie = UserManager.getInstance(context).getCookie();
 		if (cookie != null) {
@@ -73,12 +73,12 @@ public class AHUTAccessor {
 			log(URL);
 			log(strResult);
 		} catch (Exception e) {
-			return "";
+			throw new Exception("连接服务器失败，请检查网络设置。");
 		}
 		return strResult;
 	}
 
-	public String postURL(String URL, List<NameValuePair> params) {
+	public String postURL(String URL, List<NameValuePair> params) throws Exception {
 		HttpPost request = new HttpPost(URL);
 		String cookie = UserManager.getInstance(context).getCookie();
 		if (cookie != null) {
@@ -97,7 +97,7 @@ public class AHUTAccessor {
 			log(URL);
 			log(strResult);
 		} catch (Exception e) {
-			return "";
+			throw new Exception("连接服务器失败，请检查网络设置。");
 		}
 		return strResult;
 	}
@@ -111,23 +111,23 @@ public class AHUTAccessor {
 		return null;
 	}
 
-	public String regsterUser(String uxh, String password) {
+	public String regsterUser(String uxh, String password) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("x", uxh));
 		params.add(new BasicNameValuePair("p", password));
 		return postURL(SERVER_URL + "api/user.handler.php?act=register", params);
 	}
 
-	public String validateUser(String uxh, String password) {
+	public String validateUser(String uxh, String password) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("x", uxh));
 		params.add(new BasicNameValuePair("p", password));
 		return postURL(SERVER_URL + "api/user.handler.php?act=login", params);
 	}
 
-	public User getUserInfo() {
+	public User getLoginUserInfo() throws Exception {
 		User user = new User();
-		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getuserinfo");
+		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getloginuserinfo");
 		JSONTokener jsonParser = new JSONTokener(ret);
 		try {
 			JSONObject userInfo = (JSONObject) jsonParser.nextValue();
@@ -137,14 +137,13 @@ public class AHUTAccessor {
 			user.password = userInfo.getString("password");
 			user.signature = userInfo.getString("signature");
 			user.isAdmin = (userInfo.getInt("is_admin") == 1);
-		} catch (JSONException e) {
-			e.printStackTrace();
-			return user;
+		} catch (Exception e) {
+			throw new Exception("解析数据出错");
 		}
 		return user;
 	}
 
-	public ArrayList<Lesson> getLessonList(String uxh) {
+	public ArrayList<Lesson> getLessonList(String uxh) throws Exception {
 		String ret = getURL(SERVER_URL + "api/getlessonlist.php?xh=" + uxh);
 		ArrayList<Lesson> lessonList = new ArrayList<Lesson>();
 		try {
@@ -168,11 +167,20 @@ public class AHUTAccessor {
 			}
 			return lessonList;
 		} catch (Exception ex) {
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
-	public ArrayList<ForumThread> getForumThreadList(int lid, int page) {
+	public Lesson[][] getLessons(String uxh) throws Exception {
+		ArrayList<Lesson> lessonList = getLessonList(uxh);
+		Lesson[][] lessons = new Lesson[7][5];
+		for(Lesson lesson : lessonList) {
+			lessons[lesson.week][lesson.time] = lesson;
+		}
+		return lessons;
+	}
+	
+	public ArrayList<ForumThread> getForumThreadList(int lid, int page) throws Exception {
 		String ret = getURL(SERVER_URL + "api/thread.handler.php?act=get&lid="
 				+ lid + "&page=" + page);
 		ArrayList<ForumThread> threadList = new ArrayList<ForumThread>();
@@ -197,11 +205,11 @@ public class AHUTAccessor {
 			}
 			return threadList;
 		} catch (Exception ex) {
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
-	public ArrayList<Post> getPostList(int tid, int page) {
+	public ArrayList<Post> getPostList(int tid, int page) throws Exception {
 		String ret = getURL(SERVER_URL + "api/post.handler.php?act=get&tid="
 				+ tid + "&page=" + page);
 		ArrayList<Post> postList = new ArrayList<Post>();
@@ -225,7 +233,7 @@ public class AHUTAccessor {
 			}
 			return postList;
 		} catch (Exception ex) {
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
@@ -233,44 +241,50 @@ public class AHUTAccessor {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
-	public String postThread(int lid, String subject, String content) {
+	public int postThread(int lid, String subject, String content) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("l", String.valueOf(lid)));
 		params.add(new BasicNameValuePair("s", subject));
 		params.add(new BasicNameValuePair("c", content));
-		return postURL(SERVER_URL
+		String ret = postURL(SERVER_URL
 				+ "api/thread.handler.php?act=new&from=mobile", params);
+		if(ret.startsWith("0")) {
+			int newtid = Integer.valueOf(ret.substring(2));
+			return newtid;
+		}else if(ret.startsWith("1")){
+			throw new Exception(ret.substring(2));
+		}else throw new Exception("服务器返回了未知数据");
 	}
 
-	public String postReply(int tid, String content) {
+	public boolean postReply(int tid, String content) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
 		params.add(new BasicNameValuePair("c", content));
-		return postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile",
-				params);
+		String ret = postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile", params);
+		if(ret.startsWith("0")) {
+			return true;
+		}else if(ret.startsWith("1")){
+			throw new Exception(ret.substring(2));
+		}else{
+			throw new Exception("服务器返回了未知数据");
+		}
 	}
 
-	public int[] getUnreadCount() {
+	public int[] getUnreadCount() throws Exception {
 		int[] ret = { 0, 0 };
 		String uxh = UserManager.getInstance(context).getUserXH();
 		if (uxh == null)
 			return ret;
 		String result = getURL(SERVER_URL
 				+ "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
-		if (result.contentEquals(""))
-			return ret;
-		try {
-			JSONTokener jsonParser = new JSONTokener(result);
-			JSONArray retArray = (JSONArray) jsonParser.nextValue();
-			ret[0] = retArray.getInt(0);
-			ret[1] = retArray.getInt(1);
-		} catch (Exception ex) {
-			return ret;
-		}
+		JSONTokener jsonParser = new JSONTokener(result);
+		JSONArray retArray = (JSONArray) jsonParser.nextValue();
+		ret[0] = retArray.getInt(0);
+		ret[1] = retArray.getInt(1);
 		return ret;
 	}
 
-	public ArrayList<Notice> getNoticeList(int page) {
+	public ArrayList<Notice> getNoticeList(int page) throws Exception {
 		String ret = getURL(SERVER_URL
 				+ "api/notice.handler.php?act=getnotice&page=" + page);
 		ArrayList<Notice> list = new ArrayList<Notice>();
@@ -296,11 +310,11 @@ public class AHUTAccessor {
 			}
 			return list;
 		} catch (Exception ex) {
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
-	public ArrayList<Message> getMessageList(int page) {
+	public ArrayList<Message> getMessageList(int page) throws Exception {
 		String ret = getURL(SERVER_URL
 				+ "api/notice.handler.php?act=getmessage&page=" + page);
 		ArrayList<Message> list = new ArrayList<Message>();
@@ -324,16 +338,15 @@ public class AHUTAccessor {
 			}
 			return list;
 		} catch (Exception ex) {
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
-	public String deleteMessage(int mid) {
-		return getURL(SERVER_URL
-				+ "api/notice.handler.php?act=deletemessage&mid=" + mid);
+	public void deleteMessage(int mid) throws Exception {
+		getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid=" + mid);
 	}
 
-	public void sendMessage(String uxh, String title, String content) {
+	public void sendMessage(String uxh, String title, String content) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("u", uxh));
 		params.add(new BasicNameValuePair("t", title));
@@ -341,7 +354,7 @@ public class AHUTAccessor {
 		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
 	}
 
-	public ArrayList<Lessonmate> getLessonmateList(int lid, int page) {
+	public ArrayList<Lessonmate> getLessonmateList(int lid, int page) throws Exception {
 		String ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid
 				+ "&page=" + page);
 		ArrayList<Lessonmate> list = new ArrayList<Lessonmate>();
@@ -362,8 +375,7 @@ public class AHUTAccessor {
 			}
 			return list;
 		} catch (Exception ex) {
-			ex.printStackTrace();
-			return null;
+			throw new Exception("解析数据出错");
 		}
 	}
 
@@ -391,6 +403,42 @@ public class AHUTAccessor {
 			throw e;
 		}
 		return strResult;
+	}
+
+	public boolean setSignature(String signature) throws Exception {
+		List<NameValuePair> params = new ArrayList<NameValuePair>();
+		params.add(new BasicNameValuePair("s", signature));
+		String ret = postURL(SERVER_URL + "api/user.handler.php?act=setsignature", params);
+		if(ret.contentEquals("0")) {
+			return true;
+		}else if(ret.startsWith("1")) {
+			throw new Exception (ret.substring(2));
+		}else throw new Exception("服务器返回了未知数据");
+	}
+	
+	public UserInfo getUserInfo(String uxh) throws Exception {
+		UserInfo userInfo = new UserInfo();
+		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getuserinfo&uxh=" + uxh);
+		if(ret.startsWith("1")) throw new Exception(ret.substring(2));
+		JSONTokener jsonParser = new JSONTokener(ret);
+		try {
+			JSONObject userInfoObject = (JSONObject) jsonParser.nextValue();
+			userInfo.uxh = userInfoObject.getString("uxh");
+			userInfo.uname = userInfoObject.getString("uname");
+			userInfo.signature = userInfoObject.getString("signature");
+			userInfo.hasAvatar = (userInfoObject.getInt("has_avatar") == 1);
+			userInfo.isAdmin = (userInfoObject.getInt("is_admin") == 1);
+			userInfo.xb = userInfoObject.getString("xb");
+			userInfo.bj = userInfoObject.getString("bj");
+			userInfo.zy = userInfoObject.getString("zy");
+			userInfo.xy = userInfoObject.getString("xy");
+			userInfo.rx = userInfoObject.getInt("rx");
+			userInfo.registerTime = userInfoObject.getString("register_time");
+			userInfo.lastloginTime = userInfoObject.getString("lastlogin_time");
+		} catch (Exception e) {
+			throw new Exception("解析错误");
+		}
+		return userInfo;
 	}
 
 }

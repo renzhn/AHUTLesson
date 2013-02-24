@@ -19,12 +19,11 @@ import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
-import com.ahutlesson.android.alarm.Alert;
+import com.ahutlesson.android.alarm.Alarm;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.service.CheckUnreadService;
-import com.ahutlesson.android.ui.main.GridView;
 import com.ahutlesson.android.ui.main.HomeworkFragment;
 import com.ahutlesson.android.ui.main.LessonListFragmentAdapter;
 import com.ahutlesson.android.ui.main.ScheduleView;
@@ -99,9 +98,9 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		mIndicator = (TitlePageIndicator) todayView.findViewById(R.id.indicator);
 		mIndicator.setViewPager(mPager);
 		mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
-		
+
 		// Changelog
-		ChangeLog cl = new ChangeLog(this);
+		ChangeLog cl = new ChangeLog(MainActivity.this);
 		if (cl.firstRun()) {
 			cl.getLogDialog().show();
 		}
@@ -117,7 +116,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		ImageLoader.getInstance().init(config); 
         
 		//CheckUnread
-		startService(new Intent(this, CheckUnreadService.class));
+		startService(new Intent(MainActivity.this, CheckUnreadService.class));
 		
 		// Update
 		MobclickAgent.updateOnlineConfig(this);
@@ -142,14 +141,8 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			break;
 		case GRID_VIEW:
 			// 绘制课表
-			scheduleView = new ScheduleView(this, LessonManager.getInstance(this).lessons);
+			scheduleView = new ScheduleView(this, LessonManager.getInstance(this).lessons, true);
 			setContentView(scheduleView);
-			scheduleView.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					openLessonDetail();
-				}
-			});
 			break;
 		case HOMEWORK_VIEW:
 			setContentView(R.layout.homework);
@@ -177,7 +170,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		
 		setDateInfo();
 		
-		Alert.setAlarm(this);
+		Alarm.setAlarm(this);
 		MobclickAgent.onResume(this);
 	}
 	
@@ -281,7 +274,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 								int whichButton) {
 							String value = input.getText().toString();
 							Intent i = new Intent(MainActivity.this, TimetableViewerActivity.class);
-							i.putExtra("xh", value);
+							i.putExtra("uxh", value);
 							startActivity(i);
 						}
 					});
@@ -307,12 +300,6 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	}
 
 	// 课程详情
-	public void openLessonDetail() {
-		Intent i = new Intent(this, LessonDetailActivity.class);
-		i.putExtra("week", GridView.markWeek);
-		i.putExtra("time", GridView.markTime);
-		this.startActivity(i);
-	}
 
 	public void refreshTodayView() {
 		mLessonListFragmentAdapter.notifyDataSetChanged();

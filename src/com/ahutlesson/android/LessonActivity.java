@@ -7,7 +7,6 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.ui.lesson.ForumThread;
 import com.ahutlesson.android.ui.lesson.ForumThreadAdapter;
 import com.ahutlesson.android.ui.lesson.Lessonmate;
@@ -30,6 +29,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 
 	private int lid, week = -1, time = -1;
 	private String title;
+	private boolean isLocal;
 
 	private static final String[] TITLES = { "课程讨论", "课友列表" };
 
@@ -59,6 +59,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		week = getIntent().getExtras().getInt("week");
 		time = getIntent().getExtras().getInt("time");
 		title = getIntent().getExtras().getString("title");
+		isLocal = getIntent().getExtras().getBoolean("local");
 		
 		if(lid == 0) {
 			this.finish();
@@ -180,7 +181,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			menu.add(viewMode, MENU_COMPOSE, Menu.NONE, R.string.compose)
 					.setIcon(R.drawable.edit)
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
-			if (Timetable.isValidWeekTime(week, time)) {
+			if (isLocal) {
 
 				menu.add(viewMode, MENU_DETAIL, Menu.NONE, "课程详情")
 						.setShowAsAction(
@@ -192,6 +193,9 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 					.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 			
 			actionBar.setLogo(R.drawable.forum);
+			break;
+		case 1:
+			actionBar.setLogo(R.drawable.lessonmate);
 			break;
 		}
 		return true;
@@ -247,16 +251,18 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		@Override
 		protected ArrayList<ForumThread> doInBackground(Integer... params) {
 			lessonPage = 1;
-			return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			try {
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<ForumThread> ret) {
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				layoutLoading.setVisibility(View.GONE);
-				return;
-			}
+			layoutLoading.setVisibility(View.GONE);
+			if(ret == null) return;
 
 			if(ret.size() == 0) {
 				layoutLoading.setVisibility(View.GONE);
@@ -286,15 +292,17 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		@Override
 		protected ArrayList<ForumThread> doInBackground(Integer... params) {
 			lessonPage++;
-			return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			try {
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<ForumThread> ret) {
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				return;
-			}
+			if(ret == null)  return;
 
 			if(ret.size() == 0) {
 				lessonPage--;
@@ -326,20 +334,22 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			lessonPage--;
 			if(lessonPage < 1)
 				lessonPage = 1;
-			return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			try {
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<ForumThread> ret) {
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				tvPreviousPage.setText("上一页");
-				return;
-			}
+			tvPreviousPage.setText("上一页");
+			if(ret == null) return;
+			
 			if(lessonPage == 1) {
 				lvList.removeHeaderView(headerView);
 			}
-			tvPreviousPage.setText("上一页");
 			tvNextPage.setText("下一页");
 			forumThreadList.clear();
 			forumThreadList.addAll(ret);
@@ -360,16 +370,19 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		@Override
 		protected ArrayList<Lessonmate> doInBackground(Integer... param) {
 			lessonmatePage = 1;
-			return AHUTAccessor.getInstance(LessonActivity.this).getLessonmateList(lid, lessonmatePage);
+			try {
+				return AHUTAccessor.getInstance(LessonActivity.this).getLessonmateList(lid, lessonmatePage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Lessonmate> ret) {
 			layoutLoading.setVisibility(View.GONE);
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				return;
-			}
+			if(ret == null) return;
+			
 			tvNextPage.setText("加载更多");
 			layoutEmpty.setVisibility(View.GONE);
 			layoutList.setVisibility(View.VISIBLE);
@@ -391,14 +404,18 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		@Override
 		protected ArrayList<Lessonmate> doInBackground(Integer... param) {
 			lessonmatePage++;
-			return AHUTAccessor.getInstance(LessonActivity.this).getLessonmateList(lid, lessonmatePage);
+			try {
+				return AHUTAccessor.getInstance(LessonActivity.this).getLessonmateList(lid, lessonmatePage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Lessonmate> ret) {
 			layoutLoading.setVisibility(View.GONE);
 			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
 				tvNextPage.setText("加载更多");
 				return;
 			}

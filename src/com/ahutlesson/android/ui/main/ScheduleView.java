@@ -8,12 +8,13 @@ import android.view.MotionEvent;
 import android.view.View;
 
 public class ScheduleView extends View{
+	
 	public Schedule sch;
+	public int markWeek, markTime, markLid;
 
-	public ScheduleView(Activity activity, Lesson[][] lessons) {
+	public ScheduleView(Activity activity, Lesson[][] lessons, boolean isLocal) {
 		super(activity);
-		setLongClickable(true);
-		sch = new Schedule(activity, this, lessons);
+		sch = new Schedule(activity, this, lessons, isLocal);
 	}
 	
 	@Override
@@ -24,6 +25,9 @@ public class ScheduleView extends View{
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
 		sch.grid.markLesson(event.getX(), event.getY());
+		markWeek = sch.grid.markWeek;
+		markTime = sch.grid.markTime;
+		markLid = sch.grid.markLid;
 		ScheduleView.this.invalidate();
 		return super.onTouchEvent(event);
 	}

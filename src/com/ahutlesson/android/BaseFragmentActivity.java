@@ -75,19 +75,37 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 		startActivity(i);
 	}
 	
-	public void alert(String message) {
-		if(!this.hasWindowFocus()) return;
-		new AlertDialog.Builder(this).setMessage(message)
+	public void alert(final String message) {
+		runOnUiThread(new Runnable(){
+			@Override
+			public void run() {
+				new AlertDialog.Builder(BaseFragmentActivity.this)
+				.setMessage(message)
 				.setPositiveButton(R.string.ok, null).show();
+			}
+		});
 	}
-
-	public void alert(String title, String message) {
-		if(!this.hasWindowFocus()) return;
-		new AlertDialog.Builder(this).setTitle(title).setMessage(message)
+	
+	public void alert(final String title, final String message) {
+		runOnUiThread(new Runnable(){
+			@Override
+			public void run() {
+				new AlertDialog.Builder(BaseFragmentActivity.this)
+				.setIcon(R.drawable.ahutlesson)
+				.setTitle(title)
+				.setMessage(message)
 				.setPositiveButton(R.string.ok, null).show();
+			}
+		});
 	}
+	
 
-	public void makeToast(String message) {
-		Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+	public void makeToast(final String message) {
+		runOnUiThread(new Runnable(){
+			@Override
+			public void run() {
+				Toast.makeText(BaseFragmentActivity.this, message, Toast.LENGTH_LONG).show();
+			}
+		});
 	}
 }

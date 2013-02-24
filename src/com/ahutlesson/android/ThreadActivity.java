@@ -133,20 +133,20 @@ public class ThreadActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Post> doInBackground(Integer... param) {
 			threadPage = 1;
-			return AHUTAccessor.getInstance(ThreadActivity.this).getPostList(tid, threadPage);
+			try {
+				return AHUTAccessor.getInstance(ThreadActivity.this).getPostList(tid, threadPage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Post> ret) {
 			layoutLoading.setVisibility(View.GONE);
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				return;
-			}
+			if(ret == null)  return;
 
-			if(ret.size() == 0) {
-				
-			}else if(ret.size() > 0) {
+			if(ret.size() > 0) {
 				tvNextPage.setText("加载更多");
 				postList.addAll(ret);
 				showPosts();
@@ -165,7 +165,12 @@ public class ThreadActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Post> doInBackground(Integer... params) {
 			threadPage++;
-			return AHUTAccessor.getInstance(ThreadActivity.this).getPostList(tid, threadPage);
+			try {
+				return AHUTAccessor.getInstance(ThreadActivity.this).getPostList(tid, threadPage);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
@@ -187,7 +192,7 @@ public class ThreadActivity extends BaseActivity {
 		}
 	}
 
-	private class postNewReply extends AsyncTask<Integer, Integer, String> {
+	private class postNewReply extends AsyncTask<Integer, Integer, Boolean> {
 
 		ProgressDialog progressDialog;
 
@@ -197,22 +202,23 @@ public class ThreadActivity extends BaseActivity {
 		}
 		
 		@Override
-		protected String doInBackground(Integer... arg0) {
-			return AHUTAccessor.getInstance(ThreadActivity.this).postReply(tid, replyContent);
+		protected Boolean doInBackground(Integer... arg0) {
+			try {
+				return AHUTAccessor.getInstance(ThreadActivity.this).postReply(tid, replyContent);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+				return false;
+			}
 		}
 
 		@Override
-		protected void onPostExecute(String ret) {
+		protected void onPostExecute(Boolean ret) {
 			progressDialog.dismiss();
-			if(ret.startsWith("0")) {
-				etReplyContent.setText("");
-				makeToast("发布成功!");
-				new loadThread().execute();
-			}else if(ret.startsWith("1")){
-				alert(ret.substring(2));
-			}else{
-				alert("连接服务器失败，请检查手机网络设置");
-			}
+			if(!ret) return;
+			etReplyContent.setText("");
+			makeToast("发布成功!");
+			new loadThread().execute();
+
 		}
 
 	}

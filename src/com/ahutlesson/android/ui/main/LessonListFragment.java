@@ -130,6 +130,7 @@ public class LessonListFragment extends SherlockListFragment {
 		i.putExtra("week", l.week);
 		i.putExtra("time", l.time);
 		i.putExtra("title", l.getTitle());
+		i.putExtra("local", true);
 		this.startActivity(i);
 	}
 }

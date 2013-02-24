@@ -60,7 +60,7 @@ public class NewThreadActivity extends BaseActivity {
 		}
 	}
 
-	private class PostThread extends AsyncTask<Integer, Integer, String> {
+	private class PostThread extends AsyncTask<Integer, Integer, Integer> {
 		
 		ProgressDialog progressDialog;
 		
@@ -70,26 +70,25 @@ public class NewThreadActivity extends BaseActivity {
 		}
 		
 		@Override
-		protected String doInBackground(Integer... arg0) {
-			return AHUTAccessor.getInstance(NewThreadActivity.this).postThread(lid, subject, content);
+		protected Integer doInBackground(Integer... arg0) {
+			try {
+				return AHUTAccessor.getInstance(NewThreadActivity.this).postThread(lid, subject, content);
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return -1;
+			}
 		}
 
 		@Override
-		protected void onPostExecute(String ret) {
+		protected void onPostExecute(Integer ret) {
 			progressDialog.dismiss();
-			if(ret.startsWith("0")) {
-				int newtid = Integer.valueOf(ret.substring(2));
-				Intent i = new Intent(NewThreadActivity.this, ThreadActivity.class);
-				i.putExtra("tid", newtid);
-				i.putExtra("subject", subject);
-				startActivity(i);
-				LessonActivity.needRefresh = true;
-				NewThreadActivity.this.finish();
-			}else if(ret.startsWith("1")){
-				alert(ret.substring(2));
-			}else{
-				alert("连接服务器失败，请检查手机网络设置");
-			}
+			if(ret == -1) return;
+			Intent i = new Intent(NewThreadActivity.this, ThreadActivity.class);
+			i.putExtra("tid", ret);
+			i.putExtra("subject", subject);
+			startActivity(i);
+			LessonActivity.needRefresh = true;
+			NewThreadActivity.this.finish();
 		}
 	}
 	

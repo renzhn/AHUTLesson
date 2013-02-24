@@ -141,16 +141,18 @@ public class MessageActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Message> doInBackground(Integer... param) {
 			page = 1;
-			return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
+			try {
+				return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Message> ret) {
 			layoutLoading.setVisibility(View.GONE);
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				return;
-			}
+			if(ret == null) return;
 
 			if(ret.size() == 0) {
 				layoutEmpty.setVisibility(View.VISIBLE);
@@ -174,13 +176,17 @@ public class MessageActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Message> doInBackground(Integer... params) {
 			page++;
-			return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
+			try {
+				return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Message> ret) {
 			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
 				tvNextPage.setText("加载更多");
 				return;
 			}
@@ -200,12 +206,17 @@ public class MessageActivity extends BaseActivity {
 		
 		@Override
 		protected String doInBackground(Integer... mid) {
-			return AHUTAccessor.getInstance(MessageActivity.this).deleteMessage(mid[0]);
+			try {
+				AHUTAccessor.getInstance(MessageActivity.this).deleteMessage(mid[0]);
+			} catch (Exception e) {
+				alert(e.getMessage());
+			}
+			return null;
 		}
 
 		@Override
 		protected void onPostExecute(String ret) {
-			alert("操作完成！");
+			makeToast("操作完成！");
 			new LoadData().execute();
 		}
 	}

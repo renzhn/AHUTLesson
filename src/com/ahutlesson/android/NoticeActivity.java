@@ -114,16 +114,18 @@ public class NoticeActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Notice> doInBackground(Integer... param) {
 			page = 1;
-			return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
+			try {
+				return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Notice> ret) {
 			layoutLoading.setVisibility(View.GONE);
-			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
-				return;
-			}
+			if(ret == null) return;
 
 			if(ret.size() == 0) {
 				layoutEmpty.setVisibility(View.VISIBLE);
@@ -147,13 +149,17 @@ public class NoticeActivity extends BaseActivity {
 		@Override
 		protected ArrayList<Notice> doInBackground(Integer... params) {
 			page++;
-			return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
+			try {
+				return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+				return null;
+			}
 		}
 
 		@Override
 		protected void onPostExecute(ArrayList<Notice> ret) {
 			if(ret == null) {
-				alert("获取数据失败，请检查手机网络设置");
 				tvNextPage.setText("加载更多");
 				return;
 			}

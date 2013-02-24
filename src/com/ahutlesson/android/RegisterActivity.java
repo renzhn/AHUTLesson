@@ -3,16 +3,14 @@ package com.ahutlesson.android;
 import com.ahutlesson.android.model.UserManager;
 
 import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 public class RegisterActivity extends BaseActivity {
 
-	private ProgressDialog progressDialog;
-	private Handler handler = new Handler();
 	private String uxh, password, confirmPassword;
 
 	@Override
@@ -36,7 +34,7 @@ public class RegisterActivity extends BaseActivity {
 				}else if(!confirmPassword.contentEquals(password)) {
 					alert("两次输入的密码不一致!");
 				}else{
-					doRegister();
+					new RegisterTask().execute();
 				}
 					
 			}
@@ -52,34 +50,35 @@ public class RegisterActivity extends BaseActivity {
 		});
 	}
 
-	private void doRegister() {
-		progressDialog = ProgressDialog.show(RegisterActivity.this, "请稍等...", "提交中...", true);
-		new Thread() {
-			public void run() {
-				try {
-	    			UserManager.getInstance(RegisterActivity.this).registerUser(uxh,	password);
-	            	handler.post(new Runnable() {
-	            		public void run() {
-	        				progressDialog.setMessage("正在下载课表...");
-	            		}
-	            	});
-					UserManager.getInstance(RegisterActivity.this).updateLessonDB();
-	            	handler.post(new Runnable() {
-	            		public void run() {
-	            			progressDialog.dismiss();
-	            		}
-	            	});
-					openActivity(MainActivity.class);
-					RegisterActivity.this.finish();
-	            }catch(final Exception e) {
-	            	handler.post(new Runnable() {
-	            		public void run() {
-	            			progressDialog.dismiss();
-	            			alert(e.getMessage());
-	            		}
-	            	});
-	            }
+	private class RegisterTask extends AsyncTask<Integer, Integer, Boolean> {
+
+		ProgressDialog progressDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			progressDialog = ProgressDialog.show(RegisterActivity.this, "请稍等...", "提交中...", true);
+		}
+		
+
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			try {
+    			UserManager.getInstance(RegisterActivity.this).registerUser(uxh, password);
+				UserManager.getInstance(RegisterActivity.this).updateLessonDB();
+				return true;
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return false;
 			}
-		}.start();
+		}
+
+		@Override
+		protected void onPostExecute(Boolean ret) {
+			progressDialog.dismiss();
+			if(ret) {
+				openActivity(MainActivity.class);
+				RegisterActivity.this.finish();
+			}
+		}
 	}
 }

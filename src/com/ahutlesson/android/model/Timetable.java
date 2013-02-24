@@ -187,7 +187,7 @@ public class Timetable {
 		int timeInAdvance = 0;
 		switch (advanceMode){
 		case DelayAlarm:
-			timeInAdvance = Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
+			timeInAdvance = Integer.valueOf(preferences.getString("AlarmTimeBeforeLesson", "20"));
 			break;
 		case DelaySilent:
 			timeInAdvance = Integer.valueOf(preferences.getString("SilentDelay", "10"));
@@ -419,7 +419,7 @@ public class Timetable {
 	public int getTimeDelay(int advanceMode){
 		switch (advanceMode){
 		case DelayAlarm:
-			return Integer.valueOf(preferences.getString("NoticeTimeBeforeLesson", "20"));
+			return Integer.valueOf(preferences.getString("AlarmTimeBeforeLesson", "20"));
 		case DelaySilent:
 			return  Integer.valueOf(preferences.getString("SilentDelay", "10"));
 		}

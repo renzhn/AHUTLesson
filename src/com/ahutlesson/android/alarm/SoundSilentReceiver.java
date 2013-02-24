@@ -58,7 +58,7 @@ public class SoundSilentReceiver extends BroadcastReceiver {
 		am.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 	}
 	
-	public void alert(String notice) {
-		Toast.makeText(context, notice, Toast.LENGTH_LONG).show();
+	public void alert(String message) {
+		Toast.makeText(context, message, Toast.LENGTH_LONG).show();
 	}
 }

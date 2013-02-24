@@ -17,7 +17,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 
-public class AlarmAlertActivity extends BaseActivity {
+public class AlarmActivity extends BaseActivity {
 
 	private MediaPlayer player;
 	private Lesson lesson;
@@ -46,11 +46,11 @@ public class AlarmAlertActivity extends BaseActivity {
 		playMusic();
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String alertMessage = preferences.getString("MessageWhenNotice", "{TIME}有{LESSON}课，该上课了！！");
+		String alertMessage = preferences.getString("MessageWhenAlarm", "{TIME}有{LESSON}课，该上课了！！");
 		alertMessage = alertMessage.replace("{TIME}", timetable.lessontime_name[time]);
 		alertMessage = alertMessage.replace("{LESSON}", lesson.alias);
 		
-		ad = new AlertDialog.Builder(AlarmAlertActivity.this)
+		ad = new AlertDialog.Builder(AlarmActivity.this)
 
 				.setTitle("上课提醒")
 				.setMessage(alertMessage)
@@ -59,7 +59,7 @@ public class AlarmAlertActivity extends BaseActivity {
 							public void onClick(DialogInterface dialog,
 									int whichButton) {
 								ad.dismiss();
-								AlarmAlertActivity.this.finish();
+								AlarmActivity.this.finish();
 								System.exit(0);
 							}
 						}).show();

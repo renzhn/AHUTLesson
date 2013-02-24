@@ -50,7 +50,11 @@
         </activity>
         <activity
             android:name=".ProfileActivity"
-            android:label="个人中心" >
+            android:label="个人资料" >
+        </activity>
+        <activity
+            android:name=".UserActivity"
+            android:label="查看资料" >
         </activity>
         <activity
             android:name=".NewThreadActivity"
@@ -96,7 +100,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.ahutlesson.android.AlarmAlertActivity"
+            android:name="com.ahutlesson.android.AlarmActivity"
             android:label="上课提醒"
             android:theme="@style/Theme.Sherlock.Light.Dialog" >
         </activity>

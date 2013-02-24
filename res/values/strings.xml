@@ -35,7 +35,8 @@
 	    <item>下午后两节</item>
 	    <item>晚上</item>
 	</string-array>
-	<string-array name="NoticeTimeBeforeLesson_entries">
+	
+	<string-array name="AlarmTimeBeforeLesson_entries">
 	    <item>5</item>
 	    <item>15</item>
 	    <item>20</item>
@@ -47,5 +48,19 @@
 	    <item>5</item>
 	    <item>10</item>
 	    <item>20</item>
+	</string-array>
+	
+	<string-array name="CheckUnreadFreq_entries">
+	    <item>1分钟</item>
+	    <item>5分钟</item>
+	    <item>10分钟</item>
+	    <item>不检查</item>
+	</string-array>
+	
+	<string-array name="CheckUnreadFreq_values">
+	    <item>1</item>
+	    <item>5</item>
+	    <item>10</item>
+	    <item>100</item>
 	</string-array>
 </resources>

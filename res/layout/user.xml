@@ -31,23 +31,33 @@
                 android:layout_height="match_parent"
                 android:orientation="vertical"
                 android:paddingLeft="20dp"
-                android:paddingTop="18dp" >
+                android:paddingTop="12dp" >
 
                 <TextView
                     android:id="@+id/tvUname"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center_vertical"
-                    android:layout_marginBottom="5dp"
+                    android:layout_marginBottom="2dp"
                     android:gravity="center_vertical"
                     android:textSize="18sp" />
 
                 <TextView
-                    android:id="@+id/tvUInfo"
+                    android:id="@+id/tvUxh"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="#444"
                     android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvSignature"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:minHeight="25dp"
+                    android:textColor="#666"
+                    android:textSize="14sp" />
+
             </LinearLayout>
         </LinearLayout>
 
@@ -57,58 +67,13 @@
             android:layout_marginTop="15dp"
             android:orientation="vertical" >
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" >
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="5dp"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="2dp"
-                    android:text="个性签名"
-                    android:textSize="17sp" />
-
-                <ImageButton
-                    android:id="@+id/ibEditSignature"
-                    android:layout_width="25dp"
-                    android:layout_height="25dp"
-                    android:layout_marginLeft="10dp"
-                    android:background="@drawable/button"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/edit_black" />
-            </LinearLayout>
-
-            <LinearLayout
-                android:layout_width="fill_parent"
-                android:layout_height="1px"
-                android:layout_marginBottom="3dp"
-                android:background="#DDD" />
-
-            <TextView
-                android:id="@+id/tvSignature"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="8dp"
-                android:layout_marginLeft="5dp"
-                android:textColor="#555"
-                android:textSize="15sp" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:orientation="vertical" >
-
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
                 android:layout_marginLeft="5dp"
-                android:layout_marginTop="3dp"
-                android:text="头像设置"
+                android:layout_marginTop="8dp"
+                android:text="个人资料"
                 android:textSize="17sp" />
 
             <LinearLayout
@@ -117,14 +82,32 @@
                 android:layout_marginBottom="3dp"
                 android:background="#DDD" />
 
-            <Button
-                android:id="@+id/btnUploadAvatar"
+            <TextView
+                android:id="@+id/tvUserInfo"
                 android:layout_width="wrap_content"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:layout_marginTop="15dp"
-                android:text="上传头像" />
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginLeft="5dp"
+                android:textColor="#555"
+                android:textSize="15sp" />
         </LinearLayout>
+
+        <Button
+            android:id="@+id/btnSendMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="发消息" />
+
+        <Button
+            android:id="@+id/btnViewTimetable"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="10dp"
+            android:text="查看TA的课表" />
+        
     </LinearLayout>
 
 </ScrollView>

@@ -10,7 +10,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-public class Alert {
+public class Alarm {
 
 	public static void setAlarm(Context context){
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);

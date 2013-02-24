@@ -2,10 +2,13 @@ package com.ahutlesson.android.ui.main;
 
 import java.io.Serializable;
 
+import com.ahutlesson.android.LessonActivity;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.Timetable;
 
 import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,28 +21,40 @@ import android.view.View;
 public class GridView extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-	private Canvas canvas;
+	
+	public static final int NORMALTIME = 0;
+	public static final int FREETIME = 1;
+	public static final int BUSYTIME = 2;
+	public static final int NEXTTIME = 3;
+
 	private Lesson[][] lessons;
 	private Timetable timetable;
+	private Context context;
+	private boolean isLocalDB;
+	
+	private Canvas canvas;
 	
 	float top, left;
 	float cellWidth, cellHeight;
 	float calendarWidth, calendarHeight;
 	float textLeft, textTop;
 	
-	public static int markWeek = -1,markTime = -1;
+	public int markWeek = -1, markTime = -1, markLid = -1;
 	
-	public static final int NORMALTIME = 0;
-	public static final int FREETIME = 1;
-	public static final int BUSYTIME = 2;
-	public static final int NEXTTIME = 3;
-	
-	public GridView(Activity activity, View view, Lesson[][] lessons0) {
+	public GridView(Activity activity, View view, Lesson[][] lessons0, boolean isLocal) {
 		super(activity, view);
-		left = borderMargin;
-		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
+		context = activity;
 		lessons = lessons0;
 		timetable = Timetable.getInstance(context);
+		view.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				openLessonActivity();
+			}
+		});
+		isLocalDB = isLocal;
+		left = borderMargin;
+		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
 	}
 
 	@Override
@@ -371,5 +386,21 @@ public class GridView extends ScheduleParent implements Serializable {
 	public void markLesson(float x, float y) {
 		markWeek = (int) (x / cellWidth);
 		markTime = (int) ((y - top) / cellHeight);
+		if(lessons[markWeek][markTime] != null) {
+			markLid = lessons[markWeek][markTime].lid;
+		}else{
+			markLid = -1;
+		}
+	}
+	
+	public void openLessonActivity() {
+		if(lessons[markWeek][markTime] == null) return;
+		Intent i = new Intent(context, LessonActivity.class);
+		i.putExtra("lid", markLid);
+		i.putExtra("week", markWeek);
+		i.putExtra("time", markTime);
+		i.putExtra("title", lessons[markWeek][markTime].getTitle());
+		i.putExtra("local", isLocalDB);
+		context.startActivity(i);
 	}
 }

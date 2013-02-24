@@ -3,16 +3,14 @@ package com.ahutlesson.android;
 import com.ahutlesson.android.model.UserManager;
 
 import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
 public class LoginActivity extends BaseActivity {
 
-	private ProgressDialog progressDialog;
-	private Handler handler = new Handler();
 	private String uxh, password;
 
 	@Override
@@ -32,7 +30,7 @@ public class LoginActivity extends BaseActivity {
 				if(uxh.length() == 0 || password.length() == 0) {
 					alert("用户名和密码不能为空!");
 				}else{
-					doLogin();
+					new LoginTask().execute();
 				}
 			}
 		});
@@ -47,36 +45,36 @@ public class LoginActivity extends BaseActivity {
 		});
 	}
 
-	private void doLogin() {
-		progressDialog = ProgressDialog.show(LoginActivity.this, "请稍等...", "验证帐号中...", true);
-        new Thread() {
-            public void run() {
-                try{
-        			UserManager.getInstance(LoginActivity.this).verifyUser(uxh,	password);
-                	handler.post(new Runnable() {
-                		public void run() {
-            				progressDialog.setMessage("正在下载课表...");
-                		}
-                	});
-    				UserManager.getInstance(LoginActivity.this).updateLessonDB();
-                	handler.post(new Runnable() {
-                		public void run() {
-                			progressDialog.dismiss();
-                		}
-                	});
-    				openActivity(MainActivity.class);
-    				LoginActivity.this.finish();
-                }catch(final Exception e) {
-	            	e.printStackTrace();
-                	handler.post(new Runnable() {
-                		public void run() {
-                			progressDialog.dismiss();
-                			alert(e.getMessage());
-                		}
-                	});
-                }
-            }
-        }.start();
-    }
+	private class LoginTask extends AsyncTask<Integer, Integer, Boolean> {
+
+		ProgressDialog progressDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			progressDialog = ProgressDialog.show(LoginActivity.this, "请稍等...", "获取帐号信息中...", true);
+		}
+		
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			try {
+				UserManager.getInstance(LoginActivity.this).verifyUser(uxh,	password);
+				UserManager.getInstance(LoginActivity.this).updateLessonDB();
+				return true;
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return false;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Boolean ret) {
+			progressDialog.dismiss();
+			if(ret) {
+				openActivity(MainActivity.class);
+				LoginActivity.this.finish();
+			}
+		}
+		
+	}
 
 }

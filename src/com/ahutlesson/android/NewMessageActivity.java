@@ -72,7 +72,11 @@ public class NewMessageActivity extends BaseActivity {
 		
 		@Override
 		protected String doInBackground(Integer... arg0) {
-			AHUTAccessor.getInstance(NewMessageActivity.this).sendMessage(uxh, title, content);
+			try {
+				AHUTAccessor.getInstance(NewMessageActivity.this).sendMessage(uxh, title, content);
+			} catch (Exception e) {
+				makeToast(e.getMessage());
+			}
 			return null;
 		}
 

@@ -63,6 +63,7 @@ public class UserManager {
 	}
 	
 	public User getUser() {
+		if(user == null) loadUser();
 		return user;
 	}
 	
@@ -71,15 +72,11 @@ public class UserManager {
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAccessor.getInstance(context).getUserInfo();
+			User user = AHUTAccessor.getInstance(context).getLoginUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
-			Exception ex = new Exception(ret.substring(2));
-			throw ex;
-		}else{
-			Exception ex = new Exception("连接失败");
-			throw ex;
-		}
+			throw new Exception(ret.substring(2));
+		}else throw new Exception("服务器返回了未知数据");
 		
 	}
 	
@@ -88,15 +85,11 @@ public class UserManager {
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAccessor.getInstance(context).getUserInfo();
+			User user = AHUTAccessor.getInstance(context).getLoginUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
-			Exception ex = new Exception(ret.substring(2));
-			throw ex;
-		}else{
-			Exception ex = new Exception("连接服务器失败，请检查手机网络设置");
-			throw ex;
-		}
+			throw new Exception(ret.substring(2));
+		}else throw new Exception("服务器返回了未知数据");
 	}
 
 	public void setCookie(String ck) {
@@ -121,7 +114,6 @@ public class UserManager {
 		String uxh = getUserXH();
 		if(uxh == null) throw new Exception("未登录");
 		ArrayList<Lesson> lessonlist = AHUTAccessor.getInstance(context).getLessonList(uxh);
-		if(lessonlist == null) throw new Exception("下载失败，请检查网络连接");
 		LessonManager.getInstance(context).lessonlistToDB(lessonlist);
 	}
 }

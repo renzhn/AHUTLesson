@@ -15,21 +15,40 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Binder;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
 public class CheckUnreadService extends Service{
 	
-	private static final int INTERVAL = 15000;
+	private static final int ONEMIN = 60000;
 	private static final int MESSAGENOTIFYID = 1, NOTICENOTIFYID = 2;
 	private Timer timer = new Timer();
 	private boolean enableSound, enableVibrate;
+	private int checkFreq, interval = 5 * ONEMIN;
 	
     @Override
 	public void onCreate() {
 		super.onCreate();
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		enableSound = preferences.getBoolean("CheckUnreadSound", true);
+		enableVibrate = preferences.getBoolean("CheckUnreadVibrate", true);
+		checkFreq = Integer.valueOf(preferences.getString("CheckUnreadFreq", "5"));
+		System.out.println("check freq:" + checkFreq);
+		switch(checkFreq) {
+		case 1:
+			interval = ONEMIN;
+			break;
+		case 5:
+			interval = 5 * ONEMIN;
+			break;
+		case 15:
+			interval = 10 * ONEMIN;
+			break;
+		}
+		if(checkFreq == 100) {
+			this.stopservice();
+			return;
+		}
 		startservice();
 	}
 
@@ -38,16 +57,21 @@ public class CheckUnreadService extends Service{
 			public void run() {
 				checkUnread();
 			}
-		}, 0, INTERVAL);
+		}, 0, interval);
 	}
 	
 	private void checkUnread() {
-		int[] unreadCount = AHUTAccessor.getInstance(this).getUnreadCount();
-		if(unreadCount[0] > 0) {
-			showMessageNotification(unreadCount[0]);
-		}
-		if(unreadCount[1] > 0) {
-			showNoticeNotification(unreadCount[1]);
+		int[] unreadCount;
+		try {
+			unreadCount = AHUTAccessor.getInstance(this).getUnreadCount();
+			if(unreadCount[0] > 0) {
+				showMessageNotification(unreadCount[0]);
+			}
+			if(unreadCount[1] > 0) {
+				showNoticeNotification(unreadCount[1]);
+			}
+		} catch (Exception e) {
+			System.out.println("checkUnreadError");
 		}
 	}
 
@@ -63,7 +87,6 @@ public class CheckUnreadService extends Service{
 	}
 	
     private void showMessageNotification(int count) {
-    	boolean enableSound, enableVibrate;
     	Intent i = new Intent(this, MessageActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -77,13 +100,12 @@ public class CheckUnreadService extends Service{
 	        .setOnlyAlertOnce(true)
 	        .setLights(0xff00ff00, 300, 1000)
 			.build();
-		n.defaults |= Notification.DEFAULT_SOUND;
-		n.defaults |= Notification.DEFAULT_VIBRATE;
+		if(enableSound) n.defaults |= Notification.DEFAULT_SOUND;
+		if(enableVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
 		nm.notify(MESSAGENOTIFYID, n);
     }
     
     private void showNoticeNotification(int count) {
-    	boolean enableSound, enableVibrate;
     	Intent i = new Intent(this, NoticeActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
@@ -97,8 +119,8 @@ public class CheckUnreadService extends Service{
 	        .setOnlyAlertOnce(true)
 	        .setLights(0xff00ff00, 300, 1000)
 			.build();
-		n.defaults |= Notification.DEFAULT_SOUND;
-		n.defaults |= Notification.DEFAULT_VIBRATE;
+		if(enableSound) n.defaults |= Notification.DEFAULT_SOUND;
+		if(enableVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
 		nm.notify(NOTICENOTIFYID, n);
     }
 	
