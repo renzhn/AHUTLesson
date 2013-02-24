@@ -1,13 +1,18 @@
 package com.ahutlesson.android.api;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.HTTP;
@@ -18,6 +23,8 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.util.Log;
 
 import com.ahutlesson.android.model.Lesson;
@@ -30,28 +37,28 @@ import com.ahutlesson.android.ui.notice.Notice;
 import com.ahutlesson.android.ui.thread.Post;
 
 public class AHUTAccessor {
-	
+
 	private static AHUTAccessor accessor;
 	private static Context context;
-	
-	//public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+
+	// public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
 	public static final String SERVER_URL = "http://192.168.150.100/lesson/";
-	
+
 	public AHUTAccessor(Context context0) {
 		context = context0;
 	}
-	
+
 	public static AHUTAccessor getInstance(Context context) {
-		if(accessor == null){
+		if (accessor == null) {
 			accessor = new AHUTAccessor(context);
 		}
 		return accessor;
 	}
-	
+
 	public String getURL(String URL) {
 		HttpGet request = new HttpGet(URL);
 		String cookie = UserManager.getInstance(context).getCookie();
-		if(cookie != null) {
+		if (cookie != null) {
 			request.addHeader("Cookie", "ck=" + cookie);
 		}
 		String strResult = null;
@@ -60,12 +67,12 @@ public class AHUTAccessor {
 			HttpResponse httpResponse = defaultHttpClient.execute(request);
 			if (httpResponse.getStatusLine().getStatusCode() == 200) {
 				strResult = EntityUtils.toString(httpResponse.getEntity());
-				strResult = new String(strResult.getBytes("ISO-8859-1"),"UTF-8");
+				strResult = new String(strResult.getBytes("ISO-8859-1"), "UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
 			log(URL);
 			log(strResult);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			return "";
 		}
 		return strResult;
@@ -74,7 +81,7 @@ public class AHUTAccessor {
 	public String postURL(String URL, List<NameValuePair> params) {
 		HttpPost request = new HttpPost(URL);
 		String cookie = UserManager.getInstance(context).getCookie();
-		if(cookie != null) {
+		if (cookie != null) {
 			request.addHeader("Cookie", "ck=" + cookie);
 		}
 		String strResult = null;
@@ -84,23 +91,23 @@ public class AHUTAccessor {
 			HttpResponse httpResponse = defaultHttpClient.execute(request);
 			if (httpResponse.getStatusLine().getStatusCode() == 200) {
 				strResult = EntityUtils.toString(httpResponse.getEntity());
-				strResult = new String(strResult.getBytes("ISO-8859-1"),"UTF-8");
+				strResult = new String(strResult.getBytes("ISO-8859-1"), "UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
 			log(URL);
 			log(strResult);
-		}catch(Exception e) {
+		} catch (Exception e) {
 			return "";
 		}
 		return strResult;
 	}
-	
+
 	public static void log(String i) {
 		Log.i("AHUTAPI", i);
 	}
 
 	public static String getCurrentTimetableSetting() {
-		
+
 		return null;
 	}
 
@@ -110,14 +117,14 @@ public class AHUTAccessor {
 		params.add(new BasicNameValuePair("p", password));
 		return postURL(SERVER_URL + "api/user.handler.php?act=register", params);
 	}
-	
+
 	public String validateUser(String uxh, String password) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("x", uxh));
 		params.add(new BasicNameValuePair("p", password));
 		return postURL(SERVER_URL + "api/user.handler.php?act=login", params);
 	}
-	
+
 	public User getUserInfo() {
 		User user = new User();
 		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getuserinfo");
@@ -136,15 +143,15 @@ public class AHUTAccessor {
 		}
 		return user;
 	}
-	
+
 	public ArrayList<Lesson> getLessonList(String uxh) {
 		String ret = getURL(SERVER_URL + "api/getlessonlist.php?xh=" + uxh);
 		ArrayList<Lesson> lessonList = new ArrayList<Lesson>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray lessons = (JSONArray)jsonParser.nextValue();
+			JSONArray lessons = (JSONArray) jsonParser.nextValue();
 			JSONObject lesson;
-			for(int i = 0;i < lessons.length(); i++){
+			for (int i = 0; i < lessons.length(); i++) {
 				lesson = lessons.getJSONObject(i);
 				int lid = lesson.getInt("lid");
 				String lessonName = lesson.getString("lessonname");
@@ -155,23 +162,26 @@ public class AHUTAccessor {
 				int startweek = lesson.getInt("startweek");
 				int endweek = lesson.getInt("endweek");
 				String lessonPlace = lesson.getString("place");
-				lessonList.add(new Lesson(lid, lessonName, lessonAlias, lessonPlace, teacherName, startweek, endweek, null, week, time));
+				lessonList.add(new Lesson(lid, lessonName, lessonAlias,
+						lessonPlace, teacherName, startweek, endweek, null,
+						week, time));
 			}
 			return lessonList;
 		} catch (Exception ex) {
 			return null;
 		}
 	}
-	
+
 	public ArrayList<ForumThread> getForumThreadList(int lid, int page) {
-		String ret = getURL(SERVER_URL + "api/thread.handler.php?act=get&lid=" + lid + "&page=" + page);
+		String ret = getURL(SERVER_URL + "api/thread.handler.php?act=get&lid="
+				+ lid + "&page=" + page);
 		ArrayList<ForumThread> threadList = new ArrayList<ForumThread>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray retArray = (JSONArray)jsonParser.nextValue();
-			JSONArray threads = (JSONArray)retArray.getJSONArray(1);
+			JSONArray retArray = (JSONArray) jsonParser.nextValue();
+			JSONArray threads = (JSONArray) retArray.getJSONArray(1);
 			JSONObject thread;
-			for(int i = 0; i < threads.length(); i++) {
+			for (int i = 0; i < threads.length(); i++) {
 				thread = threads.getJSONObject(i);
 				ForumThread t = new ForumThread();
 				t.tid = thread.getInt("tid");
@@ -190,16 +200,17 @@ public class AHUTAccessor {
 			return null;
 		}
 	}
-	
+
 	public ArrayList<Post> getPostList(int tid, int page) {
-		String ret = getURL(SERVER_URL + "api/post.handler.php?act=get&tid=" + tid + "&page=" + page);
+		String ret = getURL(SERVER_URL + "api/post.handler.php?act=get&tid="
+				+ tid + "&page=" + page);
 		ArrayList<Post> postList = new ArrayList<Post>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray retArray = (JSONArray)jsonParser.nextValue();
-			JSONArray posts = (JSONArray)retArray.getJSONArray(1);
+			JSONArray retArray = (JSONArray) jsonParser.nextValue();
+			JSONArray posts = (JSONArray) retArray.getJSONArray(1);
 			JSONObject post;
-			for(int i = 0; i < posts.length(); i++) {
+			for (int i = 0; i < posts.length(); i++) {
 				post = posts.getJSONObject(i);
 				Post p = new Post();
 				p.pid = post.getInt("pid");
@@ -227,25 +238,30 @@ public class AHUTAccessor {
 		params.add(new BasicNameValuePair("l", String.valueOf(lid)));
 		params.add(new BasicNameValuePair("s", subject));
 		params.add(new BasicNameValuePair("c", content));
-		return postURL(SERVER_URL + "api/thread.handler.php?act=new&from=mobile", params);
+		return postURL(SERVER_URL
+				+ "api/thread.handler.php?act=new&from=mobile", params);
 	}
-	
+
 	public String postReply(int tid, String content) {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
 		params.add(new BasicNameValuePair("c", content));
-		return postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile", params);
+		return postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile",
+				params);
 	}
-	
+
 	public int[] getUnreadCount() {
-		int[] ret = {0, 0};
+		int[] ret = { 0, 0 };
 		String uxh = UserManager.getInstance(context).getUserXH();
-		if(uxh == null) return ret;
-		String result = getURL(SERVER_URL + "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
-		if(result.contentEquals("")) return ret;
+		if (uxh == null)
+			return ret;
+		String result = getURL(SERVER_URL
+				+ "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
+		if (result.contentEquals(""))
+			return ret;
 		try {
 			JSONTokener jsonParser = new JSONTokener(result);
-			JSONArray retArray = (JSONArray)jsonParser.nextValue();
+			JSONArray retArray = (JSONArray) jsonParser.nextValue();
 			ret[0] = retArray.getInt(0);
 			ret[1] = retArray.getInt(1);
 		} catch (Exception ex) {
@@ -255,13 +271,14 @@ public class AHUTAccessor {
 	}
 
 	public ArrayList<Notice> getNoticeList(int page) {
-		String ret = getURL(SERVER_URL + "api/notice.handler.php?act=getnotice&page=" + page);
+		String ret = getURL(SERVER_URL
+				+ "api/notice.handler.php?act=getnotice&page=" + page);
 		ArrayList<Notice> list = new ArrayList<Notice>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray notices = (JSONArray)jsonParser.nextValue();
+			JSONArray notices = (JSONArray) jsonParser.nextValue();
 			JSONObject notice;
-			for(int i = 0; i < notices.length(); i++) {
+			for (int i = 0; i < notices.length(); i++) {
 				notice = notices.getJSONObject(i);
 				Notice n = new Notice();
 				n.nid = notice.getInt("nid");
@@ -284,13 +301,14 @@ public class AHUTAccessor {
 	}
 
 	public ArrayList<Message> getMessageList(int page) {
-		String ret = getURL(SERVER_URL + "api/notice.handler.php?act=getmessage&page=" + page);
+		String ret = getURL(SERVER_URL
+				+ "api/notice.handler.php?act=getmessage&page=" + page);
 		ArrayList<Message> list = new ArrayList<Message>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray messages = (JSONArray)jsonParser.nextValue();
+			JSONArray messages = (JSONArray) jsonParser.nextValue();
 			JSONObject message;
-			for(int i = 0; i < messages.length(); i++) {
+			for (int i = 0; i < messages.length(); i++) {
 				message = messages.getJSONObject(i);
 				Message m = new Message();
 				m.mid = message.getInt("mid");
@@ -311,7 +329,8 @@ public class AHUTAccessor {
 	}
 
 	public String deleteMessage(int mid) {
-		return getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid=" + mid);
+		return getURL(SERVER_URL
+				+ "api/notice.handler.php?act=deletemessage&mid=" + mid);
 	}
 
 	public void sendMessage(String uxh, String title, String content) {
@@ -322,14 +341,15 @@ public class AHUTAccessor {
 		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
 	}
 
-	public ArrayList<Lessonmate> getLessonmateList(int lid,int page) {
-		String ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid + "&page=" + page);
+	public ArrayList<Lessonmate> getLessonmateList(int lid, int page) {
+		String ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid
+				+ "&page=" + page);
 		ArrayList<Lessonmate> list = new ArrayList<Lessonmate>();
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
-			JSONArray lessonmates = (JSONArray)jsonParser.nextValue();
+			JSONArray lessonmates = (JSONArray) jsonParser.nextValue();
 			JSONObject lessonmate;
-			for(int i = 0; i < lessonmates.length(); i++) {
+			for (int i = 0; i < lessonmates.length(); i++) {
 				lessonmate = lessonmates.getJSONObject(i);
 				Lessonmate l = new Lessonmate();
 				l.xh = lessonmate.getString("xh");
@@ -346,5 +366,31 @@ public class AHUTAccessor {
 			return null;
 		}
 	}
-	
+
+	public String uploadAvatar(Bitmap bm) throws Exception {
+		String strResult = null;
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		bm.compress(CompressFormat.JPEG, 90, bos);
+		byte[] data = bos.toByteArray();
+		HttpClient httpClient = new DefaultHttpClient();
+		HttpPost request = new HttpPost(SERVER_URL + "api/uploadavatar.php");
+		String cookie = UserManager.getInstance(context).getCookie();
+		if (cookie != null) {
+			request.addHeader("Cookie", "ck=" + cookie);
+		}else throw new Exception("ÉÐÎ´µÇÂ¼£¡");
+		try {
+			ByteArrayBody bab = new ByteArrayBody(data, "avatar.jpg");
+			MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+			reqEntity.addPart("avatar_file", bab);
+			request.setEntity(reqEntity);
+			HttpResponse httpResponse = httpClient.execute(request);
+			strResult = EntityUtils.toString(httpResponse.getEntity());
+			strResult = new String(strResult.getBytes("ISO-8859-1"), "UTF-8");
+			log(strResult);
+		} catch (Exception e) {
+			throw e;
+		}
+		return strResult;
+	}
+
 }

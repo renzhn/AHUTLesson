@@ -16,7 +16,7 @@
             android:orientation="vertical" >
 
             <ImageView
-                android:id="@+id/imageView1"
+                android:id="@+id/ivAvatar"
                 android:layout_width="90dp"
                 android:layout_height="90dp"
                 android:src="@drawable/noavatar" />
@@ -30,7 +30,7 @@
             android:paddingTop="18dp" >
 
             <TextView
-                android:id="@+id/textView1"
+                android:id="@+id/tvUname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
@@ -40,7 +40,7 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView2"
+                android:id="@+id/tvUInfo"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="119074021 计111"
@@ -60,7 +60,6 @@
             android:layout_height="wrap_content" >
 
             <TextView
-                android:id="@+id/textView3"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="5dp"
@@ -103,7 +102,6 @@
         android:orientation="vertical" >
 
         <TextView
-            android:id="@+id/textView3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="5dp"
@@ -120,7 +118,7 @@
     </LinearLayout>
 
     <Button
-        android:id="@+id/button1"
+        android:id="@+id/btnUploadAvatar"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_gravity="center"

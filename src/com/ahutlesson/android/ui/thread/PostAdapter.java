@@ -34,7 +34,7 @@ public class PostAdapter extends ArrayAdapter<Post> {
         TextView content = (TextView) postItem.findViewById(R.id.tvPostItemContent);
         TextView floor = (TextView) postItem.findViewById(R.id.tvPostItemFloor);
         TextView time = (TextView) postItem.findViewById(R.id.tvPostItemTime);
-        ImageView avatar = (ImageView) postItem.findViewById(R.id.ivPostItemAvatar);
+        ImageView avatar = (ImageView) postItem.findViewById(R.id.ivAvatar);
         if(post.hasAvatar) {
         	ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(post.uxh), avatar);
         }else{

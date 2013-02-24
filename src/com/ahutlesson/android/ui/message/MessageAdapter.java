@@ -35,7 +35,7 @@ public class MessageAdapter extends ArrayAdapter<Message> {
         TextView title = (TextView) item.findViewById(R.id.tvItemTitle);
         TextView content = (TextView) item.findViewById(R.id.tvItemContent);
         TextView time = (TextView) item.findViewById(R.id.tvItemTime);
-        ImageView avatar = (ImageView) item.findViewById(R.id.ivItemAvatar);
+        ImageView avatar = (ImageView) item.findViewById(R.id.ivAvatar);
         if(message.hasAvatar) {
             ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(message.fromUxh), avatar);
         }else{

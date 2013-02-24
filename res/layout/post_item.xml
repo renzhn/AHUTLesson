@@ -15,7 +15,7 @@
         android:orientation="vertical" >
 
         <ImageView
-            android:id="@+id/ivPostItemAvatar"
+            android:id="@+id/ivAvatar"
             android:layout_marginTop="3dp"
             android:layout_width="37dp"
             android:layout_height="37dp" />

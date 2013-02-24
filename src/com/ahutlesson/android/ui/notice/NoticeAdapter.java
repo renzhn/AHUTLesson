@@ -34,7 +34,7 @@ public class NoticeAdapter extends ArrayAdapter<Notice> {
         TextView uname = (TextView) item.findViewById(R.id.tvItemUname);
         TextView content = (TextView) item.findViewById(R.id.tvItemContent);
         TextView time = (TextView) item.findViewById(R.id.tvItemTime);
-        ImageView avatar = (ImageView) item.findViewById(R.id.ivItemAvatar);
+        ImageView avatar = (ImageView) item.findViewById(R.id.ivAvatar);
         if(notice.hasAvatar) {
             ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(notice.fromUxh), avatar);
         }else{
