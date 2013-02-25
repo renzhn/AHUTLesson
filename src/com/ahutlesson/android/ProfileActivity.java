@@ -101,25 +101,27 @@ public class ProfileActivity extends BaseActivity {
 		
 	}
 
-	private class SetSignatureTask extends AsyncTask<String, Integer, Boolean> {
+	private class SetSignatureTask extends AsyncTask<String, Integer, String> {
 
 		@Override
-		protected Boolean doInBackground(String... para) {
+		protected String doInBackground(String... para) {
 			try {
-				return AHUTAccessor.getInstance(ProfileActivity.this).setSignature(signature);
+				AHUTAccessor.getInstance(ProfileActivity.this).setSignature(signature);
+				return null;
 			} catch (Exception e) {
-				makeToast(e.getMessage());
+				return e.getMessage();
 			}
-			return false;
 		}
 
 		@Override
-		protected void onPostExecute(Boolean ret) {
-			if(ret) {
+		protected void onPostExecute(String ret) {
+			if(ret == null) {
 				makeToast("…Ë÷√≥…π¶£°");
 				tvSignature.setText(signature);
 				user.signature = signature;
 				userManager.setUser(user);
+			}else{
+				makeToast(ret);
 			}
 		}
 		

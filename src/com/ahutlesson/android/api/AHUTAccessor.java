@@ -283,14 +283,14 @@ public class AHUTAccessor {
 			throw new Exception("服务器返回了未知数据");
 	}
 
-	public boolean postReply(int tid, String content) throws Exception {
+	public void postReply(int tid, String content) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
 		params.add(new BasicNameValuePair("c", content));
 		String ret = postURL(SERVER_URL
 				+ "api/post.handler.php?act=new&from=mobile", params);
 		if (ret.startsWith("0")) {
-			return true;
+			return;
 		} else if (ret.startsWith("1")) {
 			throw new Exception(ret.substring(2));
 		} else {
@@ -443,13 +443,13 @@ public class AHUTAccessor {
 		return strResult;
 	}
 
-	public boolean setSignature(String signature) throws Exception {
+	public void setSignature(String signature) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("s", signature));
 		String ret = postURL(SERVER_URL
 				+ "api/user.handler.php?act=setsignature", params);
 		if (ret.contentEquals("0")) {
-			return true;
+			return;
 		} else if (ret.startsWith("1")) {
 			throw new Exception(ret.substring(2));
 		} else

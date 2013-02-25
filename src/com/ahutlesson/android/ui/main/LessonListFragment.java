@@ -120,8 +120,7 @@ public class LessonListFragment extends SherlockListFragment {
 	
 	private void reload(){
 		loadData();
-		MainActivity mainActiivty = (MainActivity)getActivity();
-		mainActiivty.refreshTodayView();
+		MainActivity.needRefresh = true;
 	}
 	
 	public void openLessonForum(Lesson l) {

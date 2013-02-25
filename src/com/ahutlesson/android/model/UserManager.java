@@ -116,4 +116,9 @@ public class UserManager {
 		ArrayList<Lesson> lessonlist = AHUTAccessor.getInstance(context).getLessonList(uxh);
 		LessonManager.getInstance(context).lessonlistToDB(lessonlist);
 	}
+
+	public void updateUserInfo() throws Exception {
+		user = AHUTAccessor.getInstance(context).getLoginUserInfo();
+		setUser(user);
+	}
 }

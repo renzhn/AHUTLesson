@@ -124,7 +124,7 @@ public class TimetableSettingActivity extends BaseActivity {
 		timetable.setEndTime(2, etEnd2.getText().toString());
 		timetable.setEndTime(3, etEnd3.getText().toString());
 		timetable.setEndTime(4, etEnd4.getText().toString());
-		timetable.initTime();
+		timetable.refreshNumOfWeek();
 	}
 
 	private void initView() {

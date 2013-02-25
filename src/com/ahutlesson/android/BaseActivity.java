@@ -79,6 +79,7 @@ public class BaseActivity extends SherlockActivity {
 	}
 	
 	public void makeToast(final String message) {
+		if(isFinishing()) return;
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {

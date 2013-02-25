@@ -18,7 +18,7 @@ import android.view.View;
  * 绘制日期和网格
  * 
  * */
-public class GridView extends ScheduleParent implements Serializable {
+public class Grid extends ScheduleParent implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
@@ -41,7 +41,7 @@ public class GridView extends ScheduleParent implements Serializable {
 	
 	public int markWeek = -1, markTime = -1, markLid = -1;
 	
-	public GridView(Activity activity, View view, Lesson[][] lessons0, boolean isLocal) {
+	public Grid(Activity activity, View view, Lesson[][] lessons0, boolean isLocal) {
 		super(activity, view);
 		context = activity;
 		lessons = lessons0;
@@ -83,6 +83,9 @@ public class GridView extends ScheduleParent implements Serializable {
 				}
 			}
 		}
+
+		//触摸的课程
+		drawMarkBackground();
 		
 		//画背景
 		drawBackgrounds();
@@ -104,8 +107,6 @@ public class GridView extends ScheduleParent implements Serializable {
 				}
 			}
 		}
-		
-		drawMarkBorder();
 	}
 
 	private void drawBackgrounds() {
@@ -136,11 +137,11 @@ public class GridView extends ScheduleParent implements Serializable {
 			drawBackground(lesson.week, lesson.time, NEXTTIME, lessonAppendMode(lesson,lessons));
 		}
 	}
-
-	private void drawMarkBorder(){
-		paint.setColor(RED);
-		paint.setStyle(Paint.Style.STROKE);
-		if(markWeek!=-1&&markTime!=-1){
+	
+	private void drawMarkBackground(){
+		paint.setColor(Color.parseColor("#DDDDDD"));
+		paint.setStyle(Paint.Style.FILL_AND_STROKE);
+		if(markWeek!=-1 && markTime!=-1){
 			canvas.drawRect(left + cellWidth * markWeek, top + cellHeight * markTime, left + cellWidth * (markWeek + 1), top + cellHeight * (markTime + 1), paint);
 		}
 	}
@@ -384,16 +385,22 @@ public class GridView extends ScheduleParent implements Serializable {
 
 	
 	public void markLesson(float x, float y) {
-		markWeek = (int) (x / cellWidth);
-		markTime = (int) ((y - top) / cellHeight);
-		if(lessons[markWeek][markTime] != null) {
-			markLid = lessons[markWeek][markTime].lid;
+		int gridX = (int) (x / cellWidth);
+		int gridY = (int) ((y - top) / cellHeight);
+		if(!Timetable.isValidWeekTime(gridX, gridY)) return;
+		if(lessons[gridX][gridY] != null) {
+			markWeek = gridX;
+			markTime = gridY;
+			markLid = lessons[gridX][gridY].lid;
 		}else{
 			markLid = -1;
+			markWeek = -1;
+			markTime = -1;
 		}
 	}
 	
 	public void openLessonActivity() {
+		if(!Timetable.isValidWeekTime(markWeek, markTime)) return;
 		if(lessons[markWeek][markTime] == null) return;
 		Intent i = new Intent(context, LessonActivity.class);
 		i.putExtra("lid", markLid);

@@ -33,7 +33,7 @@ public class AlarmActivity extends BaseActivity {
 		int time = getIntent().getExtras().getInt("time");
 		
 		lesson = lessonManager.getLessonAt(week, time);
-		if(lesson==null){
+		if(lesson==null) {
 			this.finish();
 		}
 		

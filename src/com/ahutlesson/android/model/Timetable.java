@@ -91,6 +91,10 @@ public class Timetable {
 		numOfWeek = getNumOfWeekSincePeriod();
 	}
 	
+	public void refreshNumOfWeek() {
+		numOfWeek = getNumOfWeekSincePeriod();
+	}
+	
 	public int getNumOfWeekSincePeriod() {
 		//计算开学第几周
 		Calendar beginCal = Calendar.getInstance();
@@ -492,6 +496,7 @@ public class Timetable {
 		setBeginDate_year(year);
 		setBeginDate_month(month);
 		setBeginDate_day(day);
+		refreshNumOfWeek();
 		switch(season) {
 		case 1: //winter
 			setBeginTime(0, "08:00");

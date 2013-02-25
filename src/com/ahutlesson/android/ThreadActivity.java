@@ -192,7 +192,7 @@ public class ThreadActivity extends BaseActivity {
 		}
 	}
 
-	private class postNewReply extends AsyncTask<Integer, Integer, Boolean> {
+	private class postNewReply extends AsyncTask<Integer, Integer, String> {
 
 		ProgressDialog progressDialog;
 
@@ -202,22 +202,25 @@ public class ThreadActivity extends BaseActivity {
 		}
 		
 		@Override
-		protected Boolean doInBackground(Integer... arg0) {
+		protected String doInBackground(Integer... arg0) {
 			try {
-				return AHUTAccessor.getInstance(ThreadActivity.this).postReply(tid, replyContent);
+				AHUTAccessor.getInstance(ThreadActivity.this).postReply(tid, replyContent);
+				return null;
 			} catch (Exception e) {
-				makeToast(e.getMessage());
-				return false;
+				return e.getMessage();
 			}
 		}
 
 		@Override
-		protected void onPostExecute(Boolean ret) {
+		protected void onPostExecute(String ret) {
 			progressDialog.dismiss();
-			if(!ret) return;
-			etReplyContent.setText("");
-			makeToast("发布成功!");
-			new loadThread().execute();
+			if(ret == null) {
+				etReplyContent.setText("");
+				makeToast("发布成功!");
+				new loadThread().execute();
+			}else{
+				makeToast(ret);
+			}
 
 		}
 

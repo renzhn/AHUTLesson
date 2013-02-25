@@ -23,15 +23,13 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 	}
 
 	public void enableHomeButton() {
-		if (actionBar == null)
-			return;
+		if (actionBar == null) return;
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setDisplayHomeAsUpEnabled(true);
 	}
 
 	public void disableHomeButton() {
-		if (actionBar == null)
-			return;
+		if (actionBar == null) return;
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(false);
 	}
@@ -103,6 +101,7 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 	
 
 	public void makeToast(final String message) {
+		if(isFinishing()) return;
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {

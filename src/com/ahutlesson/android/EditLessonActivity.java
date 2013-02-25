@@ -117,6 +117,7 @@ public class EditLessonActivity extends BaseActivity {
 
 		lessonManager.EditLessonAt(lessonName, lessonAlias, lessonPlace,
 				teacherName, startWeek, endWeek, week, time);
+		MainActivity.needRefresh = true;
 	}
 
 }

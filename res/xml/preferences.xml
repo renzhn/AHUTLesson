@@ -115,7 +115,7 @@
         <PreferenceScreen android:title="帐号管理" >
             <PreferenceCategory android:title="帐号管理" >
                 <Preference
-                    android:key="user_down"
+                    android:key="user_downinfo"
                     android:title="同步用户信息"
                     android:summary="从课友网获取最新用户信息" />
                 <Preference

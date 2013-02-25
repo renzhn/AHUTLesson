@@ -40,14 +40,17 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	
 	private static final String[] TITLES = {"当日课程", "课程总表", "课后作业"};
 	private static int viewMode = 0;
-
+	
 	// VIEW
 	private static final int TODAY_VIEW = 0;
 	private static final int GRID_VIEW = 1;
 	private static final int HOMEWORK_VIEW = 2;
 
+	private View dateInfoView;
+	private TextView tvDateInfo;
+	
 	//TODAY_VIEW
-	private static View todayView;
+	private View todayView;
 	private LessonListFragmentAdapter mLessonListFragmentAdapter;
 	private ViewPager mPager;
 	private PageIndicator mIndicator;
@@ -86,6 +89,19 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(list, this);
+		
+		//dateInfo
+		dateInfoView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
+				.inflate(R.layout.actionbar_customview, null, false);
+		tvDateInfo = (TextView) dateInfoView.findViewById(R.id.tvCumstomView);
+		dateInfoView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				openActivity(TimetableSettingActivity.class);
+			}
+		});
+		actionBar.setCustomView(dateInfoView);
+		actionBar.setDisplayShowCustomEnabled(true);
 		
 		//Today View
 		todayView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
@@ -154,41 +170,24 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			break;
 		}
 	}
+
+	public static boolean needRefresh = false;
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
 		
-		switch(viewMode){
-		case TODAY_VIEW:
-			refreshTodayView();
-			break;
-		case GRID_VIEW:
+		if(needRefresh) {
+			mLessonListFragmentAdapter.notifyDataSetChanged();
 			scheduleView.invalidate();
-			break;
 		}
 		
-		setDateInfo();
+		tvDateInfo.setText(dateInfo());
 		
 		Alarm.setAlarm(this);
 		MobclickAgent.onResume(this);
 	}
 	
-	private void setDateInfo() {
-		View custumView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-				.inflate(R.layout.actionbar_customview, null, false);
-		TextView tvCustomView = (TextView) custumView.findViewById(R.id.tvCumstomView);
-		tvCustomView.setText(dateInfo());
-		tvCustomView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				openActivity(TimetableSettingActivity.class);
-			}
-		});
-		actionBar.setCustomView(custumView);
-		actionBar.setDisplayShowCustomEnabled(true);
-	}
-
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// 选择导航菜单
@@ -299,10 +298,4 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		}
 	}
 
-	// 课程详情
-
-	public void refreshTodayView() {
-		mLessonListFragmentAdapter.notifyDataSetChanged();
-	}
-	
 }

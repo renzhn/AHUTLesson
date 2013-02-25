@@ -6,6 +6,7 @@ import com.ahutlesson.android.utils.ChangeLog;
 
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
+import com.nostra13.universalimageloader.core.ImageLoader;
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
@@ -14,9 +15,11 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.Preference;
+import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceClickListener;
 
 public class PreferenceActivity extends SherlockPreferenceActivity {
@@ -59,14 +62,43 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 				confirm("下载课表会清空现有的课表，继续吗？", new Runnable() {
 					@Override
 					public void run() {
-						new DownLessonTask().execute();
+						new DownLesson().execute();
 					}
-					
 				});
 				return true;
 			}
 
 		});
+
+		Preference downUserInfo = (Preference) findPreference("user_downinfo");
+		downUserInfo.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+			public boolean onPreferenceClick(Preference preference) {
+				new DownUserInfo().execute();
+				return true;
+			}
+
+		});
+		
+		Preference userLogout = (Preference) findPreference("user_logout");
+		userLogout.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+
+			public boolean onPreferenceClick(Preference preference) {
+				confirm("确定要注销账户吗？", new Runnable() {
+					@Override
+					public void run() {
+						SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PreferenceActivity.this);
+						preferences.edit().clear().commit();
+						Intent i = getBaseContext().getPackageManager()
+					             .getLaunchIntentForPackage(getBaseContext().getPackageName());
+						i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+						startActivity(i);
+					}
+				});
+				return true;
+			}
+		});
+
 		Preference delDB = (Preference) findPreference("delete_db");
 		delDB.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
@@ -76,13 +108,11 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 					public void run() {
 						LessonManager.getInstance(PreferenceActivity.this).deleteDB();
 					}
-					
 				});
 				return true;
 			}
-
 		});
-
+		
 		Preference checkUpdate = (Preference) findPreference("check_update");
 		checkUpdate.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
@@ -114,25 +144,46 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		});
 
 	}
+	private class DownUserInfo extends AsyncTask<Integer, Integer, String> {
+		@Override
+		protected String doInBackground(Integer... para) {
+			ImageLoader.getInstance().clearMemoryCache();
+			ImageLoader.getInstance().clearDiscCache();
+			try {
+				UserManager.getInstance(PreferenceActivity.this).updateUserInfo();
+				return null;
+			} catch (Exception e) {
+				return e.getMessage();
+			}
+		}
 
-	class DownLessonTask extends AsyncTask<Integer, Integer, String> {
+		@Override
+		protected void onPostExecute(String ret) {
+			if(ret != null) {
+				alert(ret);
+			}else{
+				alert("下载成功！");
+			}
+		}
+	}
+	class DownLesson extends AsyncTask<Integer, Integer, String> {
 		
 		ProgressDialog progressDialog;
 		
 		@Override
 		protected void onPreExecute() {
 			super.onPreExecute();
-			progressDialog = ProgressDialog.show(PreferenceActivity.this, "请稍等","数据下载中...", true);
+			progressDialog = ProgressDialog.show(PreferenceActivity.this, "请稍等","下载课表中...", true);
 		}
 
 		@Override
 		protected String doInBackground(Integer... para) {
 			try {
 				UserManager.getInstance(PreferenceActivity.this).updateLessonDB();
+				return null;
 			} catch (Exception e) {
 				return e.getMessage();
 			}
-			return null;
 		}
 
 		@Override
@@ -149,7 +200,7 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 	public void share() {
 		Intent intent = new Intent(Intent.ACTION_SEND);
 		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, "课友下载地址：http://ahutapp.com/lesson");
+		intent.putExtra(Intent.EXTRA_TEXT, "课友下载地址：http://ahutapp.com/");
 		startActivity(Intent.createChooser(intent, "分享到"));
 	}
 
@@ -167,20 +218,19 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 	public void confirm(String message, final Runnable r) {
 		new AlertDialog.Builder(PreferenceActivity.this)
 		.setMessage(message)
-		.setPositiveButton("确定",
+		.setPositiveButton(R.string.ok,
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog,
 							int which) {
 						r.run();
 					}
-
-				}).setNegativeButton("取消", null).show();
+				}).setNegativeButton(R.string.cancel, null).show();
 	}
 	
 	public void alert(String message) {
 		new AlertDialog.Builder(this)
 		.setMessage(message)
-		.setPositiveButton("确定", null).show();
+		.setPositiveButton(R.string.ok, null).show();
 	}
 	
 }
