@@ -245,6 +245,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			super.onPreExecute();
 			layoutLoading.setVisibility(View.VISIBLE);
 			layoutList.setVisibility(View.GONE);
+			layoutEmpty.setVisibility(View.GONE);
 			forumThreadList.clear();
 		}
 
@@ -365,6 +366,8 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			super.onPreExecute();
 			layoutLoading.setVisibility(View.VISIBLE);
 			layoutList.setVisibility(View.GONE);
+			layoutEmpty.setVisibility(View.GONE);
+			lessonmateList.clear();
 		}
 
 		@Override
@@ -386,7 +389,6 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			tvNextPage.setText("¼ÓÔØ¸ü¶à");
 			layoutEmpty.setVisibility(View.GONE);
 			layoutList.setVisibility(View.VISIBLE);
-			lessonmateList.clear();
 			lessonmateList.addAll(ret);
 			lvLessonmateAdapter.notifyDataSetChanged();
 		}

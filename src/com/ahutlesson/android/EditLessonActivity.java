@@ -41,7 +41,7 @@ public class EditLessonActivity extends BaseActivity {
 		setContentView(R.layout.edit_lesson);
 
 		TextView tvTitle = (TextView) findViewById(R.id.tvTitle);
-		tvTitle.setText(timetable.weekname[week] + timetable.lessontime_name[time]);
+		tvTitle.setText(timetable.weekName[week] + timetable.lessontimeName[time]);
 
 		etLessonName = (EditText) findViewById(R.id.etLessonName);
 		etLessonAlias = (EditText) findViewById(R.id.etLessonAlias);

@@ -1,6 +1,7 @@
 package com.ahutlesson.android.api;
 
 import java.io.ByteArrayOutputStream;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,9 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -41,11 +45,21 @@ public class AHUTAccessor {
 	private static AHUTAccessor accessor;
 	private static Context context;
 
-	// public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
-	public static final String SERVER_URL = "http://192.168.150.100/lesson/";
+	private static final int TIMEOUT_CONNECTION = 5000;
+	private static final int TIMEOUT_SOCKET = 10000;
+	private HttpParams httpParameters;
+
+	public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+
+	// public static final String SERVER_URL = "http://192.168.150.100/lesson/";
 
 	public AHUTAccessor(Context context0) {
 		context = context0;
+
+		httpParameters = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpParameters,
+				TIMEOUT_CONNECTION);
+		HttpConnectionParams.setSoTimeout(httpParameters, TIMEOUT_SOCKET);
 	}
 
 	public static AHUTAccessor getInstance(Context context) {
@@ -63,22 +77,27 @@ public class AHUTAccessor {
 		}
 		String strResult = null;
 		try {
-			DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+			DefaultHttpClient defaultHttpClient = new DefaultHttpClient(
+					httpParameters);
 			HttpResponse httpResponse = defaultHttpClient.execute(request);
 			if (httpResponse.getStatusLine().getStatusCode() == 200) {
 				strResult = EntityUtils.toString(httpResponse.getEntity());
-				strResult = new String(strResult.getBytes("ISO-8859-1"), "UTF-8");
+				strResult = new String(strResult.getBytes("ISO-8859-1"),
+						"UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
 			log(URL);
 			log(strResult);
+		} catch (SocketTimeoutException e) {
+			throw new Exception("连接超时，请稍候重试");
 		} catch (Exception e) {
-			throw new Exception("连接服务器失败，请检查网络设置。");
+			throw new Exception("连接服务器失败，请检查网络设置");
 		}
 		return strResult;
 	}
 
-	public String postURL(String URL, List<NameValuePair> params) throws Exception {
+	public String postURL(String URL, List<NameValuePair> params)
+			throws Exception {
 		HttpPost request = new HttpPost(URL);
 		String cookie = UserManager.getInstance(context).getCookie();
 		if (cookie != null) {
@@ -87,17 +106,21 @@ public class AHUTAccessor {
 		String strResult = null;
 		try {
 			request.setEntity(new UrlEncodedFormEntity(params, HTTP.UTF_8));
-			DefaultHttpClient defaultHttpClient = new DefaultHttpClient();
+			DefaultHttpClient defaultHttpClient = new DefaultHttpClient(
+					httpParameters);
 			HttpResponse httpResponse = defaultHttpClient.execute(request);
 			if (httpResponse.getStatusLine().getStatusCode() == 200) {
 				strResult = EntityUtils.toString(httpResponse.getEntity());
-				strResult = new String(strResult.getBytes("ISO-8859-1"), "UTF-8");
+				strResult = new String(strResult.getBytes("ISO-8859-1"),
+						"UTF-8");
 			}
 			defaultHttpClient.getConnectionManager().shutdown();
 			log(URL);
 			log(strResult);
+		} catch (SocketTimeoutException e) {
+			throw new Exception("连接超时，请稍候重试");
 		} catch (Exception e) {
-			throw new Exception("连接服务器失败，请检查网络设置。");
+			throw new Exception("连接服务器失败，请检查网络设置");
 		}
 		return strResult;
 	}
@@ -127,7 +150,8 @@ public class AHUTAccessor {
 
 	public User getLoginUserInfo() throws Exception {
 		User user = new User();
-		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getloginuserinfo");
+		String ret = getURL(SERVER_URL
+				+ "api/user.handler.php?act=getloginuserinfo");
 		JSONTokener jsonParser = new JSONTokener(ret);
 		try {
 			JSONObject userInfo = (JSONObject) jsonParser.nextValue();
@@ -174,13 +198,14 @@ public class AHUTAccessor {
 	public Lesson[][] getLessons(String uxh) throws Exception {
 		ArrayList<Lesson> lessonList = getLessonList(uxh);
 		Lesson[][] lessons = new Lesson[7][5];
-		for(Lesson lesson : lessonList) {
+		for (Lesson lesson : lessonList) {
 			lessons[lesson.week][lesson.time] = lesson;
 		}
 		return lessons;
 	}
-	
-	public ArrayList<ForumThread> getForumThreadList(int lid, int page) throws Exception {
+
+	public ArrayList<ForumThread> getForumThreadList(int lid, int page)
+			throws Exception {
 		String ret = getURL(SERVER_URL + "api/thread.handler.php?act=get&lid="
 				+ lid + "&page=" + page);
 		ArrayList<ForumThread> threadList = new ArrayList<ForumThread>();
@@ -241,31 +266,34 @@ public class AHUTAccessor {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
-	public int postThread(int lid, String subject, String content) throws Exception {
+	public int postThread(int lid, String subject, String content)
+			throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("l", String.valueOf(lid)));
 		params.add(new BasicNameValuePair("s", subject));
 		params.add(new BasicNameValuePair("c", content));
 		String ret = postURL(SERVER_URL
 				+ "api/thread.handler.php?act=new&from=mobile", params);
-		if(ret.startsWith("0")) {
+		if (ret.startsWith("0")) {
 			int newtid = Integer.valueOf(ret.substring(2));
 			return newtid;
-		}else if(ret.startsWith("1")){
+		} else if (ret.startsWith("1")) {
 			throw new Exception(ret.substring(2));
-		}else throw new Exception("服务器返回了未知数据");
+		} else
+			throw new Exception("服务器返回了未知数据");
 	}
 
 	public boolean postReply(int tid, String content) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
 		params.add(new BasicNameValuePair("c", content));
-		String ret = postURL(SERVER_URL + "api/post.handler.php?act=new&from=mobile", params);
-		if(ret.startsWith("0")) {
+		String ret = postURL(SERVER_URL
+				+ "api/post.handler.php?act=new&from=mobile", params);
+		if (ret.startsWith("0")) {
 			return true;
-		}else if(ret.startsWith("1")){
+		} else if (ret.startsWith("1")) {
 			throw new Exception(ret.substring(2));
-		}else{
+		} else {
 			throw new Exception("服务器返回了未知数据");
 		}
 	}
@@ -277,10 +305,15 @@ public class AHUTAccessor {
 			return ret;
 		String result = getURL(SERVER_URL
 				+ "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
-		JSONTokener jsonParser = new JSONTokener(result);
-		JSONArray retArray = (JSONArray) jsonParser.nextValue();
-		ret[0] = retArray.getInt(0);
-		ret[1] = retArray.getInt(1);
+		try {
+			JSONTokener jsonParser = new JSONTokener(result);
+			JSONArray retArray;
+			retArray = (JSONArray) jsonParser.nextValue();
+			ret[0] = retArray.getInt(0);
+			ret[1] = retArray.getInt(1);
+		} catch (Exception e) {
+			throw new Exception("解析数据出错");
+		}
 		return ret;
 	}
 
@@ -343,10 +376,12 @@ public class AHUTAccessor {
 	}
 
 	public void deleteMessage(int mid) throws Exception {
-		getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid=" + mid);
+		getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid="
+				+ mid);
 	}
 
-	public void sendMessage(String uxh, String title, String content) throws Exception {
+	public void sendMessage(String uxh, String title, String content)
+			throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("u", uxh));
 		params.add(new BasicNameValuePair("t", title));
@@ -354,7 +389,8 @@ public class AHUTAccessor {
 		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
 	}
 
-	public ArrayList<Lessonmate> getLessonmateList(int lid, int page) throws Exception {
+	public ArrayList<Lessonmate> getLessonmateList(int lid, int page)
+			throws Exception {
 		String ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid
 				+ "&page=" + page);
 		ArrayList<Lessonmate> list = new ArrayList<Lessonmate>();
@@ -389,10 +425,12 @@ public class AHUTAccessor {
 		String cookie = UserManager.getInstance(context).getCookie();
 		if (cookie != null) {
 			request.addHeader("Cookie", "ck=" + cookie);
-		}else throw new Exception("尚未登录！");
+		} else
+			throw new Exception("尚未登录！");
 		try {
 			ByteArrayBody bab = new ByteArrayBody(data, "avatar.jpg");
-			MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+			MultipartEntity reqEntity = new MultipartEntity(
+					HttpMultipartMode.BROWSER_COMPATIBLE);
 			reqEntity.addPart("avatar_file", bab);
 			request.setEntity(reqEntity);
 			HttpResponse httpResponse = httpClient.execute(request);
@@ -408,18 +446,22 @@ public class AHUTAccessor {
 	public boolean setSignature(String signature) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("s", signature));
-		String ret = postURL(SERVER_URL + "api/user.handler.php?act=setsignature", params);
-		if(ret.contentEquals("0")) {
+		String ret = postURL(SERVER_URL
+				+ "api/user.handler.php?act=setsignature", params);
+		if (ret.contentEquals("0")) {
 			return true;
-		}else if(ret.startsWith("1")) {
-			throw new Exception (ret.substring(2));
-		}else throw new Exception("服务器返回了未知数据");
+		} else if (ret.startsWith("1")) {
+			throw new Exception(ret.substring(2));
+		} else
+			throw new Exception("服务器返回了未知数据");
 	}
-	
+
 	public UserInfo getUserInfo(String uxh) throws Exception {
 		UserInfo userInfo = new UserInfo();
-		String ret = getURL(SERVER_URL + "api/user.handler.php?act=getuserinfo&uxh=" + uxh);
-		if(ret.startsWith("1")) throw new Exception(ret.substring(2));
+		String ret = getURL(SERVER_URL
+				+ "api/user.handler.php?act=getuserinfo&uxh=" + uxh);
+		if (ret.startsWith("1"))
+			throw new Exception(ret.substring(2));
 		JSONTokener jsonParser = new JSONTokener(ret);
 		try {
 			JSONObject userInfoObject = (JSONObject) jsonParser.nextValue();
@@ -439,6 +481,22 @@ public class AHUTAccessor {
 			throw new Exception("解析错误");
 		}
 		return userInfo;
+	}
+
+	public int[] getTimetableSetting() throws Exception {
+		int[] ret = { 2013, 2, 27, 1 };
+		String result = getURL(SERVER_URL + "api/gettimetable.php");
+		try {
+			JSONTokener jsonParser = new JSONTokener(result);
+			JSONObject retObject = (JSONObject) jsonParser.nextValue();
+			ret[0] = retObject.getInt("year");
+			ret[1] = retObject.getInt("month");
+			ret[2] = retObject.getInt("day");
+			ret[3] = retObject.getInt("season");
+		} catch (Exception e) {
+			throw new Exception("解析数据出错");
+		}
+		return ret;
 	}
 
 }

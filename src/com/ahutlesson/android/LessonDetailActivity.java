@@ -60,8 +60,8 @@ public class LessonDetailActivity extends BaseActivity {
 		lessonManager = LessonManager.getInstance(this);
 		timetable = Timetable.getInstance(this);
 
-		tvCurrentTime.setText(timetable.weekname[week]
-				+ timetable.lessontime_name[time]);
+		tvCurrentTime.setText(timetable.weekName[week]
+				+ timetable.lessontimeName[time]);
 		tvLessonTime.setText(timetable.begintime[time] + " ~ "
 				+ timetable.endtime[time]);
 		

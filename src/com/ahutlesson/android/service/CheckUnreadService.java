@@ -71,7 +71,7 @@ public class CheckUnreadService extends Service{
 				showNoticeNotification(unreadCount[1]);
 			}
 		} catch (Exception e) {
-			System.out.println("checkUnreadError");
+			System.out.println("checkUnreadError:" + e.getMessage());
 		}
 	}
 

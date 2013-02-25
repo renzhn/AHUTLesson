@@ -47,7 +47,7 @@ public class AlarmActivity extends BaseActivity {
 
 		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		String alertMessage = preferences.getString("MessageWhenAlarm", "{TIME}有{LESSON}课，该上课了！！");
-		alertMessage = alertMessage.replace("{TIME}", timetable.lessontime_name[time]);
+		alertMessage = alertMessage.replace("{TIME}", timetable.lessontimeName[time]);
 		alertMessage = alertMessage.replace("{LESSON}", lesson.alias);
 		
 		ad = new AlertDialog.Builder(AlarmActivity.this)

@@ -40,8 +40,8 @@ public class HomeworkListAdapter  extends ArrayAdapter<Lesson>{
           if(lesson.homework != null)
         	  tvHomework.setText(lesson.homework);
           Timetable timetable = Timetable.getInstance(this.getContext());
-          tvTime.setText(timetable.weekname[lesson.week]
-  				+ timetable.lessontime_name[lesson.time]);
+          tvTime.setText(timetable.weekName[lesson.week]
+  				+ timetable.lessontimeName[lesson.time]);
           
 
           return convertView;

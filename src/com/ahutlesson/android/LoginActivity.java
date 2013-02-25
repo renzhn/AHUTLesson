@@ -1,5 +1,6 @@
 package com.ahutlesson.android;
 
+import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
 
 import android.app.ProgressDialog;
@@ -59,6 +60,7 @@ public class LoginActivity extends BaseActivity {
 			try {
 				UserManager.getInstance(LoginActivity.this).verifyUser(uxh,	password);
 				UserManager.getInstance(LoginActivity.this).updateLessonDB();
+				Timetable.getInstance(LoginActivity.this).getTimetableSetting();
 				return true;
 			} catch (Exception e) {
 				alert(e.getMessage());

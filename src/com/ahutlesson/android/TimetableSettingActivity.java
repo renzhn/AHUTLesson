@@ -6,17 +6,20 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
+import android.app.ProgressDialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 
 public class TimetableSettingActivity extends BaseActivity {
 	
-	private static final String[] mode = {"当前", "夏季时间" , "冬季时间" };
+	private static final String[] mode = {"当前", "冬季时间" , "夏季时间" };
 	private Spinner spinner;
 	private ArrayAdapter<String> adapter;
 	private EditText etBeginDate_year,etBeginDate_month,etBeginDate_day;
@@ -33,16 +36,54 @@ public class TimetableSettingActivity extends BaseActivity {
 		
 		timetable = Timetable.getInstance(this);
 		
-		initView();
 		spinner = (Spinner) findViewById(R.id.spinnerSetMode);
 		adapter = new ArrayAdapter<String>(this,
 				android.R.layout.simple_spinner_item, mode);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(new SpinnerSelectedListener()); 
-        if(etBegin0.getText().toString().contentEquals(""))
-        		formatTimeTable(1);
 
+		initView();
+		loadData();
+		
+        Button btnGetTimetableSetting = (Button) findViewById(R.id.btnGetTimetableSetting);
+        btnGetTimetableSetting.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				new GetTimetableSetting().execute();
+			}
+		});
+	}
+	
+	private class GetTimetableSetting extends AsyncTask<Integer, Integer, Boolean> {
+
+		ProgressDialog progressDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			progressDialog = ProgressDialog.show(TimetableSettingActivity.this, "请稍等...", "获取时间表信息中...", true);
+		}
+		
+		@Override
+		protected Boolean doInBackground(Integer... params) {
+			try {
+				Timetable.getInstance(TimetableSettingActivity.this).getTimetableSetting();
+				return true;
+			} catch (Exception e) {
+				alert(e.getMessage());
+				return false;
+			}
+		}
+
+		@Override
+		protected void onPostExecute(Boolean ret) {
+			progressDialog.dismiss();
+			if(ret) {
+				alert("更新时间表成功！");
+				loadData();
+			}
+		}
+		
 	}
 	
 	@Override
@@ -104,6 +145,9 @@ public class TimetableSettingActivity extends BaseActivity {
 		etEnd3 = (EditText)findViewById(R.id.time_end3);
 		etEnd4 = (EditText)findViewById(R.id.time_end4);
 
+	}
+	
+	private void loadData() {
 		etBeginDate_year.setText(Integer.toString(timetable.getBeginDate_year()));
 		etBeginDate_month.setText(Integer.toString(timetable.getBeginDate_month()));
 		etBeginDate_day.setText(Integer.toString(timetable.getBeginDate_day())); 
@@ -121,7 +165,7 @@ public class TimetableSettingActivity extends BaseActivity {
 		etEnd4.setText(timetable.endtime[4]);
 	
 	}
-
+	
 	class SpinnerSelectedListener implements OnItemSelectedListener{  
 		  
         public void onItemSelected(AdapterView<?> arg0, View arg1, int pos,  
@@ -141,20 +185,6 @@ public class TimetableSettingActivity extends BaseActivity {
 			//winter
 			etBegin0.setText("08:00");
 			etBegin1.setText("10:00");
-			etBegin2.setText("14:30");
-			etBegin3.setText("16:30");
-			etBegin4.setText("19:00");
-			
-			etEnd0.setText("09:35");
-			etEnd1.setText("11:35");
-			etEnd2.setText("16:05");
-			etEnd3.setText("18:05");
-			etEnd4.setText("21:30");
-			break;
-		case 2:
-			//summer
-			etBegin0.setText("08:00");
-			etBegin1.setText("10:00");
 			etBegin2.setText("14:00");
 			etBegin3.setText("16:00");
 			etBegin4.setText("18:30");
@@ -164,6 +194,20 @@ public class TimetableSettingActivity extends BaseActivity {
 			etEnd2.setText("15:35");
 			etEnd3.setText("17:35");
 			etEnd4.setText("21:00");
+			break;
+		case 2:
+			//summer
+			etBegin0.setText("08:00");
+			etBegin1.setText("10:00");
+			etBegin2.setText("14:30");
+			etBegin3.setText("16:30");
+			etBegin4.setText("19:00");
+			
+			etEnd0.setText("09:35");
+			etEnd1.setText("11:35");
+			etEnd2.setText("16:05");
+			etEnd3.setText("18:05");
+			etEnd4.setText("21:30");
 			break;
 		}
 	}  

@@ -72,7 +72,7 @@ public class UserManager {
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAccessor.getInstance(context).getLoginUserInfo();
+			user = AHUTAccessor.getInstance(context).getLoginUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
 			throw new Exception(ret.substring(2));
@@ -85,7 +85,7 @@ public class UserManager {
 		if(ret.startsWith("0")) {
 			String cookie = ret.substring(2);
 			setCookie(cookie);
-			User user = AHUTAccessor.getInstance(context).getLoginUserInfo();
+			user = AHUTAccessor.getInstance(context).getLoginUserInfo();
 			setUser(user);
 		}else if(ret.startsWith("1")){
 			throw new Exception(ret.substring(2));

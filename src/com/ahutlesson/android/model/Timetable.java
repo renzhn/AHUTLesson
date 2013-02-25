@@ -10,6 +10,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 import com.ahutlesson.android.R;
+import com.ahutlesson.android.api.AHUTAccessor;
 
 public class Timetable {
 	
@@ -25,15 +26,15 @@ public class Timetable {
 	public int begintimemin[] = new int[5];
 	public int endtimemin[] = new int[5];
 	public int numOfWeek = -1;
-	public String[] weekname = new String[7],lessontime_name = new String[5];
-	private Editor edit;
+	public String[] weekName = new String[7],lessontimeName = new String[5];
+	private Editor editor;
 	
 	public Timetable(Context context0){
 		context = context0;
 		preferences = PreferenceManager
 				.getDefaultSharedPreferences(context);
-		weekname = context.getResources().getStringArray(R.array.week_name);
-		lessontime_name = context.getResources()
+		weekName = context.getResources().getStringArray(R.array.week_name);
+		lessontimeName = context.getResources()
 				.getStringArray(R.array.lessontime_name);
 		loadData();
 		initTime();
@@ -141,10 +142,10 @@ public class Timetable {
 		if(!checkTime(newtime))return false;
 		begintime[num] = newtime;
 		begintimemin[num] = time2minute(newtime);
-		if(edit == null)
-			edit = preferences.edit();
-		edit.putString("time_begin" + String.valueOf(num), newtime);
-		edit.commit();
+		if(editor == null)
+			editor = preferences.edit();
+		editor.putString("time_begin" + String.valueOf(num), newtime);
+		editor.commit();
 		return true;
 	}
 	
@@ -152,10 +153,10 @@ public class Timetable {
 		if(!checkTime(newtime))return false;
 		endtime[num] = newtime;
 		endtimemin[num] = time2minute(newtime);
-		if(edit == null)
-			edit = preferences.edit();
-		edit.putString("time_end" + String.valueOf(num), newtime);
-		edit.commit();
+		if(editor == null)
+			editor = preferences.edit();
+		editor.putString("time_end" + String.valueOf(num), newtime);
+		editor.commit();
 		return true;
 	}
 
@@ -230,28 +231,28 @@ public class Timetable {
 	}
 	public void setBeginDate_year(int beginYear){
 		if(beginYear==year || beginYear==year-1){
-			if(edit == null)
-				edit = preferences.edit();
-			edit.putInt("begin_date_year", beginYear);
-			edit.commit();
+			if(editor == null)
+				editor = preferences.edit();
+			editor.putInt("begin_date_year", beginYear);
+			editor.commit();
 		}
 		beginDate_year = beginYear;
 	}
 	public void setBeginDate_month(int beginMonth){
 		if(beginMonth>=1 && beginMonth<=12){
-			if(edit == null)
-				edit = preferences.edit();
-			edit.putInt("begin_date_month", beginMonth - 1);
-			edit.commit();
+			if(editor == null)
+				editor = preferences.edit();
+			editor.putInt("begin_date_month", beginMonth - 1);
+			editor.commit();
 		}
 		beginDate_month = beginMonth - 1;
 	}
 	public void setBeginDate_day(int beginDay){
 		if(beginDay>=1 && beginDay<=31){
-			if(edit == null)
-				edit = preferences.edit();
-			edit.putInt("begin_date_day", beginDay);
-			edit.commit();
+			if(editor == null)
+				editor = preferences.edit();
+			editor.putInt("begin_date_day", beginDay);
+			editor.commit();
 		}
 		beginDate_day = beginDay;
 	}
@@ -482,4 +483,41 @@ public class Timetable {
 		return false;
 	}
 
+	public void getTimetableSetting() throws Exception {
+		int[] timetableSetting = AHUTAccessor.getInstance(context).getTimetableSetting();
+		int year = timetableSetting[0];
+		int month = timetableSetting[1];
+		int day = timetableSetting[2];
+		int season = timetableSetting[3];
+		setBeginDate_year(year);
+		setBeginDate_month(month);
+		setBeginDate_day(day);
+		switch(season) {
+		case 1: //winter
+			setBeginTime(0, "08:00");
+			setBeginTime(1, "10:00");
+			setBeginTime(2, "14:00");
+			setBeginTime(3, "16:00");
+			setBeginTime(4, "18:30");
+			setEndTime(0, "09:35");
+			setEndTime(1, "11:35");
+			setEndTime(2, "15:35");
+			setEndTime(3, "17:35");
+			setEndTime(4, "21:00");
+			break;
+		case 2: //summer
+			setBeginTime(0, "08:00");
+			setBeginTime(1, "10:00");
+			setBeginTime(2, "14:30");
+			setBeginTime(3, "16:30");
+			setBeginTime(4, "19:00");
+			setEndTime(0, "09:35");
+			setEndTime(1, "11:35");
+			setEndTime(2, "16:05");
+			setEndTime(3, "18:05");
+			setEndTime(4, "21:30");
+			break;
+		}
+	}
+	
 }

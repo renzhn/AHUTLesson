@@ -10,6 +10,14 @@
         android:focusableInTouchMode="true"
         android:orientation="vertical" >
 
+            <Button
+                android:id="@+id/btnGetTimetableSetting"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:text="在线获取时间表信息" />
+            
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

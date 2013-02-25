@@ -293,9 +293,9 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		Timetable timetable = Timetable.getInstance(this);
 		int numOfWeek = timetable.numOfWeek;
 		if(numOfWeek > 0) {
-			return "第" + String.valueOf(numOfWeek) + "周" + " " + timetable.weekname[timetable.weekDay];
+			return "第" + String.valueOf(numOfWeek) + "周" + " " + timetable.weekName[timetable.weekDay];
 		}else{
-			return "未开学 " + timetable.weekname[timetable.weekDay];
+			return "未开学 " + timetable.weekName[timetable.weekDay];
 		}
 	}
 

@@ -76,6 +76,7 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 	}
 	
 	public void alert(final String message) {
+		if(isFinishing()) return;
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
@@ -87,6 +88,7 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 	}
 	
 	public void alert(final String title, final String message) {
+		if(isFinishing()) return;
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {

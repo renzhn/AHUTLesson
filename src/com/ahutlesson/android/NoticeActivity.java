@@ -117,7 +117,7 @@ public class NoticeActivity extends BaseActivity {
 			try {
 				return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
 			} catch (Exception e) {
-				makeToast(e.getMessage());
+				alert(e.getMessage());
 				return null;
 			}
 		}
@@ -131,7 +131,7 @@ public class NoticeActivity extends BaseActivity {
 				layoutEmpty.setVisibility(View.VISIBLE);
 			}else if(ret.size() > 0) {
 				layoutEmpty.setVisibility(View.GONE);
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				list.addAll(ret);
 				showData();
 			}
@@ -152,7 +152,7 @@ public class NoticeActivity extends BaseActivity {
 			try {
 				return AHUTAccessor.getInstance(NoticeActivity.this).getNoticeList(page);
 			} catch (Exception e) {
-				makeToast(e.getMessage());
+				alert(e.getMessage());
 				return null;
 			}
 		}
@@ -160,7 +160,7 @@ public class NoticeActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(ArrayList<Notice> ret) {
 			if(ret == null) {
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				return;
 			}
 
@@ -168,7 +168,7 @@ public class NoticeActivity extends BaseActivity {
 				page--;
 				tvNextPage.setText("没有更多的提醒了");
 			}else{
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				list.addAll(ret);
 				lvNoticeAdapter.notifyDataSetChanged();
 			}

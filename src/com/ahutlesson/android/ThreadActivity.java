@@ -147,7 +147,7 @@ public class ThreadActivity extends BaseActivity {
 			if(ret == null)  return;
 
 			if(ret.size() > 0) {
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				postList.addAll(ret);
 				showPosts();
 			}
@@ -185,7 +185,7 @@ public class ThreadActivity extends BaseActivity {
 				threadPage--;
 				tvNextPage.setText("没有更多的帖子了");
 			}else{
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				postList.addAll(ret);
 				lvPostAdapter.notifyDataSetChanged();
 			}

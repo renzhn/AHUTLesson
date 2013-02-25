@@ -73,7 +73,8 @@
         </activity>
         <activity
             android:name=".PreferenceActivity"
-            android:label="设置" >
+            android:label="设置"
+        	android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name=".TimetableSettingActivity"
@@ -126,7 +127,7 @@
             android:value="Default" />
     </application>
 
-    <uses-sdk android:minSdkVersion="8" />
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14"/>
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />

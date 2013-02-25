@@ -144,7 +144,7 @@ public class MessageActivity extends BaseActivity {
 			try {
 				return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
 			} catch (Exception e) {
-				makeToast(e.getMessage());
+				alert(e.getMessage());
 				return null;
 			}
 		}
@@ -158,7 +158,7 @@ public class MessageActivity extends BaseActivity {
 				layoutEmpty.setVisibility(View.VISIBLE);
 			}else if(ret.size() > 0) {
 				layoutEmpty.setVisibility(View.GONE);
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				list.addAll(ret);
 				showData();
 			}
@@ -179,7 +179,7 @@ public class MessageActivity extends BaseActivity {
 			try {
 				return AHUTAccessor.getInstance(MessageActivity.this).getMessageList(page);
 			} catch (Exception e) {
-				makeToast(e.getMessage());
+				alert(e.getMessage());
 				return null;
 			}
 		}
@@ -187,7 +187,7 @@ public class MessageActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(ArrayList<Message> ret) {
 			if(ret == null) {
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				return;
 			}
 
@@ -195,7 +195,7 @@ public class MessageActivity extends BaseActivity {
 				page--;
 				tvNextPage.setText("没有更多的消息了");
 			}else{
-				tvNextPage.setText("加载更多");
+				tvNextPage.setText("下一页");
 				list.addAll(ret);
 				lvMessageAdapter.notifyDataSetChanged();
 			}

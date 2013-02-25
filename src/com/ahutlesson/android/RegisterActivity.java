@@ -1,5 +1,6 @@
 package com.ahutlesson.android;
 
+import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
 
 import android.app.ProgressDialog;
@@ -65,6 +66,7 @@ public class RegisterActivity extends BaseActivity {
 			try {
     			UserManager.getInstance(RegisterActivity.this).registerUser(uxh, password);
 				UserManager.getInstance(RegisterActivity.this).updateLessonDB();
+				Timetable.getInstance(RegisterActivity.this).getTimetableSetting();
 				return true;
 			} catch (Exception e) {
 				alert(e.getMessage());

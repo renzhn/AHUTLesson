@@ -61,7 +61,7 @@ public class NewMessageActivity extends BaseActivity {
 		}
 	}
 
-	private class SendMessage extends AsyncTask<Integer, Integer, String> {
+	private class SendMessage extends AsyncTask<Integer, Integer, Boolean> {
 		
 		ProgressDialog progressDialog;
 		
@@ -71,19 +71,23 @@ public class NewMessageActivity extends BaseActivity {
 		}
 		
 		@Override
-		protected String doInBackground(Integer... arg0) {
+		protected Boolean doInBackground(Integer... arg0) {
 			try {
 				AHUTAccessor.getInstance(NewMessageActivity.this).sendMessage(uxh, title, content);
+				return true;
 			} catch (Exception e) {
 				makeToast(e.getMessage());
+				return false;
 			}
-			return null;
 		}
 
 		@Override
-		protected void onPostExecute(String ret) {
+		protected void onPostExecute(Boolean ret) {
 			progressDialog.dismiss();
-			NewMessageActivity.this.finish();
+			if(ret) {
+				makeToast("·¢ËÍ³É¹¦£¡");
+				NewMessageActivity.this.finish();
+			}
 		}
 	}
 	

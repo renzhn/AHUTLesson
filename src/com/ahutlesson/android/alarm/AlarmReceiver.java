@@ -1,7 +1,7 @@
 package com.ahutlesson.android.alarm;
 
 import com.ahutlesson.android.AlarmActivity;
-import com.ahutlesson.android.LessonActivity;
+import com.ahutlesson.android.LessonDetailActivity;
 import com.ahutlesson.android.R;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonManager;
@@ -22,7 +22,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 	private Context context;
 	private int week, time;
 	private boolean enableAlarm, enableNotification, enableSound,
-			enableNotificationSound;
+			enableNotificationSound, enableNotificationVibrate;
 
 	@Override
 	public void onReceive(Context context0, Intent intent0) {
@@ -34,14 +34,15 @@ public class AlarmReceiver extends BroadcastReceiver {
 		if (!enableAlarm)
 			return;
 
-		enableNotification = preferences.getBoolean("SendNotificationWhenAlarm", false);
+		enableNotification = preferences.getBoolean("SendNotificationWhenAlarm", true);
 		enableSound = preferences.getBoolean("PlaySoundWhenAlarm", false);
-		enableNotificationSound = preferences.getBoolean("NotificationSoundWhenAlarm", false);
-
+		enableNotificationSound = preferences.getBoolean("NotificationSoundWhenAlarm", true);
+		enableNotificationVibrate = preferences.getBoolean("NotificationVibrateWhenAlarm", true);
+		
 		week = intent0.getExtras().getInt("week");
 		time = intent0.getExtras().getInt("time");
 
-		addNextLessonAlarm();
+		setNextLessonAlarm();
 
 		if (enableNotification) {
 			pushNotification();
@@ -57,7 +58,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
 	}
 
-	private void addNextLessonAlarm() {
+	private void setNextLessonAlarm() {
 		// 设置下节课闹钟
 		Lesson nextLesson = Timetable.getInstance(context).getNextLesson(Timetable.DelayAlarm);
 		if (nextLesson != null) {
@@ -78,13 +79,13 @@ public class AlarmReceiver extends BroadcastReceiver {
 		if (lesson == null)
 			return;
 		
-		Intent i = new Intent(context, LessonActivity.class);
+		Intent i = new Intent(context, LessonDetailActivity.class);
 		i.putExtra("week", week);
 		i.putExtra("time", time);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 		
-		String message = Timetable.getInstance(context).lessontime_name[time] + "有" + lesson.alias
+		String message = Timetable.getInstance(context).lessontimeName[time] + "有" + lesson.alias
 				+ "课，地点：" + lesson.place;
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -97,10 +98,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 	        .setLights(0xff00ff00, 300, 1000)
 			.build();
 		n.flags = Notification.FLAG_AUTO_CANCEL;
-		if (enableNotificationSound) {
-			n.defaults |= Notification.DEFAULT_SOUND;
-		}
-		n.defaults |= Notification.DEFAULT_VIBRATE;
+		if (enableNotificationSound) n.defaults |= Notification.DEFAULT_SOUND;
+		if (enableNotificationVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
 		nm.notify(0, n);
 	}
 }
