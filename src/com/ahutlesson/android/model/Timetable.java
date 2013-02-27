@@ -100,7 +100,7 @@ public class Timetable {
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);
 		int passDays = calcPassDays(beginCal);
-		if(passDays > 0 && passDays <= 140)
+		if(passDays >= 0 && passDays <= 140)
 			return passDays / 7 +1;
 		else
 			return 0;
@@ -109,10 +109,10 @@ public class Timetable {
 	public int calcPassDays(Calendar cal_old){
 		int passYear = ((year - cal_old.get(Calendar.YEAR))==1)? 1 : 0;
 		int oldday = cal_old.get(Calendar.DAY_OF_YEAR);
-		if(passYear == 0 && dayOfYear>=oldday){
+		if(passYear == 0 && dayOfYear >= oldday){
 				return dayOfYear - oldday;
 		}
-		if(passYear == 1 && dayOfYear<=oldday){
+		if(passYear == 1 && dayOfYear <= oldday){
 			return dayOfYear + dayOfYear(cal_old.get(Calendar.YEAR)) - oldday;
 		}
 		return 0;

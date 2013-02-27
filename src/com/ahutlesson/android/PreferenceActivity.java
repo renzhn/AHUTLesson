@@ -2,15 +2,9 @@ package com.ahutlesson.android;
 
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.UserManager;
-import com.ahutlesson.android.utils.ChangeLog;
-
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.nostra13.universalimageloader.core.ImageLoader;
-import com.umeng.update.UmengUpdateAgent;
-import com.umeng.update.UmengUpdateListener;
-import com.umeng.update.UpdateResponse;
-
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
@@ -33,27 +27,6 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		getSupportActionBar().setIcon(R.drawable.preference);
 		
 		addPreferencesFromResource(R.xml.preferences);
-
-		Preference changelog = (Preference) findPreference("changelog");
-		changelog.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-			public boolean onPreferenceClick(Preference preference) {
-				ChangeLog cl = new ChangeLog(PreferenceActivity.this);
-				cl.getFullLogDialog().show();
-				return true;
-			}
-
-		});
-
-		Preference share = (Preference) findPreference("share");
-		share.setOnPreferenceClickListener(new OnPreferenceClickListener() {
-
-			public boolean onPreferenceClick(Preference preference) {
-				share();
-				return true;
-			}
-
-		});
 
 		Preference downDB = (Preference) findPreference("down_lesson");
 		downDB.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -87,6 +60,7 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 				confirm("确定要注销账户吗？", new Runnable() {
 					@Override
 					public void run() {
+						clearImageCache();
 						SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(PreferenceActivity.this);
 						preferences.edit().clear().commit();
 						Intent i = getBaseContext().getPackageManager()
@@ -113,42 +87,22 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 			}
 		});
 		
-		Preference checkUpdate = (Preference) findPreference("check_update");
-		checkUpdate.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+		Preference clearImageCache = (Preference) findPreference("clear_image_cache");
+		clearImageCache.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 
 			public boolean onPreferenceClick(Preference preference) {
-				UmengUpdateAgent.setUpdateOnlyWifi(false);
-				UmengUpdateAgent.setUpdateAutoPopup(false);
-				UmengUpdateAgent.setUpdateListener(new UmengUpdateListener() {
-					@Override
-					public void onUpdateReturned(int updateStatus,
-							UpdateResponse updateInfo) {
-						switch (updateStatus) {
-						case 0: // has update
-							UmengUpdateAgent.showUpdateDialog(
-									PreferenceActivity.this, updateInfo);
-							break;
-						case 1: // has no update
-							alert("您正在使用最新版");
-							break;
-						case 3: // time out
-							alert("网络连接超时");
-							break;
-						}
-					}
-				});
-				UmengUpdateAgent.update(PreferenceActivity.this);
+				clearImageCache();
+				alert("图片缓存已清除");
 				return true;
 			}
-
 		});
-
+		
 	}
+	
 	private class DownUserInfo extends AsyncTask<Integer, Integer, String> {
 		@Override
 		protected String doInBackground(Integer... para) {
-			ImageLoader.getInstance().clearMemoryCache();
-			ImageLoader.getInstance().clearDiscCache();
+			clearImageCache();
 			try {
 				UserManager.getInstance(PreferenceActivity.this).updateUserInfo();
 				return null;
@@ -197,13 +151,6 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		}
 	}
 
-	public void share() {
-		Intent intent = new Intent(Intent.ACTION_SEND);
-		intent.setType("text/plain");
-		intent.putExtra(Intent.EXTRA_TEXT, "课友下载地址：http://ahutapp.com/");
-		startActivity(Intent.createChooser(intent, "分享到"));
-	}
-
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -233,4 +180,8 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		.setPositiveButton(R.string.ok, null).show();
 	}
 	
+	public void clearImageCache() {
+		ImageLoader.getInstance().clearMemoryCache();
+		ImageLoader.getInstance().clearDiscCache();
+	}
 }

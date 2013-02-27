@@ -212,7 +212,7 @@ public class AHUTAccessor {
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
 			JSONArray retArray = (JSONArray) jsonParser.nextValue();
-			JSONArray threads = (JSONArray) retArray.getJSONArray(1);
+			JSONArray threads = (JSONArray) retArray.getJSONArray(0);
 			JSONObject thread;
 			for (int i = 0; i < threads.length(); i++) {
 				thread = threads.getJSONObject(i);
@@ -241,7 +241,7 @@ public class AHUTAccessor {
 		try {
 			JSONTokener jsonParser = new JSONTokener(ret);
 			JSONArray retArray = (JSONArray) jsonParser.nextValue();
-			JSONArray posts = (JSONArray) retArray.getJSONArray(1);
+			JSONArray posts = (JSONArray) retArray.getJSONArray(0);
 			JSONObject post;
 			for (int i = 0; i < posts.length(); i++) {
 				post = posts.getJSONObject(i);

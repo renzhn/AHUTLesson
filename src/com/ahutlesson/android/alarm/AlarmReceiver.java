@@ -85,7 +85,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 		
-		String message = Timetable.getInstance(context).lessontimeName[time] + "有" + lesson.alias
+		String message = Timetable.getInstance(context).lessontimeName[time] + "有" + lesson.name
 				+ "课，地点：" + lesson.place;
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);

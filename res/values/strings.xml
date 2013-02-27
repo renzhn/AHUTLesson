@@ -16,9 +16,7 @@
     <string name="reply">回复</string>
     
     <string name="neterror">连接服务器失败，请检查手机网络设置</string>
-   
-	<string name="about_msg">课程助手安工大版 For Android\n 作者邮箱： renzhen999@gmail.com</string>
-	
+  
 	<string-array name="week_name">
 		<item>周一</item>
 		<item>周二</item>

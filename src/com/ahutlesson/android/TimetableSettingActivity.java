@@ -37,9 +37,9 @@ public class TimetableSettingActivity extends BaseActivity {
 		timetable = Timetable.getInstance(this);
 		
 		spinner = (Spinner) findViewById(R.id.spinnerSetMode);
-		adapter = new ArrayAdapter<String>(this,
-				android.R.layout.simple_spinner_item, mode);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter = new ArrayAdapter<String>(this, R.layout.sherlock_spinner_item
+				 , mode);
+		adapter.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(new SpinnerSelectedListener()); 
 

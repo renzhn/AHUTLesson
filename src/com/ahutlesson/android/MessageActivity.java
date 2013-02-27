@@ -135,6 +135,7 @@ public class MessageActivity extends BaseActivity {
 			super.onPreExecute();
 			layoutLoading.setVisibility(View.VISIBLE);
 			layoutList.setVisibility(View.GONE);
+			layoutEmpty.setVisibility(View.GONE);
 			list.clear();
 		}
 

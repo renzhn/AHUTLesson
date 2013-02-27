@@ -92,7 +92,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		
 		//dateInfo
 		dateInfoView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-				.inflate(R.layout.actionbar_customview, null, false);
+				.inflate(R.layout.actionbar_customview_clickable, null, false);
 		tvDateInfo = (TextView) dateInfoView.findViewById(R.id.tvCumstomView);
 		dateInfoView.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -135,7 +135,6 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		startService(new Intent(MainActivity.this, CheckUnreadService.class));
 		
 		// Update
-		MobclickAgent.updateOnlineConfig(this);
 		MobclickAgent.onError(this);
 		UmengUpdateAgent.setUpdateOnlyWifi(false);
 		UmengUpdateAgent.setUpdateAutoPopup(true);
