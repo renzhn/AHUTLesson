@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahutlesson.android"
-    android:versionCode="14"
-    android:versionName="2.0" >
+    android:versionCode="15"
+    android:versionName="2.1" >
 
     <application
         android:icon="@drawable/ahutlesson"
@@ -41,6 +41,10 @@
             android:label="查看帖子" >
         </activity>
         <activity
+            android:name=".PostActivity"
+            android:label="查看回复" >
+        </activity>
+        <activity
             android:name=".MessageActivity"
             android:label="我的消息" >
         </activity>
@@ -77,16 +81,6 @@
         	android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
-            android:name=".TimetableSettingActivity"
-            android:label="时间表设置"
-			android:uiOptions="splitActionBarWhenNarrow" >
-            <intent-filter>
-                <action android:name="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <activity
             android:name=".EditLessonActivity"
             android:label="编辑课程"
 			android:uiOptions="splitActionBarWhenNarrow" >
@@ -117,7 +111,11 @@
             android:process=":remote" />
         
 		<service android:name="com.ahutlesson.android.service.CheckUnreadService"/>
-		
+		<service
+		    android:name="com.umeng.common.net.DownloadingService"
+		    android:exported="true"
+		    android:process=":DownloadingService" >
+		</service>
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="511dbbfd52701523af00002e" >

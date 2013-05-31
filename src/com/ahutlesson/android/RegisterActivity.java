@@ -51,7 +51,7 @@ public class RegisterActivity extends BaseActivity {
 		});
 	}
 
-	private class RegisterTask extends AsyncTask<Integer, Integer, Boolean> {
+	private class RegisterTask extends AsyncTask<Integer, Integer, String> {
 
 		ProgressDialog progressDialog;
 		
@@ -62,24 +62,25 @@ public class RegisterActivity extends BaseActivity {
 		
 
 		@Override
-		protected Boolean doInBackground(Integer... params) {
+		protected String doInBackground(Integer... params) {
 			try {
     			UserManager.getInstance(RegisterActivity.this).registerUser(uxh, password);
 				UserManager.getInstance(RegisterActivity.this).updateLessonDB();
 				Timetable.getInstance(RegisterActivity.this).getTimetableSetting();
-				return true;
+				return null;
 			} catch (Exception e) {
-				alert(e.getMessage());
-				return false;
+				return e.getMessage();
 			}
 		}
 
 		@Override
-		protected void onPostExecute(Boolean ret) {
+		protected void onPostExecute(String ret) {
 			progressDialog.dismiss();
-			if(ret) {
+			if(ret == null) {
 				openActivity(MainActivity.class);
 				RegisterActivity.this.finish();
+			}else{
+				alert(ret);
 			}
 		}
 	}

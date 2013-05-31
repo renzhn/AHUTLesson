@@ -54,8 +54,8 @@ public class NewMessageActivity extends BaseActivity {
 		EditText etContent = (EditText) findViewById(R.id.etContent);
 		title = etTitle.getText().toString();
 		content = etContent.getText().toString();
-		if(title.contentEquals("") || content.contentEquals("")) {
-			alert("标题或内容为空！");
+		if(title.contentEquals("") ) {
+			alert("标题不能为空！");
 		}else{
 			new SendMessage().execute();
 		}

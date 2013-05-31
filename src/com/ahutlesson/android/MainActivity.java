@@ -1,9 +1,15 @@
 package com.ahutlesson.android;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.json.JSONObject;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -20,14 +26,17 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.alarm.Alarm;
+import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
+import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.service.CheckUnreadService;
-import com.ahutlesson.android.ui.main.HomeworkFragment;
-import com.ahutlesson.android.ui.main.LessonListFragmentAdapter;
-import com.ahutlesson.android.ui.main.ScheduleView;
+import com.ahutlesson.android.ui.HomeworkFragment;
+import com.ahutlesson.android.ui.LessonListFragmentAdapter;
+import com.ahutlesson.android.ui.timetable.ScheduleView;
 import com.ahutlesson.android.utils.ChangeLog;
+import com.ahutlesson.android.utils.Util;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
@@ -36,10 +45,13 @@ import com.umeng.update.UmengUpdateAgent;
 import com.viewpagerindicator.PageIndicator;
 import com.viewpagerindicator.TitlePageIndicator;
 
-public class MainActivity extends BaseFragmentActivity implements OnNavigationListener {
-	
-	private static final String[] TITLES = {"当日课程", "课程总表", "课后作业"};
+public class MainActivity extends BaseFragmentActivity implements
+		OnNavigationListener {
+
+	private static final String[] TITLES = { "当日课程", "课程总表", "课后作业" };
 	private static int viewMode = 0;
+
+	FragmentManager fragmentManager;
 	
 	// VIEW
 	private static final int TODAY_VIEW = 0;
@@ -48,13 +60,14 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 
 	private View dateInfoView;
 	private TextView tvDateInfo;
-	
-	//TODAY_VIEW
+
+	// TODAY_VIEW
 	private View todayView;
-	private LessonListFragmentAdapter mLessonListFragmentAdapter;
+	private static LessonListFragmentAdapter mLessonListFragmentAdapter;
 	private ViewPager mPager;
 	private PageIndicator mIndicator;
-	
+	public static List<Integer> unreadLessonForum = new ArrayList<Integer>();
+
 	// GRID_VIEW
 	private static ScheduleView scheduleView;
 
@@ -65,14 +78,14 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	private static final int MENU_PROFILE = 3;
 	private static final int MENU_MESSAGE = 4;
 	private static final int MENU_NOTICE = 5;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		disableHomeButton();
 		actionBar.setDisplayShowTitleEnabled(false);
 		
-		//if Not Login
+		//if not login
 		UserManager userManager = UserManager.getInstance(this);
 		if(!userManager.hasLocalUser()) {
 			openActivity(RegisterActivity.class);
@@ -80,7 +93,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			return;
 		}
 		
-		// List Navigation
+		// list navigation
 		Context context = actionBar.getThemedContext();
 		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context, R.layout.sherlock_spinner_item);
 		list.add(TITLES[0]);
@@ -92,17 +105,15 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		
 		//dateInfo
 		dateInfoView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-				.inflate(R.layout.actionbar_customview_clickable, null, false);
+				.inflate(R.layout.actionbar_customview, null, false);
 		tvDateInfo = (TextView) dateInfoView.findViewById(R.id.tvCumstomView);
-		dateInfoView.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				openActivity(TimetableSettingActivity.class);
-			}
-		});
+		tvDateInfo.setText(dateInfo());
 		actionBar.setCustomView(dateInfoView);
 		actionBar.setDisplayShowCustomEnabled(true);
-		
+
+		//Main View
+		fragmentManager = getSupportFragmentManager();
+				
 		//Today View
 		todayView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 				.inflate(R.layout.today, null, false);
@@ -114,7 +125,7 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		mIndicator = (TitlePageIndicator) todayView.findViewById(R.id.indicator);
 		mIndicator.setViewPager(mPager);
 		mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
-
+		
 		// Changelog
 		ChangeLog cl = new ChangeLog(MainActivity.this);
 		if (cl.firstRun()) {
@@ -135,13 +146,13 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 		startService(new Intent(MainActivity.this, CheckUnreadService.class));
 		
 		// Update
+		new UpdateTask().execute();
+		
 		MobclickAgent.onError(this);
 		UmengUpdateAgent.setUpdateOnlyWifi(false);
-		UmengUpdateAgent.setUpdateAutoPopup(true);
-		UmengUpdateAgent.setUpdateListener(null);
 		UmengUpdateAgent.update(this);
 	}
-	
+
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
@@ -156,15 +167,17 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			break;
 		case GRID_VIEW:
 			// 绘制课表
-			scheduleView = new ScheduleView(this, LessonManager.getInstance(this).lessons, true);
+			scheduleView = new ScheduleView(this,
+					LessonManager.getInstance(this).lessons, true);
 			setContentView(scheduleView);
 			break;
 		case HOMEWORK_VIEW:
 			setContentView(R.layout.homework);
-			
-			FragmentManager fragmentManager = getSupportFragmentManager();
-			FragmentTransaction transaction = fragmentManager.beginTransaction();
-			transaction.replace(R.id.frameLayoutFragment, new HomeworkFragment());
+
+			FragmentTransaction transaction = fragmentManager
+					.beginTransaction();
+			transaction.replace(R.id.frameLayoutFragment,
+					new HomeworkFragment());
 			transaction.commit();
 			break;
 		}
@@ -172,21 +185,33 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 
 	public static boolean needRefresh = false;
 	
+	public static void refreshTodayView() {
+		if(mLessonListFragmentAdapter != null) 
+			mLessonListFragmentAdapter.notifyDataSetChanged();
+	}
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		
-		if(needRefresh) {
-			mLessonListFragmentAdapter.notifyDataSetChanged();
-			scheduleView.invalidate();
+
+		if (needRefresh) {
+			if(mLessonListFragmentAdapter != null) 
+				mLessonListFragmentAdapter.notifyDataSetChanged();
+			if (scheduleView != null)
+				scheduleView.invalidate();
 		}
-		
-		tvDateInfo.setText(dateInfo());
-		
+
+
 		Alarm.setAlarm(this);
 		MobclickAgent.onResume(this);
 	}
-	
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		MobclickAgent.onPause(this);
+	}
+
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// 选择导航菜单
@@ -203,25 +228,30 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 			menu.add(viewMode, MENU_PROFILE, Menu.NONE, "个人中心")
 					.setIcon(R.drawable.account)
 					.setShowAsAction(
-							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+							MenuItem.SHOW_AS_ACTION_IF_ROOM
+									| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			menu.add(viewMode, MENU_MESSAGE, Menu.NONE, "我的消息")
-			.setIcon(R.drawable.message)
-			.setShowAsAction(
-					MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+					.setIcon(R.drawable.message)
+					.setShowAsAction(
+							MenuItem.SHOW_AS_ACTION_IF_ROOM
+									| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			menu.add(viewMode, MENU_NOTICE, Menu.NONE, "我的提醒")
-			.setIcon(R.drawable.forum)
-			.setShowAsAction(
-					MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+					.setIcon(R.drawable.forum)
+					.setShowAsAction(
+							MenuItem.SHOW_AS_ACTION_IF_ROOM
+									| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			menu.add(viewMode, MENU_SETTING, Menu.NONE, "设置")
 					.setIcon(R.drawable.preference)
 					.setShowAsAction(
-							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+							MenuItem.SHOW_AS_ACTION_IF_ROOM
+									| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			break;
 		case HOMEWORK_VIEW:
 			menu.add(viewMode, MENU_CLEAR_HOMEWORK, Menu.NONE, "清空所有作业")
 					.setIcon(R.drawable.delete)
 					.setShowAsAction(
-							MenuItem.SHOW_AS_ACTION_IF_ROOM | MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+							MenuItem.SHOW_AS_ACTION_IF_ROOM
+									| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 			break;
 
 		}
@@ -252,7 +282,9 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int which) {
-									LessonManager.getInstance(MainActivity.this).deleteAllHomework();
+									LessonManager
+											.getInstance(MainActivity.this)
+											.deleteAllHomework();
 									showView();
 								}
 							}).setNegativeButton(R.string.cancel, null).show();
@@ -271,7 +303,8 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
 							String value = input.getText().toString();
-							Intent i = new Intent(MainActivity.this, TimetableViewerActivity.class);
+							Intent i = new Intent(MainActivity.this,
+									TimetableViewerActivity.class);
 							i.putExtra("uxh", value);
 							startActivity(i);
 						}
@@ -290,11 +323,54 @@ public class MainActivity extends BaseFragmentActivity implements OnNavigationLi
 	public String dateInfo() {
 		Timetable timetable = Timetable.getInstance(this);
 		int numOfWeek = timetable.numOfWeek;
-		if(numOfWeek > 0) {
-			return "第" + String.valueOf(numOfWeek) + "周" + " " + timetable.weekName[timetable.weekDay];
-		}else{
+		if (numOfWeek > 0) {
+			return "第" + String.valueOf(numOfWeek) + "周" + " "
+					+ timetable.weekName[timetable.weekDay];
+		} else {
 			return "未开学 " + timetable.weekName[timetable.weekDay];
 		}
 	}
+	
+	public class UpdateTask extends AsyncTask<Integer, Integer, Void> {
 
+		@Override
+		protected Void doInBackground(Integer... arg0) {
+			try {
+				JSONObject ret = AHUTAccessor.getInstance(MainActivity.this).checkUpdate();
+				if(ret.has("upToDate")) Util.log("upToDate");
+				if(ret.has("hasNewLessondbVer")) {
+					Util.log("found New Lessondb Version");
+					UserManager.getInstance(MainActivity.this).updateLessonDB();
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							refreshTodayView();
+						}
+					});
+					makeToast("已更新课表数据");
+				}
+				if(ret.has("hasNewTimetableSetting")) {
+					Util.log("found New Timetable Setting");
+					TimetableSetting timetableSetting = new TimetableSetting();
+					JSONObject retSetting = ret.getJSONObject("newTimetableSetting");
+					timetableSetting.year = retSetting.getInt("year");
+					timetableSetting.month = retSetting.getInt("month");
+					timetableSetting.day = retSetting.getInt("day");
+					timetableSetting.setSeason(retSetting.getInt("season"));
+					Timetable.getInstance(MainActivity.this).setTimetableSetting(timetableSetting);
+					runOnUiThread(new Runnable() {
+						@Override
+						public void run() {
+							tvDateInfo.setText(dateInfo());
+						}
+					});
+					makeToast("已更新时间表设置");
+				}
+			} catch (Exception ex) {
+				makeToast(ex.getMessage());
+			}
+			return null;
+		}
+		
+	}
 }

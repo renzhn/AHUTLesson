@@ -1,8 +1,7 @@
 package com.ahutlesson.android.model;
 
-import java.util.ArrayList;
-
 import com.ahutlesson.android.api.AHUTAccessor;
+import com.ahutlesson.android.utils.Util;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -68,28 +67,17 @@ public class UserManager {
 	}
 	
 	public void registerUser(String uxh, String password) throws Exception {
-		String ret = AHUTAccessor.getInstance(context).regsterUser(uxh, password);
-		if(ret.startsWith("0")) {
-			String cookie = ret.substring(2);
-			setCookie(cookie);
-			user = AHUTAccessor.getInstance(context).getLoginUserInfo();
-			setUser(user);
-		}else if(ret.startsWith("1")){
-			throw new Exception(ret.substring(2));
-		}else throw new Exception("服务器返回了未知数据");
-		
+		String cookie = AHUTAccessor.getInstance(context).regsterUser(uxh, password);
+		setCookie(cookie);
+		user = AHUTAccessor.getInstance(context).getLoginUserInfo();
+		setUser(user);
 	}
 	
 	public void verifyUser(String uxh, String password) throws Exception {
-		String ret = AHUTAccessor.getInstance(context).validateUser(uxh, password);
-		if(ret.startsWith("0")) {
-			String cookie = ret.substring(2);
-			setCookie(cookie);
-			user = AHUTAccessor.getInstance(context).getLoginUserInfo();
-			setUser(user);
-		}else if(ret.startsWith("1")){
-			throw new Exception(ret.substring(2));
-		}else throw new Exception("服务器返回了未知数据");
+		String cookie = AHUTAccessor.getInstance(context).validateUser(uxh, password);
+		setCookie(cookie);
+		user = AHUTAccessor.getInstance(context).getLoginUserInfo();
+		setUser(user);
 	}
 
 	public void setCookie(String ck) {
@@ -113,8 +101,11 @@ public class UserManager {
 	public void updateLessonDB() throws Exception {
 		String uxh = getUserXH();
 		if(uxh == null) throw new Exception("未登录");
-		ArrayList<Lesson> lessonlist = AHUTAccessor.getInstance(context).getLessonList(uxh);
-		LessonManager.getInstance(context).lessonlistToDB(lessonlist);
+		LessonListInfo lessonListInfo = AHUTAccessor.getInstance(context).getLessonList(uxh);
+		LessonManager lessonManager = LessonManager.getInstance(context);
+		lessonManager.lessonlistToDB(lessonListInfo.lessonList);
+		lessonManager.setLessondbVersion(lessonListInfo.build);
+		Util.log("New Lessondb Build: " + lessonListInfo.build);
 	}
 
 	public void updateUserInfo() throws Exception {

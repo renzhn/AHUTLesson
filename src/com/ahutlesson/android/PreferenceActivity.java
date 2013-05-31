@@ -1,6 +1,7 @@
 package com.ahutlesson.android;
 
 import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.UserManager;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
@@ -12,7 +13,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.CheckBoxPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceClickListener;
 
@@ -28,6 +31,17 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		
 		addPreferencesFromResource(R.xml.preferences);
 
+		CheckBoxPreference seasonWinter = (CheckBoxPreference) findPreference("season_winter");
+		seasonWinter.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
+			
+			@Override
+			public boolean onPreferenceChange(Preference arg0, Object arg1) {
+				Timetable.getInstance(PreferenceActivity.this).toggleSeason();
+				MainActivity.needRefresh = true;
+				return true;
+			}
+		});
+		
 		Preference downDB = (Preference) findPreference("down_lesson");
 		downDB.setOnPreferenceClickListener(new OnPreferenceClickListener() {
 

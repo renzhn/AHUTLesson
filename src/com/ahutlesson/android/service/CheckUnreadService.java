@@ -3,6 +3,7 @@ package com.ahutlesson.android.service;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.ahutlesson.android.MainActivity;
 import com.ahutlesson.android.MessageActivity;
 import com.ahutlesson.android.NoticeActivity;
 import com.ahutlesson.android.R;
@@ -18,7 +19,7 @@ import android.content.SharedPreferences;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 
-public class CheckUnreadService extends Service{
+public class CheckUnreadService extends Service {
 	
 	private static final int ONEMIN = 60000;
 	private static final int MESSAGENOTIFYID = 1, NOTICENOTIFYID = 2;
@@ -33,7 +34,7 @@ public class CheckUnreadService extends Service{
 		enableSound = preferences.getBoolean("CheckUnreadSound", true);
 		enableVibrate = preferences.getBoolean("CheckUnreadVibrate", true);
 		checkFreq = Integer.valueOf(preferences.getString("CheckUnreadFreq", "5"));
-		System.out.println("check freq:" + checkFreq);
+		//System.out.println("check freq:" + checkFreq);
 		switch(checkFreq) {
 		case 1:
 			interval = ONEMIN;
@@ -53,7 +54,7 @@ public class CheckUnreadService extends Service{
 	}
 
 	private void startservice() {
-		timer.scheduleAtFixedRate( new TimerTask() {
+		timer.scheduleAtFixedRate(new TimerTask() {
 			public void run() {
 				checkUnread();
 			}
@@ -61,17 +62,21 @@ public class CheckUnreadService extends Service{
 	}
 	
 	private void checkUnread() {
-		int[] unreadCount;
+		UnreadInfo unreadInfo;
 		try {
-			unreadCount = AHUTAccessor.getInstance(this).getUnreadCount();
-			if(unreadCount[0] > 0) {
-				showMessageNotification(unreadCount[0]);
+			unreadInfo = AHUTAccessor.getInstance(this).getUnreadCount();
+			if(unreadInfo.unreadMessage > 0) {
+				showMessageNotification(unreadInfo.unreadMessage);
 			}
-			if(unreadCount[1] > 0) {
-				showNoticeNotification(unreadCount[1]);
+			if(unreadInfo.unreadNotice > 0) {
+				showNoticeNotification(unreadInfo.unreadNotice);
+			}
+			if(unreadInfo.unreadLessonForum.size() > 0) {
+				MainActivity.unreadLessonForum = unreadInfo.unreadLessonForum;
+				MainActivity.refreshTodayView();
 			}
 		} catch (Exception e) {
-			System.out.println("checkUnreadError:" + e.getMessage());
+			System.out.println("checkUnreadError: " + e.getMessage());
 		}
 	}
 
@@ -86,41 +91,53 @@ public class CheckUnreadService extends Service{
 		stopservice();
 	}
 	
-    private void showMessageNotification(int count) {
+    @SuppressWarnings("deprecation")
+	private void showMessageNotification(int count) {
     	Intent i = new Intent(this, MessageActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-		NotificationManager nm = (NotificationManager) this	.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification n = new Notification.Builder(this)
-	        .setContentTitle("新消息")
-	        .setContentText("您有" + count + "条新消息")
-	        .setContentIntent(pendingIntent)
-	        .setSmallIcon(R.drawable.ahutlesson)
-	        .setAutoCancel(true)
-	        .setOnlyAlertOnce(true)
-	        .setLights(0xff00ff00, 300, 1000)
-			.build();
-		if(enableSound) n.defaults |= Notification.DEFAULT_SOUND;
-		if(enableVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
+		String message = "您有" + count + "条新消息";
+		NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification n = new Notification(R.drawable.ahutlesson, message, System.currentTimeMillis());
+		if (enableSound) {
+			n.defaults |= Notification.DEFAULT_SOUND;
+		}
+		if (enableVibrate) {
+			n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
+		}
+		n.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+		n.flags = Notification.FLAG_AUTO_CANCEL;
+		n.flags |= Notification.FLAG_SHOW_LIGHTS;
+		n.ledARGB = 0xff00ff00;
+		n.ledOnMS = 300;
+		n.ledOffMS = 1000;// LED
+		n.setLatestEventInfo(this, "新消息", message, pendingIntent);
 		nm.notify(MESSAGENOTIFYID, n);
+		
     }
     
-    private void showNoticeNotification(int count) {
+    @SuppressWarnings("deprecation")
+	private void showNoticeNotification(int count) {
     	Intent i = new Intent(this, NoticeActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
-		NotificationManager nm = (NotificationManager) this	.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification n = new Notification.Builder(this)
-	        .setContentTitle("新提醒")
-	        .setContentText("您有" + count + "条新提醒")
-	        .setContentIntent(pendingIntent)
-	        .setSmallIcon(R.drawable.ahutlesson)
-	        .setAutoCancel(true)
-	        .setOnlyAlertOnce(true)
-	        .setLights(0xff00ff00, 300, 1000)
-			.build();
-		if(enableSound) n.defaults |= Notification.DEFAULT_SOUND;
-		if(enableVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
+		
+		String message = "您有" + count + "条新提醒";
+		NotificationManager nm = (NotificationManager) this.getSystemService(Context.NOTIFICATION_SERVICE);
+		Notification n = new Notification(R.drawable.ahutlesson, message, System.currentTimeMillis());
+		if (enableSound) {
+			n.defaults |= Notification.DEFAULT_SOUND;
+		}
+		if (enableVibrate) {
+			n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
+		}
+		n.flags = Notification.FLAG_ONLY_ALERT_ONCE;
+		n.flags = Notification.FLAG_AUTO_CANCEL;
+		n.flags |= Notification.FLAG_SHOW_LIGHTS;
+		n.ledARGB = 0xff00ff00;
+		n.ledOnMS = 300;
+		n.ledOffMS = 1000;// LED
+		n.setLatestEventInfo(this, "新提醒", message, pendingIntent);
 		nm.notify(NOTICENOTIFYID, n);
     }
 	

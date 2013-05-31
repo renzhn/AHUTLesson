@@ -60,7 +60,7 @@ public class LoginActivity extends BaseActivity {
 			try {
 				UserManager.getInstance(LoginActivity.this).verifyUser(uxh,	password);
 				UserManager.getInstance(LoginActivity.this).updateLessonDB();
-				Timetable.getInstance(LoginActivity.this).getTimetableSetting();
+				Timetable.getInstance(LoginActivity.this).updateTimetableSetting();
 				return true;
 			} catch (Exception e) {
 				alert(e.getMessage());

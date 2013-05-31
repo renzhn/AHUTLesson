@@ -12,7 +12,8 @@ import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lesson;
-import com.ahutlesson.android.ui.main.ScheduleView;
+import com.ahutlesson.android.model.LessonsInfo;
+import com.ahutlesson.android.ui.timetable.ScheduleView;
 import com.ahutlesson.android.utils.ValidateHelper;
 
 public class TimetableViewerActivity extends BaseActivity {
@@ -27,16 +28,15 @@ public class TimetableViewerActivity extends BaseActivity {
 		super.onCreate(savedInstanceState);
 
 		String uxh = getIntent().getExtras().getString("uxh");
-		actionBar.setTitle(uxh + "的课表");
 		if(ValidateHelper.isXH(uxh)){
 			new GetLessons().execute(uxh);
 		}else{
-			alert("不是有效的学号");
+			makeToast("不是有效的学号");
 			finish();
 		}
 	}
 
-	class GetLessons extends AsyncTask<String, String, Lesson[][]> {
+	class GetLessons extends AsyncTask<String, String, LessonsInfo> {
 		ProgressDialog dialog;
 
 		@Override
@@ -47,7 +47,7 @@ public class TimetableViewerActivity extends BaseActivity {
 		}
 
 		@Override
-		protected Lesson[][] doInBackground(String... para) {
+		protected LessonsInfo doInBackground(String... para) {
 			try {
 				return AHUTAccessor.getInstance(TimetableViewerActivity.this).getLessons(para[0]);
 			} catch (Exception e) {
@@ -57,12 +57,13 @@ public class TimetableViewerActivity extends BaseActivity {
 		}
 
 		@Override
-		protected void onPostExecute(Lesson[][] result) {
+		protected void onPostExecute(LessonsInfo ret) {
 			dialog.dismiss();
-			if(result == null) {
+			if(ret == null) {
 				return;
 			}else{
-				lessons = result;
+				lessons = ret.lessons;
+				actionBar.setTitle(ret.xm + "的课表");
 				showLessons();
 			}
 		}

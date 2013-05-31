@@ -7,8 +7,11 @@ import com.ahutlesson.android.utils.DatabaseHelper;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.preference.PreferenceManager;
 
 public class LessonManager {
 	
@@ -182,5 +185,17 @@ public class LessonManager {
 		}
 		db.close();
 		lessonManager = new LessonManager(context);
+	}
+	
+	public void setLessondbVersion(String version) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		Editor editor = prefs.edit();
+		editor.putString("lessondbver", version);
+		editor.commit();
+	}
+	
+	public String getLessondbVersion() {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString("lessondbver", "0");
 	}
 }

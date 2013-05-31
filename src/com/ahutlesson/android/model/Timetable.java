@@ -21,13 +21,13 @@ public class Timetable {
 	private SharedPreferences preferences;
 	public String[] begintime = new String[5];
 	public String[] endtime = new String[5];
-	private int beginDate_year,beginDate_month,beginDate_day;
+	public int beginDate_year,beginDate_month,beginDate_day;
 	public int year,month,dayOfMonth,dayOfYear,weekDay;
 	public int begintimemin[] = new int[5];
 	public int endtimemin[] = new int[5];
 	public int numOfWeek = -1;
+	public boolean seasonWinter = false;
 	public String[] weekName = new String[7],lessontimeName = new String[5];
-	private Editor editor;
 	
 	public Timetable(Context context0){
 		context = context0;
@@ -49,7 +49,6 @@ public class Timetable {
 	
 	public void loadData() {
 		// 载入/刷新数据
-
 		beginDate_year = preferences.getInt("begin_date_year", getYearOfCurrentPeriod());
 		if(formerPeriodOfYear()){
 			beginDate_month = preferences.getInt("begin_date_month", 8);//important! 从0开始 实际9月
@@ -59,18 +58,62 @@ public class Timetable {
 			beginDate_day = preferences.getInt("begin_date_day", 27);
 		}
 		
-		begintime[0] = preferences.getString("time_begin0", "08:00");
-		begintime[1] = preferences.getString("time_begin1", "10:00");
-		begintime[2] = preferences.getString("time_begin2", "14:30");
-		begintime[3] = preferences.getString("time_begin3", "16:30");
-		begintime[4] = preferences.getString("time_begin4", "19:00");
-		
-		endtime[0] = preferences.getString("time_end0", "09:35");
-		endtime[1] = preferences.getString("time_end1", "11:35");
-		endtime[2] = preferences.getString("time_end2", "16:05");
-		endtime[3] = preferences.getString("time_end3", "18:05");
-		endtime[4] = preferences.getString("time_end4", "21:30");
-		
+		seasonWinter = preferences.getBoolean("season_winter", false);
+		loadBeginEndTime(seasonWinter);
+	}
+	
+	private void loadBeginEndTime(boolean seasonWinter) {
+		if(seasonWinter == false) {
+			begintime[0] = "08:00";
+			begintime[1] = "10:00";
+			begintime[2] = "14:30";
+			begintime[3] = "16:30";
+			begintime[4] = "19:00";
+			
+			endtime[0] = "09:35";
+			endtime[1] = "11:35";
+			endtime[2] = "16:05";
+			endtime[3] = "18:05";
+			endtime[4] = "21:30";
+			
+			begintimemin[0] = 480;
+			begintimemin[1] = 600;
+			begintimemin[2] = 870;
+			begintimemin[3] = 990;
+			begintimemin[4] = 1140;
+			
+			endtimemin[0]=  575;
+			endtimemin[1] = 695;
+			endtimemin[2] = 965;
+			endtimemin[3] = 1085;
+			endtimemin[4] = 1290;
+		}else{
+			begintime[0] = "08:00";
+			begintime[1] = "10:00";
+			begintime[2] = "14:00";
+			begintime[3] = "16:00";
+			begintime[4] = "18:30";
+			
+			endtime[0] = "09:35";
+			endtime[1] = "11:35";
+			endtime[2] = "15:35";
+			endtime[3] = "17:35";
+			endtime[4] = "21:00";
+			
+			begintimemin[0] = 480;
+			begintimemin[1] = 600;
+			begintimemin[2] = 840;
+			begintimemin[3] = 960;
+			begintimemin[4] = 1110;
+			
+			endtimemin[0]=  575;
+			endtimemin[1] = 695;
+			endtimemin[2] = 935;
+			endtimemin[3] = 1055;
+			endtimemin[4] = 1260;
+		}
+
+		/*
 		for(int i = 0;i < 5; i++){
 			begintimemin[i] = time2minute(begintime[i]);
 		}
@@ -78,7 +121,19 @@ public class Timetable {
 		for(int i = 0;i < 5; i++){
 			endtimemin[i] = time2minute(endtime[i]);
 		}
-		
+		*/
+	}
+
+	public void toggleSeason() {
+		seasonWinter = !seasonWinter;
+		loadBeginEndTime(seasonWinter);
+	}
+	
+	public void setSeasonWinter(boolean winter) {
+		// false for summer, true for winter
+		Editor editor = preferences.edit();
+		editor.putBoolean("season_winter", winter);
+		editor.commit();
 	}
 	
 	public void initTime(){
@@ -125,7 +180,7 @@ public class Timetable {
 		else
 			return 366;
 	}
-	public boolean formerPeriodOfYear(){
+	public boolean formerPeriodOfYear() {
 		//true summer
 		//false spring
 		cal = Calendar.getInstance();
@@ -142,32 +197,10 @@ public class Timetable {
 		}
 	}
 
-	public boolean setBeginTime(int num,String newtime){
-		if(!checkTime(newtime))return false;
-		begintime[num] = newtime;
-		begintimemin[num] = time2minute(newtime);
-		if(editor == null)
-			editor = preferences.edit();
-		editor.putString("time_begin" + String.valueOf(num), newtime);
-		editor.commit();
-		return true;
-	}
-	
-	public boolean setEndTime(int num,String newtime){
-		if(!checkTime(newtime))return false;
-		endtime[num] = newtime;
-		endtimemin[num] = time2minute(newtime);
-		if(editor == null)
-			editor = preferences.edit();
-		editor.putString("time_end" + String.valueOf(num), newtime);
-		editor.commit();
-		return true;
-	}
-
 	public int getTimeId(String time,int advanceMode) {
 		//某一时间对应的时间段
 		int min = time2minute(time);
-		for(int i = 0;i < 5;i++){
+		for(int i = 0; i < 5; i++){
 			if(min >= (begintimemin[i] - getTimeDelay(advanceMode)) && min <= (endtimemin[i] + getTimeDelay(advanceMode))){
 				return i;
 			}
@@ -220,45 +253,6 @@ public class Timetable {
 			}
 		}
 		return false;
-	}
-
-	public int getBeginDate_year() {
-		return beginDate_year;
-	}
-
-	public int getBeginDate_month() {
-		return beginDate_month + 1;
-	}
-
-	public int getBeginDate_day() {
-		return beginDate_day;
-	}
-	public void setBeginDate_year(int beginYear){
-		if(beginYear==year || beginYear==year-1){
-			if(editor == null)
-				editor = preferences.edit();
-			editor.putInt("begin_date_year", beginYear);
-			editor.commit();
-		}
-		beginDate_year = beginYear;
-	}
-	public void setBeginDate_month(int beginMonth){
-		if(beginMonth>=1 && beginMonth<=12){
-			if(editor == null)
-				editor = preferences.edit();
-			editor.putInt("begin_date_month", beginMonth - 1);
-			editor.commit();
-		}
-		beginDate_month = beginMonth - 1;
-	}
-	public void setBeginDate_day(int beginDay){
-		if(beginDay>=1 && beginDay<=31){
-			if(editor == null)
-				editor = preferences.edit();
-			editor.putInt("begin_date_day", beginDay);
-			editor.commit();
-		}
-		beginDate_day = beginDay;
 	}
 	
 	public Lesson getCurrentLesson(int advanceMode) {
@@ -487,42 +481,36 @@ public class Timetable {
 		return false;
 	}
 
-	public void getTimetableSetting() throws Exception {
-		int[] timetableSetting = AHUTAccessor.getInstance(context).getTimetableSetting();
-		int year = timetableSetting[0];
-		int month = timetableSetting[1];
-		int day = timetableSetting[2];
-		int season = timetableSetting[3];
-		setBeginDate_year(year);
-		setBeginDate_month(month);
-		setBeginDate_day(day);
-		refreshNumOfWeek();
-		switch(season) {
-		case 1: //winter
-			setBeginTime(0, "08:00");
-			setBeginTime(1, "10:00");
-			setBeginTime(2, "14:00");
-			setBeginTime(3, "16:00");
-			setBeginTime(4, "18:30");
-			setEndTime(0, "09:35");
-			setEndTime(1, "11:35");
-			setEndTime(2, "15:35");
-			setEndTime(3, "17:35");
-			setEndTime(4, "21:00");
-			break;
-		case 2: //summer
-			setBeginTime(0, "08:00");
-			setBeginTime(1, "10:00");
-			setBeginTime(2, "14:30");
-			setBeginTime(3, "16:30");
-			setBeginTime(4, "19:00");
-			setEndTime(0, "09:35");
-			setEndTime(1, "11:35");
-			setEndTime(2, "16:05");
-			setEndTime(3, "18:05");
-			setEndTime(4, "21:30");
-			break;
+	public void updateTimetableSetting() throws Exception {
+		TimetableSetting timetableSetting = AHUTAccessor.getInstance(context).getTimetableSetting();
+		setTimetableSetting(timetableSetting);
+	}
+
+	public void setTimetableSetting(TimetableSetting timetableSetting) {
+		Editor editor = preferences.edit();
+		editor.putInt("begin_date_year", timetableSetting.year);
+		beginDate_year = timetableSetting.year;
+		if(timetableSetting.month >= 1 && timetableSetting.month <= 12){
+			editor.putInt("begin_date_month", timetableSetting.month - 1);
+			beginDate_month = timetableSetting.month - 1;
 		}
+		if(timetableSetting.day >= 1 && timetableSetting.day <= 31){
+			editor.putInt("begin_date_day", timetableSetting.day);
+			beginDate_day = timetableSetting.day;
+		}
+		editor.commit();
+		
+		refreshNumOfWeek();
+		setSeasonWinter(timetableSetting.seasonWinter);
+	}
+
+	public TimetableSetting getTimetableSetting() {
+		TimetableSetting timetableSetting = new TimetableSetting();
+		timetableSetting.year = beginDate_year;
+		timetableSetting.month = beginDate_month + 1;
+		timetableSetting.day = beginDate_day;
+		timetableSetting.seasonWinter = seasonWinter;
+		return timetableSetting;
 	}
 	
 }

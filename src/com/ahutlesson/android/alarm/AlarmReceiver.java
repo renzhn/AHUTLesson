@@ -73,7 +73,8 @@ public class AlarmReceiver extends BroadcastReceiver {
 			alarm.set(AlarmManager.RTC_WAKEUP, alarmTime, sender);
 		}
 	}
-
+	
+	@SuppressWarnings("deprecation")
 	private void pushNotification() {
 		Lesson lesson = LessonManager.getInstance(context).getLessonAt(week, time);
 		if (lesson == null)
@@ -89,17 +90,20 @@ public class AlarmReceiver extends BroadcastReceiver {
 				+ "课，地点：" + lesson.place;
 		NotificationManager nm = (NotificationManager) context
 				.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification n = new Notification.Builder(context)
-	        .setContentTitle("上课提醒")
-	        .setContentText(message)
-	        .setContentIntent(pendingIntent)
-	        .setSmallIcon(R.drawable.ahutlesson)
-	        .setAutoCancel(true)
-	        .setLights(0xff00ff00, 300, 1000)
-			.build();
+		Notification n = new Notification(R.drawable.ahutlesson, message,
+				System.currentTimeMillis());
+		if (enableNotificationSound) {
+			n.defaults |= Notification.DEFAULT_SOUND;
+		}
+		if (enableNotificationVibrate) {
+			n.defaults |= Notification.DEFAULT_VIBRATE;// VIBRATE
+		}
 		n.flags = Notification.FLAG_AUTO_CANCEL;
-		if (enableNotificationSound) n.defaults |= Notification.DEFAULT_SOUND;
-		if (enableNotificationVibrate) n.defaults |= Notification.DEFAULT_VIBRATE;
+		n.flags |= Notification.FLAG_SHOW_LIGHTS;
+		n.ledARGB = 0xff00ff00;
+		n.ledOnMS = 300;
+		n.ledOffMS = 1000;// LED
+		n.setLatestEventInfo(context, "上课提醒", message, pendingIntent);
 		nm.notify(0, n);
 	}
 }

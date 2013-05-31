@@ -2,26 +2,27 @@ package com.ahutlesson.android;
 
 import java.util.ArrayList;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemClickListener;
 
 import com.actionbarsherlock.view.Menu;
+import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.ui.message.Message;
-import com.ahutlesson.android.ui.message.MessageAdapter;
+import com.ahutlesson.android.model.Message;
+import com.ahutlesson.android.ui.MessageAdapter;
 
 public class MessageActivity extends BaseActivity {
 
@@ -34,6 +35,7 @@ public class MessageActivity extends BaseActivity {
 	private MessageAdapter lvMessageAdapter;
 	private ArrayList<Message> list = new ArrayList<Message>();
 	private int page = 1;
+	public static int messagesPerPage = 1;
 	private View footerView;
 	private TextView tvNextPage;
 
@@ -68,13 +70,11 @@ public class MessageActivity extends BaseActivity {
 		lvList.addFooterView(footerView);
 		lvList.setAdapter(lvMessageAdapter);
 		
-		lvList.setOnItemClickListener(new OnItemClickListener() {
-
+		lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-					openContextMenu(view);
+				openContextMenu(view);
 			}
-			
 		});
 		registerForContextMenu(lvList);
 		
@@ -83,14 +83,14 @@ public class MessageActivity extends BaseActivity {
 	
 	public void onCreateContextMenu(ContextMenu menu, View v,  
             ContextMenuInfo menuInfo) {  
+		menu.add(Menu.NONE, MENU_REPLY, Menu.NONE, "回复");  
+		menu.add(Menu.NONE, MENU_DELETE, Menu.NONE, "删除");  
 		super.onCreateContextMenu(menu, v, menuInfo);  
-		menu.add(0, MENU_REPLY, Menu.NONE, "回复");  
-		menu.add(0, MENU_DELETE, Menu.NONE, "删除");  
 	}
 
-	public boolean onContextItemSelected(MenuItem item) {
+	public boolean onContextItemSelected(android.view.MenuItem item) {
 		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item.getMenuInfo();
-		Message n = list.get(info.position);
+		final Message n = list.get(info.position);
 		if(n == null) return true;
 		switch (item.getItemId()) {
 		case MENU_REPLY:
@@ -99,14 +99,22 @@ public class MessageActivity extends BaseActivity {
 			startActivity(i);
 			return true;
 		case MENU_DELETE:
-			new DeleteMessage().execute(n.mid);
+			new AlertDialog.Builder(MessageActivity.this)
+			.setTitle("删除消息")
+			.setMessage("确定删除此条消息？")
+			.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					new DeleteMessage().execute(n.mid);
+					
+				}
+			}).setNegativeButton(R.string.cancel, null).show();
 			return true;
-		default:
-			return false;
 		}
+		return super.onContextItemSelected(item);
 	}
 	public boolean onCreateOptionsMenu(Menu menu) {
-			menu.add(0, MENU_REFRESH, Menu.NONE, R.string.refresh)
+		menu.add(Menu.NONE, MENU_REFRESH, Menu.NONE, R.string.refresh)
 			.setIcon(R.drawable.refresh)
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		return true;
@@ -157,12 +165,25 @@ public class MessageActivity extends BaseActivity {
 
 			if(ret.size() == 0) {
 				layoutEmpty.setVisibility(View.VISIBLE);
-			}else if(ret.size() > 0) {
-				layoutEmpty.setVisibility(View.GONE);
-				tvNextPage.setText("下一页");
-				list.addAll(ret);
-				showData();
+				return;
 			}
+			
+			if(ret.size() == messagesPerPage) {
+				tvNextPage.setText("加载更多");
+				footerView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new LoadNextPage().execute();
+					}
+				});
+			}else if(ret.size() < messagesPerPage) {
+				tvNextPage.setText("没有更多的消息了");
+				footerView.setOnClickListener(null);
+			}
+			
+			layoutEmpty.setVisibility(View.GONE);
+			list.addAll(ret);
+			showData();
 		}
 	}
 	
@@ -188,18 +209,32 @@ public class MessageActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(ArrayList<Message> ret) {
 			if(ret == null) {
-				tvNextPage.setText("下一页");
+				tvNextPage.setText("加载更多");
 				return;
 			}
 
 			if(ret.size() == 0) {
 				page--;
 				tvNextPage.setText("没有更多的消息了");
-			}else{
-				tvNextPage.setText("下一页");
-				list.addAll(ret);
-				lvMessageAdapter.notifyDataSetChanged();
+				footerView.setOnClickListener(null);
+				return;
 			}
+
+			if(ret.size() == messagesPerPage) {
+				tvNextPage.setText("加载更多");
+				footerView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new LoadNextPage().execute();
+					}
+				});
+			}else if(ret.size() < messagesPerPage) {
+				tvNextPage.setText("没有更多的消息了");
+				footerView.setOnClickListener(null);
+			}
+			
+			list.addAll(ret);
+			lvMessageAdapter.notifyDataSetChanged();
 		}
 	}
 

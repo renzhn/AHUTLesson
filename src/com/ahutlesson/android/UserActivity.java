@@ -17,7 +17,7 @@ public class UserActivity extends BaseActivity {
 
 	private String uxh;
 	private ImageView ivAvatar;
-	private TextView tvUName, tvUInfo,tvSignature, tvUserInfo;
+	private TextView tvUname, tvUxh,tvSignature, tvUserInfo;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,8 @@ public class UserActivity extends BaseActivity {
 			return;
 		}
 
-		tvUName = (TextView) findViewById(R.id.tvUname);
-		tvUInfo = (TextView) findViewById(R.id.tvUxh);
+		tvUname = (TextView) findViewById(R.id.tvUname);
+		tvUxh = (TextView) findViewById(R.id.tvUxh);
 		tvSignature = (TextView) findViewById(R.id.tvSignature);
 		tvUserInfo = (TextView) findViewById(R.id.tvUserInfo);
 		ivAvatar = (ImageView) findViewById(R.id.ivAvatar);
@@ -75,8 +75,8 @@ public class UserActivity extends BaseActivity {
 		protected void onPostExecute(UserInfo uinfo) {
 			if(uinfo == null)  return;
 			
-			tvUName.setText(uinfo.uname);
-			tvUInfo.setText(uinfo.uxh);
+			tvUname.setText(uinfo.uname);
+			tvUxh.setText(uinfo.uxh);
 			tvSignature.setText(uinfo.signature);
 			String userInfo = "ÐÔ±ð:" + uinfo.xb + "\n"
 					+ "°à¼¶:" + uinfo.bj + "\n"

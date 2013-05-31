@@ -1,6 +1,8 @@
 package com.ahutlesson.android;
 
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +12,7 @@ import com.ahutlesson.android.model.UserManager;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -38,6 +41,7 @@ public class ProfileActivity extends BaseActivity {
 	private String signature;
 	private UserManager userManager;
 	private User user;
+	private Bitmap avatar;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -186,25 +190,48 @@ public class ProfileActivity extends BaseActivity {
 			} else {
 				selectedImageUri = data == null ? null : data.getData();
 			}
-			Bitmap bitmap;
 			try {
-				bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
-				ivAvatar.setImageBitmap(bitmap);
-				String result = AHUTAccessor.getInstance(this).uploadAvatar(bitmap);
-				if(result.contentEquals("0")) {
-					makeToast("上传成功！");
-					ImageLoader.getInstance().clearMemoryCache();
-					ImageLoader.getInstance().clearDiscCache();
-					ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(user.uxh), ivAvatar); 
-				}else if(result.startsWith("1")) {
-					makeToast(result.substring(2));
-				}else{
-					makeToast("发生错误");
-				}
+				avatar = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImageUri);
+			} catch (FileNotFoundException e) {
+				makeToast("文件未找到");
+			} catch (IOException e) {
+				makeToast("IO错误");
+			}
+			new UploadAvatar().execute();
+		}
+	}
+	
+	private class UploadAvatar extends AsyncTask<Integer, Integer, String> {
+		ProgressDialog progressDialog;
+		
+		@Override
+		protected void onPreExecute() {
+			progressDialog = ProgressDialog.show(ProfileActivity.this, "请稍等...", "提交中...", true);
+		}
+
+		@Override
+		protected String doInBackground(Integer... arg0) {
+			try {
+				AHUTAccessor.getInstance(ProfileActivity.this).uploadAvatar(avatar);
+				return null;
 			} catch (Exception e) {
-				e.printStackTrace();
-				makeToast(e.getMessage());
+				return e.getMessage();
 			} 
 		}
+
+		@Override
+		protected void onPostExecute(String result) {
+			progressDialog.dismiss();
+			if(result == null) {
+				ImageLoader.getInstance().clearMemoryCache();
+				ImageLoader.getInstance().clearDiscCache();
+				ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(user.uxh), ivAvatar);
+				makeToast("上传成功！");
+			}else{
+				alert(result);
+			}
+		}
+		
+
 	}
 }

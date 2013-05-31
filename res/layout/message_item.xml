@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
+    android:descendantFocusability="blocksDescendants"
     android:background="@drawable/listitem"
     android:orientation="horizontal"
     android:paddingTop="8dp"
@@ -19,6 +20,7 @@
             android:layout_marginTop="3dp"
             android:layout_width="37dp"
             android:layout_height="37dp" />
+        
         <TextView
             android:id="@+id/tvItemUname"
             android:layout_width="match_parent"
@@ -46,7 +48,6 @@
         
         <TextView
             android:id="@+id/tvItemContent"
-            android:textIsSelectable="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"

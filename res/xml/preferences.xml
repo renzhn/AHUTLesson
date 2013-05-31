@@ -2,12 +2,12 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
     <PreferenceCategory android:title="基本设置" >
-        <Preference
-            android:key="setting_timetable"
-            android:title="时间表设置" >
-            <intent android:action="com.ahutlesson.android.TIMETABLESETTINGACTIVITY" />
-        </Preference>
-
+         <CheckBoxPreference
+             android:defaultValue="false"
+             android:key="season_winter"
+             android:title="冬季时间"
+             android:summaryOff="当前是夏季时间" 
+             android:summaryOn="当前是冬季时间"/>
         <PreferenceScreen android:title="上课提醒设置" >
             <PreferenceCategory android:title="上课提醒设置" >
                 <CheckBoxPreference

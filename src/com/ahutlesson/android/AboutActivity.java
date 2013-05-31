@@ -6,6 +6,7 @@ import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -39,8 +40,10 @@ public class AboutActivity extends BaseActivity {
 							UpdateResponse updateInfo) {
 						switch (updateStatus) {
 						case 0: // has update
-							UmengUpdateAgent.showUpdateDialog(
-									AboutActivity.this, updateInfo);
+							makeToast("发现新版本！ (" + updateInfo.version + ")");
+							Uri uri = Uri.parse(updateInfo.path);
+							Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+							startActivity(intent);
 							break;
 						case 1: // has no update
 							alert("您正在使用最新版");

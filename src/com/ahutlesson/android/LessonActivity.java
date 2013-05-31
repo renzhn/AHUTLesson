@@ -7,10 +7,11 @@ import com.actionbarsherlock.app.ActionBar.OnNavigationListener;
 import com.actionbarsherlock.view.Menu;
 import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.ui.lesson.ForumThread;
-import com.ahutlesson.android.ui.lesson.ForumThreadAdapter;
-import com.ahutlesson.android.ui.lesson.Lessonmate;
-import com.ahutlesson.android.ui.lesson.LessonmateAdapter;
+import com.ahutlesson.android.model.ForumThread;
+import com.ahutlesson.android.model.Lessonmate;
+import com.ahutlesson.android.ui.ForumThreadAdapter;
+import com.ahutlesson.android.ui.LessonmateAdapter;
+import com.umeng.analytics.MobclickAgent;
 
 import android.content.Context;
 import android.content.Intent;
@@ -45,8 +46,12 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 	private ArrayList<ForumThread> forumThreadList = new ArrayList<ForumThread>();
 	private LessonmateAdapter lvLessonmateAdapter;
 	private ArrayList<Lessonmate> lessonmateList = new ArrayList<Lessonmate>();
-	private int lessonPage = 1;
+	private int threadPage = 1;
+	public static int threadsPerPage = 1;
+	public static int totalThreads = 1;
+	public static int totalThreadPages = 1;
 	private int lessonmatePage = 1;
+	public static int lessonmatesPerPage = 1;
 	private View headerView, footerView;
 	private TextView tvPreviousPage, tvNextPage;
 
@@ -114,8 +119,14 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			showView();
 			needRefresh = false;
 		}
+		MobclickAgent.onResume(this);
 	}
 
+	@Override
+	protected void onPause() {
+		super.onPause();
+		MobclickAgent.onPause(this);
+	}
 	@Override
 	public boolean onNavigationItemSelected(int itemPosition, long itemId) {
 		// 选择导航菜单
@@ -251,9 +262,9 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 
 		@Override
 		protected ArrayList<ForumThread> doInBackground(Integer... params) {
-			lessonPage = 1;
+			threadPage = 1;
 			try {
-				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, threadPage);
 			} catch (Exception e) {
 				alert(e.getMessage());
 				return null;
@@ -268,7 +279,10 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			if(ret.size() == 0) {
 				layoutLoading.setVisibility(View.GONE);
 				layoutEmpty.setVisibility(View.VISIBLE);
-			}else if(ret.size() > 0) {
+				return;
+			}
+			
+			if(totalThreadPages > threadPage) {
 				tvNextPage.setText("下一页");
 				footerView.setOnClickListener(new View.OnClickListener() {
 					@Override
@@ -276,9 +290,12 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 						new LoadNextPage().execute();
 					}
 				});
-				forumThreadList.addAll(ret);
-				showForumThreads();
+			}else{
+				lvList.removeFooterView(footerView);
 			}
+
+			forumThreadList.addAll(ret);
+			showForumThreads();
 		}
 	}
 
@@ -292,9 +309,9 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 
 		@Override
 		protected ArrayList<ForumThread> doInBackground(Integer... params) {
-			lessonPage++;
+			threadPage++;
 			try {
-				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, threadPage);
 			} catch (Exception e) {
 				alert(e.getMessage());
 				return null;
@@ -304,20 +321,31 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		@Override
 		protected void onPostExecute(ArrayList<ForumThread> ret) {
 			if(ret == null)  return;
-
 			if(ret.size() == 0) {
-				lessonPage--;
+				threadPage--;
 				tvNextPage.setText("没有更多的帖子了");
 				footerView.setOnClickListener(null);
-			}else{
-				if(lessonPage == 2) {
-					lvList.addHeaderView(headerView);
-				}
-				tvNextPage.setText("下一页");
-				forumThreadList.clear();
-				forumThreadList.addAll(ret);
-				lvForumThreadAdapter.notifyDataSetChanged();
+				return;
 			}
+			
+			if(threadPage == 2) {
+				lvList.addHeaderView(headerView);
+			}
+			if(totalThreadPages > threadPage) {
+				tvNextPage.setText("下一页");
+				footerView.setOnClickListener(new View.OnClickListener() {
+					@Override
+					public void onClick(View v) {
+						new LoadNextPage().execute();
+					}
+				});
+			}else{
+				tvNextPage.setText("没有更多的帖子了");
+				footerView.setOnClickListener(null);
+			}
+			forumThreadList.clear();
+			forumThreadList.addAll(ret);
+			lvForumThreadAdapter.notifyDataSetChanged();
 		}
 	}
 
@@ -332,11 +360,11 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 
 		@Override
 		protected ArrayList<ForumThread> doInBackground(Integer... params) {
-			lessonPage--;
-			if(lessonPage < 1)
-				lessonPage = 1;
+			threadPage--;
+			if(threadPage < 1)
+				threadPage = 1;
 			try {
-				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, lessonPage);
+				return AHUTAccessor.getInstance(LessonActivity.this).getForumThreadList(lid, threadPage);
 			} catch (Exception e) {
 				alert(e.getMessage());
 				return null;
@@ -348,10 +376,16 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			tvPreviousPage.setText("上一页");
 			if(ret == null) return;
 			
-			if(lessonPage == 1) {
+			if(threadPage == 1) {
 				lvList.removeHeaderView(headerView);
 			}
 			tvNextPage.setText("下一页");
+			footerView.setOnClickListener(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					new LoadNextPage().execute();
+				}
+			});
 			forumThreadList.clear();
 			forumThreadList.addAll(ret);
 			lvForumThreadAdapter.notifyDataSetChanged();
@@ -386,7 +420,13 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 			layoutLoading.setVisibility(View.GONE);
 			if(ret == null) return;
 			
-			tvNextPage.setText("加载更多");
+			if(ret.size() == lessonmatesPerPage) {
+				tvNextPage.setText("加载更多");
+			}else{
+				tvNextPage.setText("没有更多课友了");
+				footerView.setOnClickListener(null);
+			}
+			
 			layoutEmpty.setVisibility(View.GONE);
 			layoutList.setVisibility(View.VISIBLE);
 			lessonmateList.addAll(ret);
@@ -416,21 +456,17 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 
 		@Override
 		protected void onPostExecute(ArrayList<Lessonmate> ret) {
-			layoutLoading.setVisibility(View.GONE);
-			if(ret == null) {
+			if(ret == null)  return;
+			
+			if(ret.size() == lessonmatesPerPage) {
 				tvNextPage.setText("加载更多");
-				return;
-			}
-
-			if(ret.size() == 0) {
-				lessonmatePage--;
+			}else{
 				tvNextPage.setText("没有更多课友了");
 				footerView.setOnClickListener(null);
-			}else{
-				tvNextPage.setText("加载更多");
-				lessonmateList.addAll(ret);
 			}
-			
+
+			lessonmateList.addAll(ret);
+			lvLessonmateAdapter.notifyDataSetChanged();
 		}
 	}
 	
