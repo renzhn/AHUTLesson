@@ -9,8 +9,10 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
@@ -36,6 +38,7 @@ import com.ahutlesson.android.ui.HomeworkFragment;
 import com.ahutlesson.android.ui.LessonListFragmentAdapter;
 import com.ahutlesson.android.ui.timetable.ScheduleView;
 import com.ahutlesson.android.utils.ChangeLog;
+import com.ahutlesson.android.utils.GlobalContext;
 import com.ahutlesson.android.utils.Util;
 import com.nostra13.universalimageloader.core.DisplayImageOptions;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -63,7 +66,7 @@ public class MainActivity extends BaseFragmentActivity implements
 
 	// TODAY_VIEW
 	private View todayView;
-	private static LessonListFragmentAdapter mLessonListFragmentAdapter;
+	private LessonListFragmentAdapter mLessonListFragmentAdapter;
 	private ViewPager mPager;
 	private PageIndicator mIndicator;
 	public static List<Integer> unreadLessonForum = new ArrayList<Integer>();
@@ -82,6 +85,7 @@ public class MainActivity extends BaseFragmentActivity implements
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		GlobalContext.mainActivity = this;
 		disableHomeButton();
 		actionBar.setDisplayShowTitleEnabled(false);
 		
@@ -146,11 +150,15 @@ public class MainActivity extends BaseFragmentActivity implements
 		startService(new Intent(MainActivity.this, CheckUnreadService.class));
 		
 		// Update
-		new UpdateTask().execute();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		boolean autoUpdate = prefs.getBoolean("auto_update", true);
+		if(autoUpdate)
+			new UpdateTask().execute();
 		
-		MobclickAgent.onError(this);
 		UmengUpdateAgent.setUpdateOnlyWifi(false);
 		UmengUpdateAgent.update(this);
+		
+		MobclickAgent.onError(this);
 	}
 
 	@Override
@@ -185,9 +193,10 @@ public class MainActivity extends BaseFragmentActivity implements
 
 	public static boolean needRefresh = false;
 	
-	public static void refreshTodayView() {
+	public void refreshTodayView() {
 		if(mLessonListFragmentAdapter != null) 
 			mLessonListFragmentAdapter.notifyDataSetChanged();
+		invalidateOptionsMenu();
 	}
 
 	@Override
@@ -199,9 +208,9 @@ public class MainActivity extends BaseFragmentActivity implements
 				mLessonListFragmentAdapter.notifyDataSetChanged();
 			if (scheduleView != null)
 				scheduleView.invalidate();
+			tvDateInfo.setText(dateInfo());
 		}
-
-
+		
 		Alarm.setAlarm(this);
 		MobclickAgent.onResume(this);
 	}
@@ -256,6 +265,7 @@ public class MainActivity extends BaseFragmentActivity implements
 
 		}
 		menu.add(0, MENU_TIMETABLEVIEWER, Menu.NONE, "课表浏览器");
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
@@ -367,7 +377,7 @@ public class MainActivity extends BaseFragmentActivity implements
 					makeToast("已更新时间表设置");
 				}
 			} catch (Exception ex) {
-				makeToast(ex.getMessage());
+				Util.log(ex.getMessage());
 			}
 			return null;
 		}

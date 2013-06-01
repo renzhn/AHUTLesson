@@ -17,6 +17,7 @@
         android:ellipsize="end"
         android:maxWidth="66dp"
         android:singleLine="true"
+        android:textColor="#000"
         android:text="任震"
         android:textSize="18sp" />
 

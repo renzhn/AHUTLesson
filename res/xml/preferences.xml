@@ -1,19 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="基本设置" >
-         <CheckBoxPreference
-             android:defaultValue="false"
-             android:key="season_winter"
-             android:title="冬季时间"
-             android:summaryOff="当前是夏季时间" 
-             android:summaryOn="当前是冬季时间"/>
+    <PreferenceCategory android:title="时间表设置" >
+        <Preference
+            android:key="set_begin_date"
+            android:title="设置开学日期" />
+
+        <CheckBoxPreference
+            android:defaultValue="false"
+            android:key="season_winter"
+            android:summaryOff="当前是夏季时间"
+            android:summaryOn="当前是冬季时间"
+            android:title="冬季时间" />
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="auto_update"
+            android:summary="自动下载最新课表和时间表数据"
+            android:title="自动同步" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="提醒与静音" >
         <PreferenceScreen android:title="上课提醒设置" >
             <PreferenceCategory android:title="上课提醒设置" >
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:key="AlarmBeforeLesson"
                     android:title="启用上课提醒" />
+
                 <ListPreference
                     android:defaultValue="20"
                     android:dependency="AlarmBeforeLesson"
@@ -83,14 +95,14 @@
     <PreferenceCategory android:title="课友网" >
         <PreferenceScreen android:title="消息提醒" >
             <PreferenceCategory android:title="消息提醒" >
-                
                 <ListPreference
-                    android:title="提醒频率"
-                    android:summary="检查新消息频率，修改后下次启动生效"
                     android:defaultValue="5"
                     android:entries="@array/CheckUnreadFreq_entries"
                     android:entryValues="@array/CheckUnreadFreq_values"
-                    android:key="CheckUnreadFreq" />
+                    android:key="CheckUnreadFreq"
+                    android:summary="检查新消息频率，修改后下次启动生效"
+                    android:title="提醒频率" />
+
                 <CheckBoxPreference
                     android:defaultValue="true"
                     android:key="CheckUnreadSound"
@@ -116,8 +128,8 @@
             <PreferenceCategory android:title="帐号管理" >
                 <Preference
                     android:key="user_downinfo"
-                    android:title="同步用户信息"
-                    android:summary="从课友网获取最新用户信息" />
+                    android:summary="从课友网获取最新用户信息"
+                    android:title="同步用户信息" />
                 <Preference
                     android:key="user_logout"
                     android:summary="将会清除本地所有信息"

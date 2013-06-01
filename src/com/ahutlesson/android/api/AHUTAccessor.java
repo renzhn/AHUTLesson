@@ -65,9 +65,9 @@ public class AHUTAccessor {
 	private static final int TIMEOUT_SOCKET = 10000;
 	private HttpParams httpParameters = new BasicHttpParams();;
 
-	//public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+	public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
 
-	public static final String SERVER_URL = "http://192.168.1.2/lesson/";
+	//public static final String SERVER_URL = "http://192.168.1.2/lesson/";
 
 	public AHUTAccessor(Context context0) {
 		context = context0;
@@ -503,11 +503,20 @@ public class AHUTAccessor {
 		} catch (Exception e) {
 			throw e;
 		}
-		if(strResult.contentEquals("0")) {
-			return;
-		}else if(strResult.startsWith("1")) {
-			throw new Exception(strResult.substring(2));
+		try {
+			JSONTokener jsonParser = new JSONTokener(strResult);
+			JSONObject ret = (JSONObject) jsonParser.nextValue();
+			int retCode = ret.getInt("code");
+			if(retCode == 1) {
+				String msg = ret.getString("msg");
+				throw new Exception(msg);
+			}else if(retCode == 0) {
+				return;
+			} 
+		} catch (JSONException e) {  
+			throw new Exception("解析数据出错");
 		}
+		throw new Exception("服务器返回了错误的数据");
 	}
 
 	public void setSignature(String signature) throws Exception {

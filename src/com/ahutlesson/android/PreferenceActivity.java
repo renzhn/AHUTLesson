@@ -2,11 +2,13 @@ package com.ahutlesson.android;
 
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
+import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.model.UserManager;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.nostra13.universalimageloader.core.ImageLoader;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -18,6 +20,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.PreferenceManager;
 import android.preference.Preference.OnPreferenceClickListener;
+import android.widget.DatePicker;
 
 public class PreferenceActivity extends SherlockPreferenceActivity {
 
@@ -31,6 +34,31 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		
 		addPreferencesFromResource(R.xml.preferences);
 
+		Preference setBeginDate = (Preference) findPreference("set_begin_date");
+		setBeginDate.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+			@Override
+			public boolean onPreferenceClick(Preference arg0) {
+				final Timetable timetable = Timetable.getInstance(PreferenceActivity.this);
+				final TimetableSetting timetableSetting = timetable.getTimetableSetting();
+                DatePickerDialog.OnDateSetListener dateListener =
+                        new DatePickerDialog.OnDateSetListener() {  
+                            @Override  
+                            public void onDateSet(DatePicker datePicker,   
+                                    int year, int month, int dayOfMonth) {  
+                            	timetableSetting.year = year;
+                            	timetableSetting.month = month + 1;
+                            	timetableSetting.day = dayOfMonth;
+                            	timetable.setTimetableSetting(timetableSetting);
+                            	MainActivity.needRefresh = true;
+                            }  
+                        };  
+                DatePickerDialog dialog = new DatePickerDialog(PreferenceActivity.this, dateListener, timetableSetting.year, timetableSetting.month - 1, timetableSetting.day);  
+				dialog.show();
+                return false;
+			}
+			
+		});
+		
 		CheckBoxPreference seasonWinter = (CheckBoxPreference) findPreference("season_winter");
 		seasonWinter.setOnPreferenceChangeListener(new OnPreferenceChangeListener() {
 			
