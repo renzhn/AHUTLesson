@@ -90,7 +90,7 @@ public class LessonActivity extends BaseFragmentActivity implements OnNavigation
 		layoutEmpty = (LinearLayout) findViewById(R.id.layoutEmpty);
 
 		TextView tvEmpty = (TextView) layoutEmpty.findViewById(R.id.tvEmpty);
-		tvEmpty.setText("暂无帖子");
+		tvEmpty.setText("暂无帖子，触摸屏幕左下角来发表第一帖吧！");
 
 		footerView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
 				.inflate(R.layout.listview_footer, null, false);

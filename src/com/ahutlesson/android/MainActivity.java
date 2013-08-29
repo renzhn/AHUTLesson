@@ -357,7 +357,8 @@ public class MainActivity extends BaseFragmentActivity implements
 							refreshTodayView();
 						}
 					});
-					makeToast("已更新课表数据");
+					String latestLessondbVer = ret.getString("latestLessondbVer");
+					makeToast("已更新课表数据 (" + latestLessondbVer + ")");
 				}
 				if(ret.has("hasNewTimetableSetting")) {
 					Util.log("found New Timetable Setting");
@@ -374,7 +375,7 @@ public class MainActivity extends BaseFragmentActivity implements
 							tvDateInfo.setText(dateInfo());
 						}
 					});
-					makeToast("已更新时间表设置");
+					makeToast("已更新时间表设置 (" + timetableSetting.getBeginDate() + ")");
 				}
 			} catch (Exception ex) {
 				Util.log(ex.getMessage());

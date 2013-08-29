@@ -11,4 +11,8 @@ public class TimetableSetting {
 	public String getSeason() {
 		return seasonWinter ? "1" : "0";
 	}
+	
+	public String getBeginDate() {
+		return year + "-" + month + "-" + day;
+	}
 }
