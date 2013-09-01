@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
+    <PreferenceCategory android:title="界面设置" >
+        <ListPreference
+            android:defaultValue="0"
+            android:dialogTitle="默认视图"
+            android:entries="@array/DefaultView_entries"
+            android:entryValues="@array/DefaultView_entryValues"
+            android:key="DefaultView"
+            android:title="默认视图" />
+    </PreferenceCategory>
     <PreferenceCategory android:title="时间表设置" >
         <Preference
             android:key="set_begin_date"

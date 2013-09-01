@@ -115,6 +115,16 @@ public class MainActivity extends BaseFragmentActivity implements
 		actionBar.setCustomView(dateInfoView);
 		actionBar.setDisplayShowCustomEnabled(true);
 
+		//ViewMode
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+		int defaultView;
+		try {
+			defaultView = Integer.valueOf(prefs.getString("DefaultView", "0"));
+		} catch (Exception ex) {
+			defaultView = 0;
+		}
+		actionBar.setSelectedNavigationItem(defaultView);
+		
 		//Main View
 		fragmentManager = getSupportFragmentManager();
 				
@@ -150,7 +160,6 @@ public class MainActivity extends BaseFragmentActivity implements
 		startService(new Intent(MainActivity.this, CheckUnreadService.class));
 		
 		// Update
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
 		boolean autoUpdate = prefs.getBoolean("auto_update", true);
 		if(autoUpdate)
 			new UpdateTask().execute();

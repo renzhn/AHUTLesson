@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.joda.time.Days;
+
 import com.ahutlesson.android.R;
 import com.ahutlesson.android.api.AHUTAccessor;
 
@@ -154,23 +156,14 @@ public class Timetable {
 		//计算开学第几周
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);
-		int passDays = calcPassDays(beginCal);
-		if(passDays >= 0 && passDays <= 140)
-			return passDays / 7 +1;
+		Date beginDate = beginCal.getTime();
+		
+		int days = Days.daysBetween(new org.joda.time.DateTime(beginDate), new org.joda.time.DateTime(Calendar.getInstance().getTime())).getDays();
+		
+		if(days >= 0 && days <= 140)
+			return days / 7 +1;
 		else
 			return 0;
-	}
-	
-	public int calcPassDays(Calendar cal_old){
-		int passYear = ((year - cal_old.get(Calendar.YEAR))==1)? 1 : 0;
-		int oldday = cal_old.get(Calendar.DAY_OF_YEAR);
-		if(passYear == 0 && dayOfYear >= oldday){
-				return dayOfYear - oldday;
-		}
-		if(passYear == 1 && dayOfYear <= oldday){
-			return dayOfYear + dayOfYear(cal_old.get(Calendar.YEAR)) - oldday;
-		}
-		return 0;
 	}
 	
 	public int dayOfYear(int year) {
