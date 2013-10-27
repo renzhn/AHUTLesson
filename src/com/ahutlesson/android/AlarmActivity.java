@@ -38,7 +38,7 @@ public class AlarmActivity extends BaseActivity {
 		}
 		
 		int curTimeBlock = timetable.getCurrentTimeBlock(Timetable.DelayDefault);
-		if(curTimeBlock != -1 && lessonManager.lessons[lesson.week][curTimeBlock] != null){
+		if(curTimeBlock != -1 && lessonManager.getLessonAt(lesson.week, curTimeBlock) != null){
 			this.finish();//如果现在正在上课则不提醒
 			return;
 		}

@@ -3,13 +3,10 @@ package com.ahutlesson.android.service;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.ahutlesson.android.MainActivity;
 import com.ahutlesson.android.MessageActivity;
 import com.ahutlesson.android.NoticeActivity;
 import com.ahutlesson.android.R;
 import com.ahutlesson.android.api.AHUTAccessor;
-import com.ahutlesson.android.utils.GlobalContext;
-
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -71,12 +68,6 @@ public class CheckUnreadService extends Service {
 			}
 			if(unreadInfo.unreadNotice > 0) {
 				showNoticeNotification(unreadInfo.unreadNotice);
-			}
-			if(unreadInfo.unreadLessonForum.size() > 0) {
-				MainActivity.unreadLessonForum = unreadInfo.unreadLessonForum;
-				if(GlobalContext.mainActivity != null) {
-					GlobalContext.mainActivity.refreshTodayView();
-				}
 			}
 		} catch (Exception e) {
 			System.out.println("checkUnreadError: " + e.getMessage());

@@ -1,4 +1,4 @@
-package com.ahutlesson.android.ui.timetable;
+package com.ahutlesson.android.ui.gridview;
 
 public class LessonName {
 	//used in lessonName drawing

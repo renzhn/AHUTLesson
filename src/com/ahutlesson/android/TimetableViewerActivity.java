@@ -13,14 +13,14 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonsInfo;
-import com.ahutlesson.android.ui.timetable.ScheduleView;
+import com.ahutlesson.android.ui.gridview.GridView;
 import com.ahutlesson.android.utils.ValidateHelper;
 
 public class TimetableViewerActivity extends BaseActivity {
 
 	private static final int MENU_RETYPE = 0;
 	
-	private ScheduleView scheduleView;
+	private GridView scheduleView;
 	private Lesson lessons[][] = new Lesson[7][5];
 	
 	@Override
@@ -70,7 +70,8 @@ public class TimetableViewerActivity extends BaseActivity {
 	}
 
 	private void showLessons() {
-		scheduleView = new ScheduleView(TimetableViewerActivity.this, lessons, false);
+		if (lessons != null)
+			scheduleView = new GridView(TimetableViewerActivity.this, lessons);
 		setContentView(scheduleView);
 	}
 	

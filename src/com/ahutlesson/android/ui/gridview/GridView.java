@@ -1,68 +1,92 @@
-package com.ahutlesson.android.ui.timetable;
-
-import java.io.Serializable;
+package com.ahutlesson.android.ui.gridview;
 
 import com.ahutlesson.android.LessonActivity;
+import com.ahutlesson.android.R;
 import com.ahutlesson.android.model.Lesson;
+import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.DashPathEffect;
 import android.graphics.Paint;
+import android.graphics.Paint.Style;
+import android.view.MotionEvent;
 import android.view.View;
 
-/**
- * 绘制日期和网格
- * 
- * */
-public class Grid extends ScheduleParent implements Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class GridView extends View {
 	
-	public static final int NORMALTIME = 0;
-	public static final int FREETIME = 1;
-	public static final int BUSYTIME = 2;
-	public static final int NEXTTIME = 3;
-
+	private Context context;
 	private Lesson[][] lessons;
 	private Timetable timetable;
-	private Context context;
-	private boolean isLocalDB;
+	private boolean isLocal = true;
 	
-	private Canvas canvas;
+	private int markWeek = -1, markTime = -1, markLid = -1;
+
+	public static final int NORMALTIME = 0;
+	public static final int BUSYTIME = 1;
+	public static final int NEXTTIME = 2;
+
+	public static final int BLUE = Color.parseColor("#3F92D2");
+	public static final int RED = Color.parseColor("#B22222");
 	
-	float top, left;
-	float cellWidth, cellHeight;
-	float calendarWidth, calendarHeight;
-	float textLeft, textTop;
-	
-	public int markWeek = -1, markTime = -1, markLid = -1;
-	
-	public Grid(Activity activity, View view, Lesson[][] lessons0, boolean isLocal) {
-		super(activity, view);
-		context = activity;
-		lessons = lessons0;
+	//if lessons null, load local
+	public GridView(Context _context, Lesson[][] _lessons) {
+		super(_context);
+		context = _context;
+		lessons = _lessons;
+		if (lessons == null) {
+			isLocal = false;
+			lessons = LessonManager.getInstance(context).getLessons();
+		}
 		timetable = Timetable.getInstance(context);
-		view.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				openLessonActivity();
-			}
-		});
-		isLocalDB = isLocal;
-		left = borderMargin;
-		top = borderMargin + weekNameSize + weekNameMargin * 2 + 4;
 	}
 
+	private Paint paint = new Paint();
+	private Canvas canvas;
+	private float left, top;
+	private float borderMargin, weekNameMargin, weekNameSize, lessonNameSize, lessonPlaceSize;
+	private float calendarWidth, calendarHeight, cellWidth, cellHeight;
 	@Override
-	public void draw(Canvas canvas0) {
-		canvas = canvas0;
+	protected void onDraw(Canvas _canvas) {
+		canvas = _canvas;
+		paint.setAntiAlias(true);
 
-		calendarWidth = view.getMeasuredWidth() - left * 2;
-		calendarHeight = view.getMeasuredHeight() - top - borderMargin;
+		borderMargin = context.getResources().getDimension(R.dimen.calendar_border_margin);
+		
+		weekNameMargin = context.getResources().getDimension(R.dimen.weekname_margin);
+		weekNameSize = context.getResources().getDimension(R.dimen.weekname_size);
+		lessonNameSize = context.getResources().getDimension(R.dimen.lessonname_size);
+		lessonPlaceSize = context.getResources().getDimension(R.dimen.lessonplace_size);
+
+		left = borderMargin;
+		top = borderMargin;
+		String[] weekNames = context.getResources().getStringArray(R.array.week_name);
+
+		paint.setTextSize(weekNameSize);
+		
+		paint.setColor(BLUE);
+		float endYOfWeek = borderMargin * 2 + weekNameSize + weekNameMargin * 2 + 4;
+		canvas.drawRect(0, 0, canvas.getWidth(), endYOfWeek, paint);
+		
+		float everyWeekWidth = (this.getMeasuredWidth() - borderMargin * 2) / 7;
+		paint.setColor(Color.WHITE);
+		for (int i = 0; i < 7; i++) {
+
+			left = borderMargin + everyWeekWidth * i
+					+ (everyWeekWidth - paint.measureText(weekNames[i])) / 2;
+			canvas.drawText(weekNames[i], left, top + paint.getTextSize()
+					+ weekNameMargin, paint);
+		}
+
+		//开始画课表
+        left = 0;
+        top = endYOfWeek;
+        
+		calendarWidth = this.getMeasuredWidth();
+		calendarHeight = this.getMeasuredHeight() - top;
 		cellWidth = calendarWidth / 7;
 		cellHeight = calendarHeight / 5;
 		
@@ -84,9 +108,6 @@ public class Grid extends ScheduleParent implements Serializable {
 			}
 		}
 
-		//触摸的课程
-		drawMarkBackground();
-		
 		//画背景
 		drawBackgrounds();
 		
@@ -96,9 +117,9 @@ public class Grid extends ScheduleParent implements Serializable {
 			if(lessonsOfDay!=null){
 				for(Lesson lesson:lessonsOfDay){
 					if(lesson!=null){
-						if(lessonCanAppend(lesson,lessons)&&timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
+						if(lessonCanAppend(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
 							drawLesson(lesson, true);
-						}else if(lessonIsAppended(lesson,lessons)&&timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
+						}else if(lessonIsAppended(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
 							//四节课的课间且是后两节课，不用画了
 						}else{
 							drawLesson(lesson, timetable.isNowHavingLesson(lesson)==0?true:false);
@@ -107,11 +128,16 @@ public class Grid extends ScheduleParent implements Serializable {
 				}
 			}
 		}
+
+		this.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				openLessonActivity();
+			}
+		});
 	}
 
 	private void drawBackgrounds() {
-		//画背景
-
 		//处理在四节课课间的情况
 		Lesson tLesson = lessons[timetable.weekDay][0];
 		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && timetable.nowIsAtLessonBreak(timetable.weekDay, 0)){
@@ -125,11 +151,6 @@ public class Grid extends ScheduleParent implements Serializable {
 		Lesson lesson = getLesson(timetable.weekDay, timetable.getCurrentTimeBlock(Timetable.DelayDefault));
 		if(lesson!=null && lesson.isInRange(context)) {
 			drawBackground(lesson.week, lesson.time, BUSYTIME, lessonAppendMode(lesson,lessons));
-		}else{
-			int curTimeBlock = timetable.getCurrentTimeBlock(Timetable.DelayDefault);
-			if(curTimeBlock != -1){
-				drawBackground(timetable.weekDay, curTimeBlock, FREETIME, 0);
-			}
 		}
 
 		lesson = timetable.getNextLesson(Timetable.DelayDefault);
@@ -138,34 +159,24 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 	}
 	
-	private void drawMarkBackground(){
-		paint.setColor(Color.parseColor("#DDDDDD"));
-		paint.setStyle(Paint.Style.FILL_AND_STROKE);
-		if(markWeek!=-1 && markTime!=-1){
-			canvas.drawRect(left + cellWidth * markWeek, top + cellHeight * markTime, left + cellWidth * (markWeek + 1), top + cellHeight * (markTime + 1), paint);
-		}
-	}
-	
 	private void drawLines() {
-		paint.setColor(Color.LTGRAY);
-
+		Paint linePaint = new Paint();
+		linePaint.setARGB(80, 0, 0, 0);
+		linePaint.setStyle(Style.STROKE);
+		linePaint.setPathEffect(new DashPathEffect(new float[] {5,10}, 0));
+		
 		//画横线
-		for (int i = 0; i <= 5; i++) {
+		for (int i = 1; i < 5; i++) {
 			canvas.drawLine(left, top + (cellHeight) * i, left + calendarWidth,
-					top + (cellHeight) * i, paint);
+					top + (cellHeight) * i, linePaint);
 		}
 		//画竖线
-		for (int i = 0; i <= 7; i++) {
+		for (int i = 1; i < 7; i++) {
 			canvas.drawLine(left + cellWidth * i, top, left + cellWidth * i,
-					view.getMeasuredHeight() - borderMargin, paint);
+					this.getMeasuredHeight(), linePaint);
 		}
-
 	}
-	
-	public static final int GREEN = Color.parseColor("#228B22");
-	public static final int RED = Color.parseColor("#B22222");
-	public static final int GRAY = Color.parseColor("#CDCDCD");
-	
+
 	private void drawBackground(int week,int time, int mode, int append) {
 		// 画下节课背景
 		// append:0 默认 1 扩展下节 -1 扩展上节
@@ -174,14 +185,11 @@ public class Grid extends ScheduleParent implements Serializable {
 		case NORMALTIME:
 			paintbg.setColor(Color.WHITE);
 			break;
-		case FREETIME:
-			paintbg.setColor(GREEN);
-			break;
 		case BUSYTIME:
 			paintbg.setColor(RED);
 			break;
 		case NEXTTIME:
-			paintbg.setColor(GRAY);
+			paintbg.setARGB(30, 0, 0, 0);
 			break;
 		}
 		switch (append){
@@ -205,6 +213,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		}
 	}
 
+	private float textLeft, textTop;
 	private void drawLesson(Lesson lesson,boolean busytime) {
 		// 一般课程
 		if(lesson == null) return;
@@ -250,7 +259,7 @@ public class Grid extends ScheduleParent implements Serializable {
 		}else if(lesson.hasHomework){
 			paint.setColor(Color.parseColor("#CE5600"));
 		}else if(!lesson.isInRange(context)){
-			paint.setColor(Color.parseColor("#999999"));
+			paint.setARGB(30, 0, 0, 0);
 		}else{
 			paint.setColor(Color.BLACK);
 		}
@@ -281,7 +290,7 @@ public class Grid extends ScheduleParent implements Serializable {
 				paint.setColor(Color.TRANSPARENT);
 			}
 		}else if(!lesson.isInRange(context)){
-			paint.setColor(Color.parseColor("#999999"));
+			paint.setARGB(30, 0, 0, 0);
 		}else{
 			paint.setColor(Color.parseColor("#B22222"));
 		}
@@ -407,7 +416,14 @@ public class Grid extends ScheduleParent implements Serializable {
 		i.putExtra("week", markWeek);
 		i.putExtra("time", markTime);
 		i.putExtra("title", lessons[markWeek][markTime].getTitle());
-		i.putExtra("local", isLocalDB);
+		i.putExtra("local", isLocal);
 		context.startActivity(i);
 	}
+	
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		markLesson(event.getX(), event.getY());
+		return super.onTouchEvent(event);
+	}
+
 }

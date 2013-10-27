@@ -19,7 +19,7 @@ public class LessonManager {
 	
 	private Context context;
 	private DatabaseHelper DBHelper;
-	public Lesson lessons[][] = new Lesson[7][5];
+	private Lesson lessons[][];
 	
 	public LessonManager(Context context0){
 		context = context0;
@@ -34,7 +34,14 @@ public class LessonManager {
 		return lessonManager;
 	}
 	
+	public Lesson[][] getLessons() {
+		if (lessons == null)
+			getAllLessons();
+		return lessons;
+	}
+	
 	public void getAllLessons(){
+		lessons = new Lesson[7][5];
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		
 		String name,alias,place,teacher,homework;

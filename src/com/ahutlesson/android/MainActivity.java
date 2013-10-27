@@ -1,8 +1,5 @@
 package com.ahutlesson.android;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.json.JSONObject;
 
 import android.app.AlertDialog;
@@ -15,7 +12,6 @@ import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.ViewPager;
 import android.text.InputType;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -35,8 +31,7 @@ import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.model.UserManager;
 import com.ahutlesson.android.service.CheckUnreadService;
 import com.ahutlesson.android.ui.HomeworkFragment;
-import com.ahutlesson.android.ui.LessonListFragmentAdapter;
-import com.ahutlesson.android.ui.timetable.ScheduleView;
+import com.ahutlesson.android.ui.gridview.GridView;
 import com.ahutlesson.android.utils.ChangeLog;
 import com.ahutlesson.android.utils.GlobalContext;
 import com.ahutlesson.android.utils.Util;
@@ -45,34 +40,25 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 import com.nostra13.universalimageloader.core.ImageLoaderConfiguration;
 import com.umeng.analytics.MobclickAgent;
 import com.umeng.update.UmengUpdateAgent;
-import com.viewpagerindicator.PageIndicator;
-import com.viewpagerindicator.TitlePageIndicator;
+
 
 public class MainActivity extends BaseFragmentActivity implements
 		OnNavigationListener {
 
-	private static final String[] TITLES = { "当日课程", "课程总表", "课后作业" };
+	private static final String[] TITLES = { "课程总表", "课后作业" };
 	private static int viewMode = 0;
 
 	FragmentManager fragmentManager;
 	
 	// VIEW
-	private static final int TODAY_VIEW = 0;
-	private static final int GRID_VIEW = 1;
-	private static final int HOMEWORK_VIEW = 2;
+	private static final int GRID_VIEW = 0;
+	private static final int HOMEWORK_VIEW = 1;
 
 	private View dateInfoView;
 	private TextView tvDateInfo;
 
-	// TODAY_VIEW
-	private View todayView;
-	private LessonListFragmentAdapter mLessonListFragmentAdapter;
-	private ViewPager mPager;
-	private PageIndicator mIndicator;
-	public static List<Integer> unreadLessonForum = new ArrayList<Integer>();
-
 	// GRID_VIEW
-	private static ScheduleView scheduleView;
+	private static GridView gridView;
 
 	// MENU
 	private static final int MENU_SETTING = 0;
@@ -102,7 +88,6 @@ public class MainActivity extends BaseFragmentActivity implements
 		ArrayAdapter<CharSequence> list = new ArrayAdapter<CharSequence>(context, R.layout.sherlock_spinner_item);
 		list.add(TITLES[0]);
 		list.add(TITLES[1]);
-		list.add(TITLES[2]);
 		list.setDropDownViewResource(R.layout.sherlock_spinner_dropdown_item);
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_LIST);
 		actionBar.setListNavigationCallbacks(list, this);
@@ -114,31 +99,12 @@ public class MainActivity extends BaseFragmentActivity implements
 		tvDateInfo.setText(dateInfo());
 		actionBar.setCustomView(dateInfoView);
 		actionBar.setDisplayShowCustomEnabled(true);
-
-		//ViewMode
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-		int defaultView;
-		try {
-			defaultView = Integer.valueOf(prefs.getString("DefaultView", "0"));
-		} catch (Exception ex) {
-			defaultView = 0;
-		}
-		actionBar.setSelectedNavigationItem(defaultView);
 		
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+
 		//Main View
 		fragmentManager = getSupportFragmentManager();
 				
-		//Today View
-		todayView = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE))
-				.inflate(R.layout.today, null, false);
-		mLessonListFragmentAdapter = new LessonListFragmentAdapter(getSupportFragmentManager());
-
-		mPager = (ViewPager) todayView.findViewById(R.id.pager);
-		mPager.setAdapter(mLessonListFragmentAdapter);
-
-		mIndicator = (TitlePageIndicator) todayView.findViewById(R.id.indicator);
-		mIndicator.setViewPager(mPager);
-		mIndicator.setCurrentItem(Timetable.getCurrentWeekDay());
 		
 		// Changelog
 		ChangeLog cl = new ChangeLog(MainActivity.this);
@@ -179,14 +145,10 @@ public class MainActivity extends BaseFragmentActivity implements
 	// 显示视图
 	public void showView() {
 		switch (viewMode) {
-		case TODAY_VIEW:
-			setContentView(todayView);
-			break;
 		case GRID_VIEW:
 			// 绘制课表
-			scheduleView = new ScheduleView(this,
-					LessonManager.getInstance(this).lessons, true);
-			setContentView(scheduleView);
+			gridView = new GridView(this, null);
+			setContentView(gridView);
 			break;
 		case HOMEWORK_VIEW:
 			setContentView(R.layout.homework);
@@ -201,11 +163,15 @@ public class MainActivity extends BaseFragmentActivity implements
 	}
 
 	public static boolean needRefresh = false;
+
+	public void refreshScheduleView() {
+		if (gridView != null)
+			gridView.invalidate();
+	}
 	
-	public void refreshTodayView() {
-		if(mLessonListFragmentAdapter != null) 
-			mLessonListFragmentAdapter.notifyDataSetChanged();
-		invalidateOptionsMenu();
+	public void refreshDateInfo() {
+		if (tvDateInfo != null)
+			tvDateInfo.setText(dateInfo());;
 	}
 
 	@Override
@@ -213,11 +179,8 @@ public class MainActivity extends BaseFragmentActivity implements
 		super.onResume();
 
 		if (needRefresh) {
-			if(mLessonListFragmentAdapter != null) 
-				mLessonListFragmentAdapter.notifyDataSetChanged();
-			if (scheduleView != null)
-				scheduleView.invalidate();
-			tvDateInfo.setText(dateInfo());
+			refreshScheduleView();
+			refreshDateInfo();
 		}
 		
 		Alarm.setAlarm(this);
@@ -242,7 +205,7 @@ public class MainActivity extends BaseFragmentActivity implements
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		switch (viewMode) {
-		case TODAY_VIEW:
+		case -1:
 			menu.add(viewMode, MENU_PROFILE, Menu.NONE, "个人中心")
 					.setIcon(R.drawable.account)
 					.setShowAsAction(
@@ -363,7 +326,7 @@ public class MainActivity extends BaseFragmentActivity implements
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							refreshTodayView();
+							refreshScheduleView();
 						}
 					});
 					String latestLessondbVer = ret.getString("latestLessondbVer");
@@ -381,7 +344,7 @@ public class MainActivity extends BaseFragmentActivity implements
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							tvDateInfo.setText(dateInfo());
+							refreshDateInfo();
 						}
 					});
 					makeToast("已更新时间表设置 (" + timetableSetting.getBeginDate() + ")");

@@ -75,7 +75,7 @@ public class HomeworkFragment extends SherlockListFragment {
 
 	private void loadData() {
 		homeworkLessonList = new ArrayList<Lesson>();
-		for (Lesson[] lessons : LessonManager.getInstance(this.getActivity()).lessons) {
+		for (Lesson[] lessons : LessonManager.getInstance(this.getActivity()).getLessons()) {
 			for (Lesson lesson : lessons) {
 				if (lesson != null && lesson.hasHomework)
 					homeworkLessonList.add(lesson);

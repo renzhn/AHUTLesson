@@ -10,8 +10,7 @@
         android:theme="@style/AHUTLesson"
         android:allowBackup="true" >
         <activity
-			android:name=".MainActivity" 
-			android:uiOptions="splitActionBarWhenNarrow" >
+			android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -34,8 +33,7 @@
         </activity>
         <activity
             android:name=".LessonActivity"
-            android:label="课程讨论" 
-			android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="课程讨论" >
         </activity>
         <activity
             android:name=".ThreadActivity"
@@ -63,18 +61,15 @@
         </activity>
         <activity
             android:name=".NewThreadActivity"
-            android:label="发表帖子" 
-			android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="发表帖子" >
         </activity>
         <activity
             android:name=".NewMessageActivity"
-            android:label="发送消息" 
-			android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="发送消息"  >
         </activity>
         <activity
             android:name=".LessonDetailActivity"
-            android:label="课程详情" 
-			android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="课程详情" >
         </activity>
         <activity
             android:name=".PreferenceActivity"
@@ -83,8 +78,7 @@
         </activity>
         <activity
             android:name=".EditLessonActivity"
-            android:label="编辑课程"
-			android:uiOptions="splitActionBarWhenNarrow" >
+            android:label="编辑课程" >
         </activity>
         <activity
             android:name=".AboutActivity"
@@ -98,7 +92,7 @@
         <activity
             android:name="com.ahutlesson.android.AlarmActivity"
             android:label="上课提醒"
-            android:theme="@style/Theme.Sherlock.Light.Dialog" >
+            android:theme="@android:style/Theme.Dialog" >
         </activity>
 
         <receiver

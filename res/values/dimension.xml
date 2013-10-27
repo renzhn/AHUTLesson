@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-   <dimen name="calendar_border_margin">1dp</dimen>
+   <dimen name="calendar_border_margin">3dp</dimen>
    <dimen name="weekname_size">14dp</dimen>
    <dimen name="weekname_margin">1dp</dimen>  
    <dimen name="lessonname_size">14dp</dimen> 

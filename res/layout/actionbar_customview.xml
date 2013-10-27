@@ -13,8 +13,7 @@
         android:paddingRight="8dp"
         android:singleLine="true"
         android:ellipsize="end"
-		android:textSize="16sp"
-		android:textColor="#fff" >
+		android:textSize="16sp"  >
     </TextView>
 
 </RelativeLayout>

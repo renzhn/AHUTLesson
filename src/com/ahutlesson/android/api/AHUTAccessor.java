@@ -367,10 +367,6 @@ public class AHUTAccessor {
 			data = ret.getJSONObject("data");
 			unreadInfo.unreadMessage = data.getInt("m");
 			unreadInfo.unreadNotice = data.getInt("n");
-			JSONArray lidListHasNew = data.getJSONArray("l");
-			for(int i = 0; i < lidListHasNew.length(); i++) {
-				unreadInfo.unreadLessonForum.add(lidListHasNew.getInt(i));
-			}
 		} catch (Exception e) {
 			throw new Exception("解析数据出错");
 		}
