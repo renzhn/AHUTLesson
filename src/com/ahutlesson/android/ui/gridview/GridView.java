@@ -38,12 +38,10 @@ public class GridView extends View {
 	
 	private float markX = -1, markY = -1;
 	private int markWeek = -1, markTime = -1, markLid = -1;
-
-	public static final int NORMALTIME = 0;
-	public static final int BUSYTIME = 1;
-	public static final int NEXTTIME = 2;
+	
 	public static final int BLUE = Color.parseColor("#3F92D2");
 	public static final int RED = Color.parseColor("#B22222");
+	public static final int BLACK = Color.parseColor("#333333");
 	
 	//if lessons is null, load local
 	public GridView(Context _context, Lesson[][] _lessons) {
@@ -130,13 +128,7 @@ public class GridView extends View {
 			if (lessonsOfDay != null) {
 				for (Lesson lesson:lessonsOfDay) {
 					if (lesson != null) {
-						if (lessonCanAppend(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time)) {
-							drawLesson(lesson, true);
-						}else if (lessonIsAppended(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)) {
-							//四节课的课间且是后两节课，不用画了
-						}else{
-							drawLesson(lesson, timetable.isNowHavingLesson(lesson) == 0);
-						}
+						drawLesson(lesson);
 					}
 				}
 			}
@@ -182,12 +174,12 @@ public class GridView extends View {
 	}
 
 	private float textLeft, textTop;
-	private void drawLesson(Lesson lesson,boolean busytime) {
+	private void drawLesson(Lesson lesson) {
 		// 一般课程
 		if(lesson == null) return;
 		paint.setTextSize(lessonNameSize);
 		int week,time;
-		int appendMode = lessonAppendMode(lesson,lessons);
+		int appendMode = lessonAppendMode(lesson, lessons);
 		if(appendMode == -1){
 			return;//后两节课不画
 		}
@@ -206,6 +198,9 @@ public class GridView extends View {
 			if(timetable.isNowHavingLesson(nextlesson) == 0) return;
 			cellHeight *= 2;
 			lessonNameMaxLines = (int) ((cellHeight - lessonPlaceMaxLength * 2 - lessonNamePlaceGap) / lessonNameSize);
+			Paint bgPaint = new Paint();
+			bgPaint.setColor(Color.WHITE);
+			canvas.drawLine(leftBorder[week], bottomBorder[time], leftBorder[week + 1], bottomBorder[time], bgPaint);
 		}
 		
 		float length = name.length();
@@ -234,12 +229,10 @@ public class GridView extends View {
 		//画课程名
 		textTop = topBorder[time] + (cellHeight - lessonPlaceSize * placeLines - lessonNamePlaceGap + lessonNameSize * lines) / 2; //课程名最后一行的底部Y
 		
-		if (lesson.hasHomework) {
-			paint.setColor(Color.parseColor("#CE5600"));
-		} else if (!lesson.isInRange(context)) {
+		if (!lesson.isInRange(context)) {
 			paint.setARGB(30, 0, 0, 0);
 		} else {
-			paint.setColor(Color.BLACK);
+			paint.setColor(BLACK);
 		}
 		
 		String text;
@@ -262,7 +255,6 @@ public class GridView extends View {
 		}else{
 			paint.setColor(Color.parseColor("#B22222"));
 		}
-
 
 		textTop += lessonNamePlaceGap + lessonPlaceSize;
 		
@@ -310,7 +302,7 @@ public class GridView extends View {
 		// 后两节有课
 		if (lesson.time == 0 || lesson.time == 2) {
 			Lesson appendLesson =  lessons[lesson.week][lesson.time + 1];
-			if (appendLesson!=null) {
+			if (appendLesson != null) {
 				if (appendLesson.name.contentEquals(lesson.name)) {
 					return true;
 				}
