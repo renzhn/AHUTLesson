@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="weekname_size">13sp</dimen>
+    <dimen name="weekname_margin">4dp</dimen> 
+    <dimen name="lessonname_size">13sp</dimen> 
+    <dimen name="lessonplace_size">11sp</dimen> 
+</resources>

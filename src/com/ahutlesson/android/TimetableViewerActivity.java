@@ -20,14 +20,15 @@ public class TimetableViewerActivity extends BaseActivity {
 
 	private static final int MENU_RETYPE = 0;
 	
-	private GridView scheduleView;
+	private String uxh;
+	private GridView gridView;
 	private Lesson lessons[][] = new Lesson[7][5];
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		String uxh = getIntent().getExtras().getString("uxh");
+		uxh = getIntent().getExtras().getString("uxh");
 		if(ValidateHelper.isXH(uxh)){
 			new GetLessons().execute(uxh);
 		}else{
@@ -49,7 +50,7 @@ public class TimetableViewerActivity extends BaseActivity {
 		@Override
 		protected LessonsInfo doInBackground(String... para) {
 			try {
-				return AHUTAccessor.getInstance(TimetableViewerActivity.this).getLessons(para[0]);
+				return AHUTAccessor.getInstance(TimetableViewerActivity.this).getLessons(uxh);
 			} catch (Exception e) {
 				alert(e.getMessage());
 				return null;
@@ -71,8 +72,8 @@ public class TimetableViewerActivity extends BaseActivity {
 
 	private void showLessons() {
 		if (lessons != null)
-			scheduleView = new GridView(TimetableViewerActivity.this, lessons);
-		setContentView(scheduleView);
+			gridView = new GridView(TimetableViewerActivity.this, lessons);
+		setContentView(gridView);
 	}
 	
 	@Override
@@ -104,9 +105,9 @@ public class TimetableViewerActivity extends BaseActivity {
 								int whichButton) {
 							String xh = input.getText().toString();
 							if(ValidateHelper.isXH(xh)){
-								actionBar.setTitle(xh + "的课表");
+								uxh = xh;
 								lessons = new Lesson[7][5];
-								new GetLessons().execute(xh);
+								new GetLessons().execute();
 							}else{
 								alert("不是有效的学号");
 							}

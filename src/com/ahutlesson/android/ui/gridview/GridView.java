@@ -22,18 +22,19 @@ public class GridView extends View {
 	private Lesson[][] lessons;
 	private Timetable timetable;
 	private boolean isLocal = true;
-	private static final int ORIENTATION_LANDSCAPE = 2;
-	private boolean isLandscapeMode = false;
 
-	public static final float WEEKNAME_SIZE = 28;
-	public static final float WEEKNAME_MARGIN = 10;
-	public static final float LESSONNAME_SIZE = 29;
-	public static final float LESSONPLACE_SIZE = 24;
-	public static final float LESSONNAME_PLACE_GAP = 24;
-	public static final float LANDSCAPEMODE_LESSONNAME_PLACE_GAP = 5;
-	public static final int LANDSCAPEMODE_LESSONNAME_MAX_LENGTH = 6;
-
-	public static final float GAPHEIGHT = 28;
+	private float weekNameSize;
+	private float weekNameMargin;
+	private float lessonNameSize;
+	private float lessonNameMargin;
+	private float lessonPlaceSize;
+	private float lessonNamePlaceGap;
+	private float timePartitionGap;
+	
+	private int lessonNameMaxLines = 3; 
+	private int lessonNameMaxLength = 2;// 每行
+	private int lessonPlaceMaxLength = 4;
+	private int lessonPlaceMaxLines = 2; 
 	
 	private float markX = -1, markY = -1;
 	private int markWeek = -1, markTime = -1, markLid = -1;
@@ -44,13 +45,13 @@ public class GridView extends View {
 	public static final int BLUE = Color.parseColor("#3F92D2");
 	public static final int RED = Color.parseColor("#B22222");
 	
-	//if lessons null, load local
+	//if lessons is null, load local
 	public GridView(Context _context, Lesson[][] _lessons) {
 		super(_context);
 		context = _context;
 		lessons = _lessons;
 		if (lessons == null) {
-			isLocal = false;
+			isLocal = true;
 			lessons = LessonManager.getInstance(context).getLessons();
 		}
 		timetable = Timetable.getInstance(context);
@@ -58,78 +59,83 @@ public class GridView extends View {
 
 	private Paint paint = new Paint();
 	private Canvas canvas;
-	private float left, top;
+	private float top, weekNameHeight;
 	private float viewWidth, viewHeight, calendarWidth, calendarHeight, cellWidth, cellHeight;
 	private float leftBorder[] = new float[8];
 	private float topBorder[] = new float[6];
 	private float bottomBorder[] = new float[6];
+	private Paint weekNamePaint, linePaint;
 
 	@Override
 	protected void onDraw(Canvas _canvas) {
 		canvas = _canvas;
-		isLandscapeMode = (getResources().getConfiguration().orientation == ORIENTATION_LANDSCAPE);
 		paint.setAntiAlias(true);
-
+		
+		weekNameSize = context.getResources().getDimension(R.dimen.weekname_size);
+		weekNameMargin = context.getResources().getDimension(R.dimen.weekname_margin);
+		lessonNameSize = context.getResources().getDimension(R.dimen.lessonname_size);
+		lessonPlaceSize = context.getResources().getDimension(R.dimen.lessonplace_size);
+		
         viewWidth = this.getMeasuredWidth();
         viewHeight = this.getMeasuredHeight();
 
 		calendarWidth = viewWidth;
 		cellWidth = calendarWidth / 7;
-        
-		left = 0;
-		top = 0;
-		String[] weekNames = context.getResources().getStringArray(R.array.week_name);
-		paint.setTextSize(WEEKNAME_SIZE);
-		paint.setColor(BLUE);
-		float endYOfWeek = WEEKNAME_SIZE + WEEKNAME_MARGIN * 2 + 4;
-		canvas.drawRect(0, 0, canvas.getWidth(), endYOfWeek, paint);
-		
-		paint.setColor(Color.WHITE);
-		for (int i = 0; i < 7; i++) {
-			left = cellWidth * i
-					+ (cellWidth - paint.measureText(weekNames[i])) / 2;
-			canvas.drawText(weekNames[i], left, top + paint.getTextSize()
-					+ WEEKNAME_MARGIN, paint);
-		}
+		lessonNameMargin = cellWidth / 15;
+		weekNameHeight = weekNameSize + weekNameMargin * 2 + 5;
 
-		//开始画课表
-        left = 0;
-        top = endYOfWeek;
+        top = weekNameHeight;
         
-		calendarHeight = viewHeight - top;
-		cellHeight = (calendarHeight - GAPHEIGHT * 2) / 5;
+		calendarHeight = viewHeight - weekNameHeight;
+		timePartitionGap = calendarHeight / 40;
+		cellHeight = (calendarHeight - timePartitionGap * 2) / 5;
+		lessonNamePlaceGap = cellHeight / 20;
 		
 		for (int i = 0; i < 8; i++) {
 			leftBorder[i] = cellWidth * i;
 		}
 		for (int i = 0; i < 6; i++) {
 			topBorder[i] = top + cellHeight * i;
-			if (i > 1) topBorder[i] += GAPHEIGHT;
-			if (i > 3) topBorder[i] += GAPHEIGHT;
+			if (i > 1) topBorder[i] += timePartitionGap;
+			if (i > 3) topBorder[i] += timePartitionGap;
 		}
 		for (int i = 0; i < 6; i++) {
 			bottomBorder[i] = top + cellHeight * (i + 1);
-			if (i > 1) bottomBorder[i] += GAPHEIGHT;
-			if (i > 3) bottomBorder[i] += GAPHEIGHT;
+			if (i > 1) bottomBorder[i] += timePartitionGap;
+			if (i > 3) bottomBorder[i] += timePartitionGap;
 		}
+
+		weekNamePaint = new Paint();
+		weekNamePaint.setTextSize(weekNameSize);
+		weekNamePaint.setColor(BLUE);
 		
+		linePaint = new Paint();
+		linePaint.setARGB(80, 0, 0, 0);
+		linePaint.setStyle(Style.STROKE);
+		linePaint.setPathEffect(new DashPathEffect(new float[] {5,10}, 0));
+		
+		//画周几
+		paint.setColor(Color.WHITE);
+		paint.setTextSize(weekNameSize);
+		drawWeekNames();
+
 		//画线
 		drawLines();
-
-		//画背景
-		drawBackgrounds();
 		
 		//课程名和地点
-		for(Lesson[] lessonsOfDay : lessons){
-			if(lessonsOfDay != null){
-				for(Lesson lesson:lessonsOfDay){
-					if(lesson != null){
-						if(lessonCanAppend(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time)){
+		lessonNameMaxLength = (int) ((cellWidth - lessonNameMargin) / (float) lessonNameSize);
+		lessonPlaceMaxLength = (int) (cellWidth / (float) lessonPlaceSize);
+		lessonNameMaxLines = (int) ((cellHeight - lessonPlaceMaxLength * 2 - lessonNamePlaceGap) / lessonNameSize);
+		for (Lesson[] lessonsOfDay : lessons) {
+			if (lessonsOfDay != null) {
+				for (Lesson lesson:lessonsOfDay) {
+					if (lesson != null) {
+						if (lessonCanAppend(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time)) {
 							drawLesson(lesson, true);
-						}else if(lessonIsAppended(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)){
+						}else if (lessonIsAppended(lesson,lessons) && timetable.nowIsAtLessonBreak(lesson.week, lesson.time - 1)) {
 							//四节课的课间且是后两节课，不用画了
 						}else{
-							drawLesson(lesson, timetable.isNowHavingLesson(lesson) == 0 ? true : false);
+							drawLesson(lesson, timetable.isNowHavingLesson(lesson) == 0);
 						}
 					}
 				}
@@ -144,34 +150,18 @@ public class GridView extends View {
 		});
 	}
 
-	private void drawBackgrounds() {
-		//处理在四节课课间的情况
-		Lesson tLesson = lessons[timetable.weekDay][0];
-		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && timetable.nowIsAtLessonBreak(timetable.weekDay, 0)){
-			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
-		}
-		tLesson = lessons[timetable.weekDay][2];
-		if(tLesson!=null && lessonCanAppend(tLesson,lessons) && timetable.nowIsAtLessonBreak(timetable.weekDay, 2)){
-			drawBackground(tLesson.week, tLesson.time, BUSYTIME, lessonAppendMode(tLesson,lessons));
-		}
+	private void drawWeekNames() {
+		String[] weekNames = context.getResources().getStringArray(R.array.week_name);
+		canvas.drawRect(0, 0, canvas.getWidth(), weekNameHeight, weekNamePaint);
 		
-		Lesson lesson = getLesson(timetable.weekDay, timetable.getCurrentTimeBlock(Timetable.DelayDefault));
-		if(lesson!=null && lesson.isInRange(context)) {
-			drawBackground(lesson.week, lesson.time, BUSYTIME, lessonAppendMode(lesson,lessons));
-		}
-
-		lesson = timetable.getNextLesson(Timetable.DelayDefault);
-		if(lesson!=null){
-			drawBackground(lesson.week, lesson.time, NEXTTIME, lessonAppendMode(lesson,lessons));
+		float weekNameXOffset = (cellWidth - paint.measureText(weekNames[0])) / 2; //都是两个字
+		float weekNameYOffset = weekNameSize + weekNameMargin;
+		for (int i = 0; i < 7; i++) {
+			canvas.drawText(weekNames[i], leftBorder[i] + weekNameXOffset, weekNameYOffset, paint);
 		}
 	}
-	
+
 	private void drawLines() {
-		Paint linePaint = new Paint();
-		linePaint.setARGB(80, 0, 0, 0);
-		linePaint.setStyle(Style.STROKE);
-		linePaint.setPathEffect(new DashPathEffect(new float[] {5,10}, 0));
-		
 		//画横线
 		for (int i = 1; i < 5; i++) {
 			canvas.drawLine(0, topBorder[i], calendarWidth, topBorder[i], linePaint);
@@ -191,43 +181,11 @@ public class GridView extends View {
 		}
 	}
 
-	private void drawBackground(int week, int time, int mode, int append) {
-		// 画下节课背景
-		// append:0 默认 1 扩展下节 -1 扩展上节
-		Paint paintbg = new Paint();
-		switch(mode){
-		case NORMALTIME:
-			paintbg.setColor(Color.WHITE);
-			break;
-		case BUSYTIME:
-			paintbg.setColor(RED);
-			break;
-		case NEXTTIME:
-			paintbg.setARGB(30, 0, 0, 0);
-			break;
-		}
-		switch (append){
-		case 0:
-			canvas.drawRect(leftBorder[week], topBorder[time], leftBorder[week + 1], topBorder[time + 1], paintbg);
-			break;
-		case 1:
-			canvas.drawRect(leftBorder[week], topBorder[time], leftBorder[week + 1], topBorder[time + 2], paintbg);
-			break;
-		case -1:
-			break;
-		}
-	}
-
 	private float textLeft, textTop;
 	private void drawLesson(Lesson lesson,boolean busytime) {
-		if (isLandscapeMode) {
-			drawLessonInLandscapeMode(lesson, busytime);
-			return;
-		}
-		
 		// 一般课程
 		if(lesson == null) return;
-		paint.setTextSize(LESSONNAME_SIZE);
+		paint.setTextSize(lessonNameSize);
 		int week,time;
 		int appendMode = lessonAppendMode(lesson,lessons);
 		if(appendMode == -1){
@@ -239,175 +197,99 @@ public class GridView extends View {
 		String place;
 		LessonName name = (lesson.alias.contentEquals("")) ? new LessonName(lesson.name) : new LessonName(lesson.alias);
 		place = lesson.place;
-		textLeft = left + cellWidth * week
-				+ cellWidth / 2 - paint.getTextSize();
-		Lesson mlesson;
-		switch(appendMode){
-		case 0:
-			textTop = topBorder[time] + cellHeight / 2 - LESSONNAME_SIZE;
-			break;
-		case 1:
-			mlesson = getLesson(week, time + 1);
-			if(mlesson == null) return;
-			if(timetable.isNowHavingLesson(mlesson) == 0) return;
-			textTop = topBorder[time] + cellHeight - LESSONNAME_SIZE;
-			break;
-		case -1:
-			break;
-		}
+		float cellHeight = this.cellHeight;
+		int lessonNameMaxLines = this.lessonNameMaxLines;
 
-		// 画课程名
-		if (busytime){
-			if(lesson.isInRange(context)){
-				paint.setColor(Color.WHITE);
-			}else{
-				paint.setColor(Color.TRANSPARENT);
-			}
-		}else if(lesson.hasHomework){
-			paint.setColor(Color.parseColor("#CE5600"));
-		}else if(!lesson.isInRange(context)){
-			paint.setARGB(30, 0, 0, 0);
-		}else{
-			paint.setColor(Color.BLACK);
+		if (appendMode == 1) {
+			Lesson nextlesson = getLesson(week, time + 1);
+			if(nextlesson == null) return;
+			if(timetable.isNowHavingLesson(nextlesson) == 0) return;
+			cellHeight *= 2;
+			lessonNameMaxLines = (int) ((cellHeight - lessonPlaceMaxLength * 2 - lessonNamePlaceGap) / lessonNameSize);
 		}
 		
 		float length = name.length();
-		
-		if (length <= 2) {
-			canvas.drawText(name.toString(), textLeft, textTop, paint);
-		} else if (length <= 4) {
-			canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
-			canvas.drawText(name.substring(2), textLeft,
-					textTop + (paint.getTextSize() + 5), paint);
-		} else {
-			canvas.drawText(name.substring(0, 2), textLeft, textTop, paint);
-			canvas.drawText(name.substring(2, 4), textLeft,
-					textTop + (paint.getTextSize() + 5), paint);
-		}
-		// 画地点
-		paint.setTextSize(LESSONPLACE_SIZE);
-		if (busytime){
-			if(lesson.isInRange(context)){
-				paint.setColor(Color.WHITE);
-			}else{
-				paint.setColor(Color.TRANSPARENT);
-			}
-		}else if(!lesson.isInRange(context)){
-			paint.setARGB(30, 0, 0, 0);
-		}else{
-			paint.setColor(Color.parseColor("#B22222"));
+		int lines = (int) ((length - 1) / (float) lessonNameMaxLength) + 1;
+		if (lines > lessonNameMaxLines) lines = lessonNameMaxLines;
+		int lessonNameMaxLength = this.lessonNameMaxLength;
+		if (lessonNameMaxLength == 3 && length >= 4 && length <= 5) {
+			lines = 2;
+			lessonNameMaxLength = 2;
 		}
 
-		switch(appendMode){
-		case 0:
-			textTop = topBorder[time] + cellHeight / 2 + LESSONPLACE_SIZE + LESSONNAME_PLACE_GAP;
-			break;
-		case 1:
-			textTop = topBorder[time] + cellHeight + LESSONPLACE_SIZE + LESSONNAME_PLACE_GAP;
-			break;
-		}
+		int placeLines = 2;
+		boolean isRoomNumber = false;
+		if (place.length() <= lessonPlaceMaxLength) {
+			placeLines = 1;
+		} else if (place.length() <= lessonPlaceMaxLength * lessonPlaceMaxLines) {
+			if (isInt(place.substring(place.length() - 3, place.length()))) {
+				isRoomNumber = true;
+				placeLines = 2;
 
-		if (place.length() <= 4) {
-			textLeft = leftBorder[week] + (cellWidth - paint.measureText(place)) / 2;
-			canvas.drawText(place, textLeft, textTop, paint);
-		} else if (place.length() <= 8) {
-			String roomNumber = place.substring(place.length() - 3,
-					place.length());
-			if (isInt(roomNumber)) {
-				textLeft = leftBorder[week] + (cellWidth - paint.measureText(place.substring(0,
-								place.length() - 3))) / 2;
-				canvas.drawText(place.substring(0, place.length() - 3),
-						textLeft, textTop, paint);
-				textLeft = leftBorder[week] + (cellWidth - paint.measureText(roomNumber)) / 2;
-				canvas.drawText(roomNumber, textLeft,
-						textTop + LESSONPLACE_SIZE, paint);
 			} else {
-				textLeft = leftBorder[week] + (cellWidth - paint.measureText(place.substring(0, 4)))
-						/ 2;
-				canvas.drawText(place.substring(0, 4), textLeft, textTop, paint);
-				textLeft = leftBorder[week] + (cellWidth - paint.measureText(place.substring(4)))
-						/ 2;
-				canvas.drawText(place.substring(4), textLeft,
-						textTop + LESSONPLACE_SIZE, paint);
+				placeLines = lessonPlaceMaxLines;
 			}
-		}
-	}
-
-	private void drawLessonInLandscapeMode(Lesson lesson,boolean busytime) {
-		// 一般课程
-		if(lesson == null) return;
-		paint.setTextSize(LESSONNAME_SIZE);
-		int week,time;
-		int appendMode = lessonAppendMode(lesson,lessons);
-		if(appendMode == -1){
-			return;//后两节课不画
 		}
 		
-		week = lesson.week;
-		time = lesson.time;
-		String place;
-		LessonName name = (lesson.alias.contentEquals("")) ? new LessonName(lesson.name) : new LessonName(lesson.alias);
-		String drawName = (name.length() > LANDSCAPEMODE_LESSONNAME_MAX_LENGTH) ? name.substring(0, LANDSCAPEMODE_LESSONNAME_MAX_LENGTH).toString() : name.toString();
-		place = lesson.place;
-		Lesson mlesson;
-		switch(appendMode){
-		case 0:
-			textTop = topBorder[time] + cellHeight / 2;
-			break;
-		case 1:
-			mlesson = getLesson(week, time + 1);
-			if(mlesson == null) return;
-			if(timetable.isNowHavingLesson(mlesson) == 0) return;
-			textTop = topBorder[time] + cellHeight;
-			break;
-		case -1:
-			break;
-		}
-
-		// 画课程名
-		if (busytime){
-			if(lesson.isInRange(context)){
-				paint.setColor(Color.WHITE);
-			}else{
-				paint.setColor(Color.TRANSPARENT);
-			}
-		}else if(lesson.hasHomework){
+		//画课程名
+		textTop = topBorder[time] + (cellHeight - lessonPlaceSize * placeLines - lessonNamePlaceGap + lessonNameSize * lines) / 2; //课程名最后一行的底部Y
+		
+		if (lesson.hasHomework) {
 			paint.setColor(Color.parseColor("#CE5600"));
-		}else if(!lesson.isInRange(context)){
+		} else if (!lesson.isInRange(context)) {
 			paint.setARGB(30, 0, 0, 0);
-		}else{
+		} else {
 			paint.setColor(Color.BLACK);
 		}
+		
+		String text;
+		for (int i = 0; i < lines; i++) {
+			if (name.length() <= lessonNameMaxLength) {
+				text = name.toString();
+			} else {
+				text = name.substring(0, lessonNameMaxLength);
+				name = new LessonName(name.substring(lessonNameMaxLength));
+			}
+			textLeft = leftBorder[week] + (cellWidth - paint.measureText(text)) / 2;
+			canvas.drawText(text, textLeft, textTop - lessonNameSize * (lines - i - 1), paint);
+		}
 
-		textLeft = leftBorder[week] +  (cellWidth - paint.measureText(drawName)) / 2;
-		canvas.drawText(drawName, textLeft, textTop, paint);
 
 		// 画地点
-		paint.setTextSize(LESSONPLACE_SIZE);
-		if (busytime){
-			if(lesson.isInRange(context)){
-				paint.setColor(Color.WHITE);
-			}else{
-				paint.setColor(Color.TRANSPARENT);
-			}
-		}else if(!lesson.isInRange(context)){
+		paint.setTextSize(lessonPlaceSize);
+		if(!lesson.isInRange(context)){
 			paint.setARGB(30, 0, 0, 0);
 		}else{
 			paint.setColor(Color.parseColor("#B22222"));
 		}
 
-		switch(appendMode){
-		case 0:
-			textTop = topBorder[time] + cellHeight / 2 + LESSONPLACE_SIZE + LANDSCAPEMODE_LESSONNAME_PLACE_GAP;
-			break;
-		case 1:
-			textTop = topBorder[time] + cellHeight + LESSONPLACE_SIZE + LANDSCAPEMODE_LESSONNAME_PLACE_GAP;
-			break;
-		}
-		
-		textLeft = leftBorder[week] + (cellWidth - paint.measureText(place)) / 2;
-		canvas.drawText(place, textLeft, textTop, paint);
 
+		textTop += lessonNamePlaceGap + lessonPlaceSize;
+		
+		if (place.length() <= lessonPlaceMaxLength) {
+			textLeft = leftBorder[week] + (cellWidth - paint.measureText(place)) / 2;
+			canvas.drawText(place, textLeft, textTop, paint);
+		} else if (place.length() <= lessonPlaceMaxLength * lessonPlaceMaxLines) {
+			if (isRoomNumber) {
+				String building = place.substring(0, place.length() - 3);
+				String roomNumber = place.substring(place.length() - 3, place.length());
+				if (building.length() > lessonPlaceMaxLength)
+					building = building.substring(0, lessonPlaceMaxLength);
+				textLeft = leftBorder[week] + (cellWidth - paint.measureText(building)) / 2;
+				canvas.drawText(building, textLeft, textTop, paint);
+				textLeft = leftBorder[week] + (cellWidth - paint.measureText(roomNumber)) / 2;
+				canvas.drawText(roomNumber, textLeft, textTop + lessonPlaceSize, paint);
+			} else {
+				text = place.substring(0, lessonPlaceMaxLength);
+				textLeft = leftBorder[week] + (cellWidth - paint.measureText(text)) / 2;
+				canvas.drawText(text, textLeft, textTop, paint);
+				text = place.substring(lessonPlaceMaxLength);
+				if (text.length() > lessonPlaceMaxLength)
+					text = text.substring(0, lessonPlaceMaxLength);
+				textLeft = leftBorder[week] + (cellWidth - paint.measureText(text)) / 2;
+				canvas.drawText(text, textLeft, textTop + lessonPlaceSize, paint);
+			}
+		}
 	}
 
 	private boolean isInt(String str) {
@@ -420,7 +302,7 @@ public class GridView extends View {
 	}
 	
 	private Lesson getLesson(int week, int time){
-		return (!Timetable.isValidWeek(week)||!Timetable.isValidTime(time))? null : lessons[week][time];
+		return (!Timetable.isValidWeekTime(week, time))? null : lessons[week][time];
 	}
 	
 
