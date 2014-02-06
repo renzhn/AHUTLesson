@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.ahutlesson.android"
-    android:versionCode="18"
-    android:versionName="2.1.3" >
+    android:versionCode="19"
+    android:versionName="2.2" >
 
     <application
         android:icon="@drawable/ahutlesson"
@@ -79,9 +79,12 @@
         
 		<service
 		    android:name="com.umeng.common.net.DownloadingService"
-		    android:exported="true"
 		    android:process=":DownloadingService" >
 		</service>
+		<activity 
+		    android:name="com.umeng.update.UpdateDialogActivity"
+		    android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+		</activity>
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="511dbbfd52701523af00002e" >
@@ -91,7 +94,7 @@
             android:value="Default" />
     </application>
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="14"/>
+    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19"/>
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
