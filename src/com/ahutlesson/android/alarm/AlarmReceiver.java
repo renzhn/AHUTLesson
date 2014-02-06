@@ -1,7 +1,7 @@
 package com.ahutlesson.android.alarm;
 
 import com.ahutlesson.android.AlarmActivity;
-import com.ahutlesson.android.LessonDetailActivity;
+import com.ahutlesson.android.MainActivity;
 import com.ahutlesson.android.R;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonManager;
@@ -80,9 +80,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 		if (lesson == null)
 			return;
 		
-		Intent i = new Intent(context, LessonDetailActivity.class);
-		i.putExtra("week", week);
-		i.putExtra("time", time);
+		Intent i = new Intent(context, MainActivity.class);
 		i.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, i, PendingIntent.FLAG_UPDATE_CURRENT);
 		

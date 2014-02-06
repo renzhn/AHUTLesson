@@ -109,7 +109,7 @@ public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 			v.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Toast.makeText(context, "TA还没有在课友网注册，快邀请TA吧！",
+					Toast.makeText(context, "TA还没有注册课友，快邀请TA吧！",
 							Toast.LENGTH_SHORT).show();
 				}
 			});

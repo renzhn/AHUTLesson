@@ -22,6 +22,7 @@ public class UserActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		enableHomeButton();
 		setContentView(R.layout.user);
 		
 		uxh = getIntent().getExtras().getString("uxh");
@@ -35,16 +36,6 @@ public class UserActivity extends BaseActivity {
 		tvSignature = (TextView) findViewById(R.id.tvSignature);
 		tvUserInfo = (TextView) findViewById(R.id.tvUserInfo);
 		ivAvatar = (ImageView) findViewById(R.id.ivAvatar);
-		
-		Button btnSendMessage = (Button) findViewById(R.id.btnSendMessage);
-		btnSendMessage.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Intent i = new Intent(UserActivity.this, NewMessageActivity.class);
-				i.putExtra("uxh", uxh);
-				startActivity(i);
-			}
-		});
 		
 		Button btnViewTimetable = (Button) findViewById(R.id.btnViewTimetable);
 		btnViewTimetable.setOnClickListener(new View.OnClickListener() {

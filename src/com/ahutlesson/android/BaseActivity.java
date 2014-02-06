@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
@@ -19,7 +20,6 @@ public class BaseActivity extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		actionBar = getSupportActionBar();
-		enableHomeButton();
 		super.onCreate(savedInstanceState);
 	}
 
@@ -57,9 +57,20 @@ public class BaseActivity extends SherlockActivity {
 		runOnUiThread(new Runnable(){
 			@Override
 			public void run() {
-				new AlertDialog.Builder(BaseActivity.this)
-				.setMessage(message)
-				.setPositiveButton(R.string.ok, null).show();
+				if (android.os.Build.VERSION.SDK_INT >= 11) {
+					TextView showText = new TextView(BaseActivity.this);
+					showText.setTextSize(18);
+					showText.setPadding(10, 10, 10, 10);
+					showText.setText(message);
+					showText.setTextIsSelectable(true);
+					new AlertDialog.Builder(BaseActivity.this)
+					.setView(showText)
+					.setPositiveButton(R.string.ok, null).show();
+				} else {
+					new AlertDialog.Builder(BaseActivity.this)
+					.setMessage(message)
+					.setPositiveButton(R.string.ok, null).show();
+				}
 			}
 		});
 	}

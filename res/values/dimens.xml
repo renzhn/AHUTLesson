@@ -3,5 +3,8 @@
     <dimen name="weekname_size">13sp</dimen>
     <dimen name="weekname_margin">4dp</dimen> 
     <dimen name="lessonname_size">13sp</dimen> 
-    <dimen name="lessonplace_size">11sp</dimen> 
+    <dimen name="lessonplace_size">11sp</dimen>
+    <dimen name="lessoninfo_size">12sp</dimen>
+    <dimen name="lessoninfo_padding">2dp</dimen>
+    <dimen name="lessoninfo_padding_left">4dp</dimen>
 </resources>

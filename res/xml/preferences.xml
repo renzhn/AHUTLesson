@@ -144,12 +144,4 @@
             </PreferenceCategory>
         </PreferenceScreen>
     </PreferenceCategory>
-    <PreferenceCategory android:title="关于" >
-        <Preference
-            android:key="about"
-            android:title="关于软件" >
-            <intent android:action="com.ahutlesson.android.ABOUTACTIVITY" />
-        </Preference>
-    </PreferenceCategory>
-
 </PreferenceScreen>

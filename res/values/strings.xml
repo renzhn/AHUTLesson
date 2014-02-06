@@ -7,13 +7,14 @@
     <string name="changelog_ok_button">知道了</string>
     
 	<string name="about">关于</string>
+    <string name="setting">设置</string>
+    <string name="add">添加</string>
     <string name="edit">编辑</string>
     <string name="delete">删除</string>
     <string name="cancel">取消</string>
     <string name="ok">确定</string>
     <string name="refresh">刷新</string>
-    <string name="compose">发帖</string>
-    <string name="reply">回复</string>
+    <string name="timetable_viewer">课表浏览器</string>
     
     <string name="neterror">连接服务器失败，请检查手机网络设置</string>
   

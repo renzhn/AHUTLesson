@@ -21,14 +21,12 @@ public class EditLessonActivity extends BaseActivity {
 	private EditText etLessonName, etLessonAlias, etLessonPlace, etTeacherName,
 			etStartWeek, etEndWeek;
 
-	private LessonManager lessonManager;
 	private Timetable timetable;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		lessonManager = LessonManager.getInstance(this);
 		timetable = Timetable.getInstance(this);
 		
 		week = getIntent().getExtras().getInt("week");
@@ -50,7 +48,7 @@ public class EditLessonActivity extends BaseActivity {
 		etStartWeek = (EditText) findViewById(R.id.etStartWeek);
 		etEndWeek = (EditText) findViewById(R.id.etEndWeek);
 
-		lesson = lessonManager.getLessonAt(week, time);
+		lesson = LessonManager.getInstance(this).getLessonAt(week, time);
 		if (lesson != null) {
 			etLessonName.setText(lesson.name);
 			etLessonAlias.setText(lesson.alias);
@@ -85,7 +83,7 @@ public class EditLessonActivity extends BaseActivity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
 		case R.id.menu_edit_ok:
-			EditLesson();
+			editLesson();
 			finish();
 			return true;
 		case R.id.menu_edit_cancel:
@@ -96,27 +94,36 @@ public class EditLessonActivity extends BaseActivity {
 		}
 	}
 
-	protected void EditLesson() {
+	protected void editLesson() {
 		lessonName = etLessonName.getText().toString();
 		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
 		teacherName = etTeacherName.getText().toString();
 		String startWeekText = etStartWeek.getText().toString();
 		String endWeekText = etEndWeek.getText().toString();
-		if (startWeekText.contentEquals("")) {
-			startWeek = timetable.numOfWeek;
-		} else {
+		try {
 			startWeek = Integer.valueOf(startWeekText);
-		}
-
-		if (endWeekText.contentEquals("")) {
-			endWeek = startWeek + 1;
-		} else {
 			endWeek = Integer.valueOf(endWeekText);
+			if (startWeek > endWeek) throw new Exception("结束周不能小于起始周");
+		} catch (NumberFormatException ex) {
+			makeToast("起始周或结束周输入错误");
+			startWeek = timetable.numOfWeek;
+			endWeek = startWeek + 1;
+		} catch (Exception ex) {
+			makeToast(ex.getMessage());
+			startWeek = timetable.numOfWeek;
+			endWeek = startWeek + 1;
 		}
-
-		lessonManager.EditLessonAt(lessonName, lessonAlias, lessonPlace,
+		
+		LessonManager lessonManager = LessonManager.getInstance(this);
+		if (lessonManager.hasLessonAt(week, time)) {
+			lessonManager.editLessonAt(lessonName, lessonAlias, lessonPlace,
 				teacherName, startWeek, endWeek, week, time);
+		} else {
+			lessonManager.addLessonAt(lessonName, lessonAlias, lessonPlace,
+					teacherName, startWeek, endWeek, week, time);
+		}
+		
 		MainActivity.needRefresh = true;
 	}
 

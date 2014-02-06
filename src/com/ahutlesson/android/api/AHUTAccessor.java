@@ -30,25 +30,17 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.CompressFormat;
 
-import com.ahutlesson.android.LessonActivity;
-import com.ahutlesson.android.MessageActivity;
-import com.ahutlesson.android.NoticeActivity;
-import com.ahutlesson.android.ThreadActivity;
-import com.ahutlesson.android.model.ForumThread;
+import com.ahutlesson.android.LessonmateActivity;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonListInfo;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Lessonmate;
 import com.ahutlesson.android.model.LessonsInfo;
-import com.ahutlesson.android.model.Message;
-import com.ahutlesson.android.model.Notice;
-import com.ahutlesson.android.model.Post;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.model.User;
 import com.ahutlesson.android.model.UserInfo;
 import com.ahutlesson.android.model.UserManager;
-import com.ahutlesson.android.service.UnreadInfo;
 import com.ahutlesson.android.utils.ChangeLog;
 import com.ahutlesson.android.utils.Util;
 
@@ -65,9 +57,9 @@ public class AHUTAccessor {
 	private static final int TIMEOUT_SOCKET = 10000;
 	private HttpParams httpParameters = new BasicHttpParams();;
 
-	public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+	//public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
 
-	//public static final String SERVER_URL = "http://192.168.1.2/lesson/";
+	public static final String SERVER_URL = "http://192.168.170.50/lesson/";
 
 	public AHUTAccessor(Context context0) {
 		context = context0;
@@ -221,7 +213,7 @@ public class AHUTAccessor {
 				int endweek = lesson.getInt("endweek");
 				String lessonPlace = lesson.getString("place");
 				lessonList.add(new Lesson(lid, lessonName, lessonAlias,
-						lessonPlace, teacherName, startweek, endweek, null,
+						lessonPlace, teacherName, startweek, endweek,
 						week, time));
 			}
 			if(lessonList.size() == 0)	throw new Exception("该学号课表为空，请检查学号是否有误或者反馈");
@@ -247,204 +239,10 @@ public class AHUTAccessor {
 		return lessonsInfo;
 	}
 
-	public ArrayList<ForumThread> getForumThreadList(int lid, int page)
-			throws Exception {
-		JSONObject ret = getURL(SERVER_URL + "api/thread.handler.php?act=get&lid="
-				+ lid + "&page=" + page);
-		ArrayList<ForumThread> threadList = new ArrayList<ForumThread>();
-		try {
-			JSONArray threads = ret.getJSONArray("data");
-			JSONObject thread;
-			for (int i = 0; i < threads.length(); i++) {
-				thread = threads.getJSONObject(i);
-				ForumThread t = new ForumThread();
-				t.tid = thread.getInt("tid");
-				t.lid = thread.getInt("lid");
-				t.subject = thread.getString("subject");
-				t.uxh = thread.getString("uxh");
-				t.uname = thread.getString("uname");
-				t.view = thread.getInt("view");
-				t.reply = thread.getInt("reply");
-				t.top = (thread.getInt("top") == 1);
-				t.setReplyTime(thread.getString("lastreply_time"));
-				threadList.add(t);
-			}
-			JSONObject metadata = ret.getJSONObject("metadata");
-			LessonActivity.totalThreads = metadata.getInt("total");
-			LessonActivity.threadsPerPage = metadata.getInt("threadsPerPage");
-			LessonActivity.totalThreadPages = (int) Math.floor((LessonActivity.totalThreads - 1) / LessonActivity.threadsPerPage + 1);
-			return threadList;
-		} catch (Exception ex) {
-			throw new Exception("解析数据出错");
-		}
-	}
-
-	public ArrayList<Post> getPostList(int tid, int page) throws Exception {
-		JSONObject ret = getURL(SERVER_URL + "api/post.handler.php?act=get&tid="
-				+ tid + "&page=" + page);
-		ArrayList<Post> postList = new ArrayList<Post>();
-		try {
-			JSONArray posts = ret.getJSONArray("data");
-			JSONObject post;
-			for (int i = 0; i < posts.length(); i++) {
-				post = posts.getJSONObject(i);
-				Post p = new Post();
-				p.pid = post.getInt("pid");
-				p.tid = post.getInt("tid");
-				p.uxh = post.getString("uxh");
-				p.uname = post.getString("uname");
-				p.content = post.getString("content");
-				p.floor = post.getInt("floor");
-				p.hasAvatar = (post.getInt("has_avatar") == 1);
-				p.setPostTime(post.getString("post_time"));
-				postList.add(p);
-			}
-			JSONObject metadata = ret.getJSONObject("metadata");
-			ThreadActivity.totalPosts = metadata.getInt("total");
-			ThreadActivity.postsPerPage = metadata.getInt("postsPerPage");
-			ThreadActivity.currentPage = metadata.getInt("currentPage");
-			ThreadActivity.totalPages =  (int) Math.floor((ThreadActivity.totalPosts - 1) / ThreadActivity.postsPerPage + 1);
-			return postList;
-		} catch (Exception ex) {
-			throw new Exception("解析帖子列表数据出错");
-		}
-	}
-
-	public Post getPost(int pid) throws Exception {
-		JSONObject ret = getURL(SERVER_URL + "api/post.handler.php?act=getbypid&pid="
-				+ pid);
-		try {
-			Post p = new Post();
-			JSONObject post = ret.getJSONObject("data");
-			p.pid = post.getInt("pid");
-			p.tid = post.getInt("tid");
-			p.uxh = post.getString("uxh");
-			p.uname = post.getString("uname");
-			p.content = post.getString("content");
-			p.floor = post.getInt("floor");
-			p.hasAvatar = (post.getInt("has_avatar") == 1);
-			p.setPostTime(post.getString("post_time"));
-			return p;
-		} catch (Exception ex) {
-			throw new Exception("解析帖子数据出错");
-		}
-	}
-	
 	public static String getAvatarURI(String uxh) {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
-	public int postThread(int lid, String subject, String content)
-			throws Exception {
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("l", String.valueOf(lid)));
-		params.add(new BasicNameValuePair("s", subject));
-		params.add(new BasicNameValuePair("c", content));
-		JSONObject ret =  postURL(SERVER_URL
-				+ "api/thread.handler.php?act=new&from=mobile", params);
-		int newtid = ret.getInt("data");
-		return newtid;
-	}
-
-	public void postReply(int tid, String content) throws Exception {
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("t", String.valueOf(tid)));
-		params.add(new BasicNameValuePair("c", content));
-		postURL(SERVER_URL
-				+ "api/post.handler.php?act=new&from=mobile", params);
-		return;
-	}
-
-	public UnreadInfo getUnreadCount() throws Exception {
-		UnreadInfo unreadInfo = new UnreadInfo();
-		String uxh = UserManager.getInstance(context).getUserXH();
-		if (uxh == null)
-			throw new Exception("你还没有登录");
-		JSONObject ret = getURL(SERVER_URL
-				+ "api/notice.handler.php?act=getunreadcount&uxh=" + uxh);
-		try {
-			JSONObject data;
-			data = ret.getJSONObject("data");
-			unreadInfo.unreadMessage = data.getInt("m");
-			unreadInfo.unreadNotice = data.getInt("n");
-		} catch (Exception e) {
-			throw new Exception("解析数据出错");
-		}
-		return unreadInfo;
-	}
-
-	public ArrayList<Notice> getNoticeList(int page) throws Exception {
-		JSONObject ret = getURL(SERVER_URL
-				+ "api/notice.handler.php?act=getnotice&page=" + page);
-		ArrayList<Notice> list = new ArrayList<Notice>();
-		try {
-			JSONArray notices = ret.getJSONArray("data");
-			JSONObject notice;
-			for (int i = 0; i < notices.length(); i++) {
-				notice = notices.getJSONObject(i);
-				Notice n = new Notice();
-				n.nid = notice.getInt("nid");
-				n.tid = notice.getInt("tid");
-				n.pid = notice.getInt("pid");
-				n.subject = notice.getString("subject");
-				n.read = (notice.getInt("read") == 1);
-				n.toUxh = notice.getString("to_uxh");
-				n.fromUxh = notice.getString("from_uxh");
-				n.uname = notice.getString("uname");
-				n.hasAvatar = (notice.getInt("has_avatar") == 1);
-				n.setPostTime(notice.getString("post_time"));
-				list.add(n);
-			}
-			JSONObject metadata = ret.getJSONObject("metadata");
-			NoticeActivity.noticesPerPage = metadata.getInt("noticesPerPage");
-			return list;
-		} catch (Exception ex) {
-			throw new Exception("解析数据出错");
-		}
-	}
-
-	public ArrayList<Message> getMessageList(int page) throws Exception {
-		JSONObject ret = getURL(SERVER_URL
-				+ "api/notice.handler.php?act=getmessage&page=" + page);
-		ArrayList<Message> list = new ArrayList<Message>();
-		try {
-			JSONArray messages = ret.getJSONArray("data");
-			JSONObject message;
-			for (int i = 0; i < messages.length(); i++) {
-				message = messages.getJSONObject(i);
-				Message m = new Message();
-				m.mid = message.getInt("mid");
-				m.title = message.getString("title");
-				m.content = message.getString("content");
-				m.read = (message.getInt("read") == 1);
-				m.toUxh = message.getString("to_uxh");
-				m.fromUxh = message.getString("from_uxh");
-				m.uname = message.getString("uname");
-				m.hasAvatar = (message.getInt("has_avatar") == 1);
-				m.setPostTime(message.getString("post_time"));
-				list.add(m);
-			}
-			JSONObject metadata = ret.getJSONObject("metadata");
-			MessageActivity.messagesPerPage = metadata.getInt("messagesPerPage");
-			return list;
-		} catch (Exception ex) {
-			throw new Exception("解析数据出错");
-		}
-	}
-
-	public void deleteMessage(int mid) throws Exception {
-		getURL(SERVER_URL + "api/notice.handler.php?act=deletemessage&mid="
-				+ mid);
-	}
-
-	public void sendMessage(String uxh, String title, String content)
-			throws Exception {
-		List<NameValuePair> params = new ArrayList<NameValuePair>();
-		params.add(new BasicNameValuePair("u", uxh));
-		params.add(new BasicNameValuePair("t", title));
-		params.add(new BasicNameValuePair("c", content));
-		postURL(SERVER_URL + "api/notice.handler.php?act=sendmessage", params);
-	}
 
 	public ArrayList<Lessonmate> getLessonmateList(int lid, int page)
 			throws Exception {
@@ -467,7 +265,7 @@ public class AHUTAccessor {
 				list.add(l);
 			}
 			JSONObject metadata = ret.getJSONObject("metadata");
-			LessonActivity.lessonmatesPerPage = metadata.getInt("lessonmatesPerPage");
+			LessonmateActivity.lessonmatesPerPage = metadata.getInt("lessonmatesPerPage");
 			return list;
 		} catch (Exception ex) {
 			throw new Exception("解析数据出错");

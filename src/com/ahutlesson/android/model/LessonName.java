@@ -1,4 +1,4 @@
-package com.ahutlesson.android.ui.gridview;
+package com.ahutlesson.android.model;
 
 public class LessonName {
 	//used in lessonName drawing

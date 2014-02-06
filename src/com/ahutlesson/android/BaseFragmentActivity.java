@@ -7,8 +7,6 @@ import android.widget.Toast;
 
 import com.actionbarsherlock.app.ActionBar;
 import com.actionbarsherlock.app.SherlockFragmentActivity;
-import com.actionbarsherlock.view.Menu;
-import com.actionbarsherlock.view.MenuInflater;
 import com.actionbarsherlock.view.MenuItem;
 
 public class BaseFragmentActivity extends SherlockFragmentActivity {
@@ -32,29 +30,6 @@ public class BaseFragmentActivity extends SherlockFragmentActivity {
 		if (actionBar == null) return;
 		actionBar.setHomeButtonEnabled(false);
 		actionBar.setDisplayHomeAsUpEnabled(false);
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getSupportMenuInflater();
-		inflater.inflate(R.menu.main, menu);
-		return super.onCreateOptionsMenu(menu);
-	}
-
-	@Override
-	public boolean onMenuItemSelected(int featureId, MenuItem item) {
-		switch (item.getItemId()) {
-		case R.id.menu_setting:
-			Intent i = new Intent(this, PreferenceActivity.class);
-			startActivity(i);
-			return true;
-		case R.id.menu_exit:
-			this.finish();
-			return true;
-		default:
-			return super.onMenuItemSelected(featureId, item);
-		}
-
 	}
 
 	@Override

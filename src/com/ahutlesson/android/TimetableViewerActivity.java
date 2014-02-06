@@ -13,7 +13,7 @@ import com.actionbarsherlock.view.MenuItem;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonsInfo;
-import com.ahutlesson.android.ui.gridview.GridView;
+import com.ahutlesson.android.ui.GridView;
 import com.ahutlesson.android.utils.ValidateHelper;
 
 public class TimetableViewerActivity extends BaseActivity {
@@ -27,6 +27,7 @@ public class TimetableViewerActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		enableHomeButton();
 
 		uxh = getIntent().getExtras().getString("uxh");
 		if(ValidateHelper.isXH(uxh)){
@@ -97,6 +98,7 @@ public class TimetableViewerActivity extends BaseActivity {
 
 			final EditText input = new EditText(this);
 			input.setInputType(InputType.TYPE_CLASS_NUMBER);
+			input.setText(uxh);
 			alert.setView(input);
 
 			alert.setPositiveButton(R.string.ok,

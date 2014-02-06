@@ -31,6 +31,7 @@ public class AboutActivity extends BaseActivity {
 		btnCheckUpdate.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
+				makeToast("开始检查更新...");
 				UmengUpdateAgent.setUpdateOnlyWifi(false);
 				UmengUpdateAgent.setUpdateAutoPopup(false);
 				UmengUpdateAgent.setUpdateListener(new UmengUpdateListener() {

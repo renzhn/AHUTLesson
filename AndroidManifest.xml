@@ -32,24 +32,8 @@
             android:label="课表浏览器" >
         </activity>
         <activity
-            android:name=".LessonActivity"
-            android:label="课程讨论" >
-        </activity>
-        <activity
-            android:name=".ThreadActivity"
-            android:label="查看帖子" >
-        </activity>
-        <activity
-            android:name=".PostActivity"
-            android:label="查看回复" >
-        </activity>
-        <activity
-            android:name=".MessageActivity"
-            android:label="我的消息" >
-        </activity>
-        <activity
-            android:name=".NoticeActivity"
-            android:label="我的提醒" >
+            android:name=".LessonmateActivity"
+            android:label="课友列表" >
         </activity>
         <activity
             android:name=".ProfileActivity"
@@ -58,18 +42,6 @@
         <activity
             android:name=".UserActivity"
             android:label="查看资料" >
-        </activity>
-        <activity
-            android:name=".NewThreadActivity"
-            android:label="发表帖子" >
-        </activity>
-        <activity
-            android:name=".NewMessageActivity"
-            android:label="发送消息"  >
-        </activity>
-        <activity
-            android:name=".LessonDetailActivity"
-            android:label="课程详情" >
         </activity>
         <activity
             android:name=".PreferenceActivity"
@@ -105,7 +77,6 @@
             android:name="com.ahutlesson.android.alarm.SoundNormalReceiver"
             android:process=":remote" />
         
-		<service android:name="com.ahutlesson.android.service.CheckUnreadService"/>
 		<service
 		    android:name="com.umeng.common.net.DownloadingService"
 		    android:exported="true"
