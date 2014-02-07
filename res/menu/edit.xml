@@ -4,13 +4,13 @@
     <item
         android:id="@+id/menu_edit_cancel"
         android:title="@string/cancel"
-        android:icon="@drawable/ic_menu_cancel"
+        android:icon="@drawable/ic_action_cancel"
         android:showAsAction="ifRoom|withText" ></item>
 
     <item
         android:id="@+id/menu_edit_ok"
         android:title="@string/ok"
-        android:icon="@drawable/ic_menu_ok"
+        android:icon="@drawable/ic_action_accept"
         android:showAsAction="ifRoom|withText" ></item>
 
 </menu>

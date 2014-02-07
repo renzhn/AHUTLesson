@@ -62,6 +62,8 @@
           android:id="@+id/tvSignature"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:ellipsize="end"
+          android:lines="1"
           android:minLines="1"
           android:text="个性签名啊签名"
           android:textColor="#666"

@@ -20,6 +20,7 @@ public class BaseActivity extends SherlockActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		actionBar = getSupportActionBar();
+		enableHomeButton();
 		super.onCreate(savedInstanceState);
 	}
 

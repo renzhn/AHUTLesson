@@ -7,6 +7,7 @@
     <string name="changelog_ok_button">知道了</string>
     
 	<string name="about">关于</string>
+	<string name="share">分享</string>
     <string name="setting">设置</string>
     <string name="add">添加</string>
     <string name="edit">编辑</string>
@@ -14,7 +15,10 @@
     <string name="cancel">取消</string>
     <string name="ok">确定</string>
     <string name="refresh">刷新</string>
+    <string name="profile">个人资料</string>
     <string name="timetable_viewer">课表浏览器</string>
+    
+    <string name="web_link">安工大微信助手公共账号: ahutapp\n课友网页版: http://ahutlesson.com\n我的新浪微博: http://weibo.com/ohrz</string>
     
     <string name="neterror">连接服务器失败，请检查手机网络设置</string>
   

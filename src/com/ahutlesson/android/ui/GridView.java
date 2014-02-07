@@ -75,31 +75,25 @@ public class GridView extends View {
 				showLessonInfo();
 			}
 		});
-		currentGridView = this;
 	}
 
-	private static GridView currentGridView;
-	
-	public static GridPosition getCurrentGridPosition() {
-		if (currentGridView == null) return null;
-		return currentGridView.calcGridPosition();
+	public GridPosition getCurrentGridPosition() {
+		return calcGridPosition();
 	}
 	
-	public static void updateLessonPosition(boolean showLessonBackgroundIfNoLesson) {
-		if (currentGridView == null) return;
-		currentGridView.showLessonBackgroundIfNoLesson = showLessonBackgroundIfNoLesson;
-		currentGridView.lessonPosition = currentGridView.calcGridPosition();
-		currentGridView.showLessonInfo = false;
-		currentGridView.invalidate();
+	public void updateLessonPosition(boolean showLessonBackgroundIfNoLesson) {
+		this.showLessonBackgroundIfNoLesson = showLessonBackgroundIfNoLesson;
+		lessonPosition = calcGridPosition();
+		showLessonInfo = false;
+		invalidate();
 	}
 	
-	public static void refreshView() {
-		if (currentGridView == null) return;
-		currentGridView.lessons = LessonManager.getInstance(currentGridView.context).getLessons();
-		currentGridView.showLessonInfo = false;
-		currentGridView.lessonPosition = null;
-		currentGridView.lesson = null;
-		currentGridView.invalidate();
+	public void refreshView() {
+		lessons = LessonManager.getInstance(context).getLessons();
+		showLessonInfo = false;
+		lessonPosition = null;
+		lesson = null;
+		invalidate();
 	}
 	
 	private TextPaint textPaint = new TextPaint();

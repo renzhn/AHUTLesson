@@ -47,8 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:gravity="center"
-        android:orientation="vertical" >
+        android:gravity="center" >
 
         <Button
             android:id="@+id/btnCheckUpdate"
@@ -60,15 +59,9 @@
             android:id="@+id/btnChangelog"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
+            android:layout_marginLeft="5dp"
             android:text="更新日志" />
 
-        <Button
-            android:id="@+id/btnShare"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="5dp"
-            android:text="分享" />
     </LinearLayout>
 
     <LinearLayout
@@ -84,7 +77,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:autoLink="web"
-            android:text="软件下载地址: http://ahutapp.com"
+            android:text="课友下载: http://ahutapp.com"
             android:textColor="#555"
             android:textSize="14sp" />
         
@@ -101,8 +94,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
+            android:autoLink="web"
+            android:text="我的微博: http://weibo.com/ohrz"
+            android:textColor="#555"
+            android:textSize="14sp" />
+        
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
             android:autoLink="email"
-            android:text="作者邮箱: renzhen999@gmail.com"
+            android:text="我的邮箱: renzhn@gmail.com"
             android:textColor="#555"
             android:textSize="14sp" />
         
@@ -110,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="By Renzhn@AHUT :: Copyright 2013"
+            android:text="By Renzhn@AHUT :: Copyright 2014"
             android:textColor="#555"
             android:textSize="12sp" />
 

@@ -26,7 +26,7 @@ public class EditLessonActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
+		
 		timetable = Timetable.getInstance(this);
 		
 		week = getIntent().getExtras().getInt("week");

@@ -38,7 +38,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 	
-	//http://stackoverflow.com/questions/8442147/how-to-delete-or-add-column-in-sqlite
+	// http://stackoverflow.com/questions/8442147/how-to-delete-or-add-column-in-sqlite
 	private void dropColumn(SQLiteDatabase db,
 	        String tableName,
 	        String createTableCmd,

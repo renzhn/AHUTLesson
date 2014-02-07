@@ -1,5 +1,6 @@
 package com.ahutlesson.android.model;
 
+import com.ahutlesson.android.MainActivity;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.utils.Util;
 
@@ -106,6 +107,7 @@ public class UserManager {
 		lessonManager.lessonlistToDB(lessonListInfo.lessonList);
 		lessonManager.setLessondbVersion(lessonListInfo.build);
 		Util.log("New Lessondb Build: " + lessonListInfo.build);
+		MainActivity.needRefresh = true;
 	}
 
 	public void updateUserInfo() throws Exception {

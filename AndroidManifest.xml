@@ -55,14 +55,13 @@
         <activity
             android:name=".AboutActivity"
             android:label="关于" >
-            <intent-filter>
-                <action android:name="com.ahutlesson.android.ABOUTACTIVITY" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
         </activity>
         <activity
-            android:name="com.ahutlesson.android.AlarmActivity"
+            android:name=".ShareActivity"
+            android:label="分享" >
+        </activity>
+        <activity
+            android:name=".AlarmActivity"
             android:label="上课提醒"
             android:theme="@android:style/Theme.Dialog" >
         </activity>

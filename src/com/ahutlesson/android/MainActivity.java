@@ -44,16 +44,17 @@ public class MainActivity extends BaseActivity {
 	private static final int MENU_TIMETABLEVIEWER = 1;
 	private static final int MENU_SETTING = 2;
 	private static final int MENU_ABOUT = 3;
+	private static final int MENU_SHARE = 4;
 
-	private static final int MENU_ADD = 6;
-	private static final int MENU_EDIT = 4;
-	private static final int MENU_DELETE = 5;
+	private static final int MENU_ADD = 10;
+	private static final int MENU_EDIT = 11;
+	private static final int MENU_DELETE = 12;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		GlobalContext.mainActivity = this;
-
+		disableHomeButton();
 		// if not login
 		UserManager userManager = UserManager.getInstance(this);
 		if (!userManager.hasLocalUser()) {
@@ -117,7 +118,7 @@ public class MainActivity extends BaseActivity {
 		super.onResume();
 
 		if (needRefresh) {
-			GridView.refreshView();
+			refreshView();
 			refreshDateInfo();
 		}
 
@@ -132,8 +133,11 @@ public class MainActivity extends BaseActivity {
 	}
 
 	public boolean onCreateOptionsMenu(Menu menu) {
-		menu.add(Menu.NONE, MENU_TIMETABLEVIEWER, Menu.NONE,
-				R.string.timetable_viewer);
+		menu.add(Menu.NONE, MENU_SHARE, Menu.NONE, R.string.share)
+			.setIcon(R.drawable.ic_action_share)
+			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
+		menu.add(Menu.NONE, MENU_PROFILE, Menu.NONE, R.string.profile);
+		menu.add(Menu.NONE, MENU_TIMETABLEVIEWER, Menu.NONE, R.string.timetable_viewer);
 		menu.add(Menu.NONE, MENU_SETTING, Menu.NONE, R.string.setting);
 		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, R.string.about);
 		return true;
@@ -142,8 +146,14 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
 		switch (item.getItemId()) {
+		case MENU_SHARE:
+			openActivity(ShareActivity.class);
+			return true;
 		case MENU_PROFILE:
 			openActivity(ProfileActivity.class);
+			return true;
+		case MENU_ABOUT:
+			openActivity(AboutActivity.class);
 			return true;
 		case MENU_TIMETABLEVIEWER:
 			AlertDialog.Builder alert = new AlertDialog.Builder(this);
@@ -173,9 +183,6 @@ public class MainActivity extends BaseActivity {
 		case MENU_SETTING:
 			openActivity(PreferenceActivity.class);
 			return true;
-		case MENU_ABOUT:
-			openActivity(AboutActivity.class);
-			return true;
 		default:
 			return super.onMenuItemSelected(featureId, item);
 		}
@@ -184,14 +191,15 @@ public class MainActivity extends BaseActivity {
 	@Override
 	public void onCreateContextMenu(ContextMenu menu, View v,
 			ContextMenuInfo menuInfo) {
-		GridPosition position = GridView.getCurrentGridPosition();
+		if (gridView == null) return;
+		GridPosition position = gridView.getCurrentGridPosition();
 		if (position == null) return;
 		if (position.hasLesson) {
-			GridView.updateLessonPosition(false);
+			gridView.updateLessonPosition(false);
 			menu.add(0, MENU_EDIT, Menu.NONE, R.string.edit);
 			menu.add(0, MENU_DELETE, Menu.NONE, R.string.delete);
 		} else {
-			GridView.updateLessonPosition(true);
+			gridView.updateLessonPosition(true);
 			menu.add(0, MENU_ADD, Menu.NONE, R.string.add);
 		}
 		super.onCreateContextMenu(menu, v, menuInfo);
@@ -199,7 +207,8 @@ public class MainActivity extends BaseActivity {
 
 	@Override
 	public boolean onContextItemSelected(android.view.MenuItem item) {
-		GridPosition position = GridView.getCurrentGridPosition();
+		if (gridView == null) return false;
+		GridPosition position = gridView.getCurrentGridPosition();
 		if (position == null) return false;
 		switch (item.getItemId()) {
 		case MENU_ADD:
@@ -217,13 +226,22 @@ public class MainActivity extends BaseActivity {
 		case MENU_DELETE:
 			LessonManager.getInstance(this).deleteLessonAt(position.week,
 					position.time);
-			GridView.refreshView();
+			refreshView();
 			break;
 		}
 		return super.onContextItemSelected(item);
 	}
+	
+	@Override
+	public void onContextMenuClosed(android.view.Menu menu) {
+		refreshView();
+		super.onContextMenuClosed(menu);
+	}
 
-	// 日期信息
+	public void refreshView() {
+		if (gridView != null) gridView.refreshView();
+	}
+	
 	public String dateInfo() {
 		Timetable timetable = Timetable.getInstance(this);
 		int numOfWeek = timetable.numOfWeek;
@@ -250,7 +268,7 @@ public class MainActivity extends BaseActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							GridView.refreshView();
+							refreshView();
 						}
 					});
 					String latestLessondbVer = ret

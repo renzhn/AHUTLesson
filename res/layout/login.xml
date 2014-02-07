@@ -14,26 +14,26 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="10dp" >
-       
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="10dp"
                 android:text="登录已有帐号"
                 android:textAppearance="?android:attr/textAppearanceMedium" />
-            
+
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:paddingTop="3dp"
                 android:text="此帐号与课友网（ahutlesson.com）互通" />
-            
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:orientation="vertical"
-                android:padding="10dp"
-                android:gravity="center" >
+                android:padding="10dp" >
 
                 <EditText
                     android:id="@+id/etLoginXH"
@@ -67,10 +67,17 @@
                     android:layout_marginTop="10dp"
                     android:text="注册新帐号"
                     android:textSize="18sp" />
-                
             </LinearLayout>
-            
-            
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="40dp"
+                android:autoLink="web"
+                android:gravity="center"
+                android:lineSpacingExtra="5dp"
+                android:text="@string/web_link" />
         </LinearLayout>
     </ScrollView>
 

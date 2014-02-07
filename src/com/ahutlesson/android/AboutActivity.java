@@ -5,7 +5,6 @@ import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
 import com.umeng.update.UpdateResponse;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -16,8 +15,9 @@ public class AboutActivity extends BaseActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);	
+		
 		setContentView(R.layout.about);
-
+		
 		final ChangeLog cl = new ChangeLog(AboutActivity.this);
 		
 		TextView tvVersion = (TextView) findViewById(R.id.tvVersion);
@@ -26,7 +26,6 @@ public class AboutActivity extends BaseActivity {
 		
 		Button btnCheckUpdate = (Button) findViewById(R.id.btnCheckUpdate);
 		Button btnChangelog = (Button) findViewById(R.id.btnChangelog);
-		Button btnShare = (Button) findViewById(R.id.btnShare);
 		
 		btnCheckUpdate.setOnClickListener(new View.OnClickListener() {
 			@Override
@@ -59,16 +58,6 @@ public class AboutActivity extends BaseActivity {
 			@Override
 			public void onClick(View arg0) {
 				cl.getFullLogDialog().show();
-			}
-		});
-		
-		btnShare.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				Intent intent = new Intent(Intent.ACTION_SEND);
-				intent.setType("text/plain");
-				intent.putExtra(Intent.EXTRA_TEXT, "课友下载地址：http://ahutapp.com/");
-				startActivity(Intent.createChooser(intent, "分享到"));
 			}
 		});
 		

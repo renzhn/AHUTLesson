@@ -9,6 +9,7 @@ import java.util.List;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.User;
 import com.ahutlesson.android.model.UserManager;
+import com.ahutlesson.android.utils.GlobalContext;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.app.AlertDialog;
@@ -47,7 +48,9 @@ public class ProfileActivity extends BaseActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.profile);
-		actionBar.setIcon(R.drawable.account);
+		actionBar.setIcon(R.drawable.ic_action_person);
+		
+		GlobalContext.initImageLoader();
 		
 		userManager = UserManager.getInstance(this);
 		user = userManager.getUser();
@@ -228,7 +231,7 @@ public class ProfileActivity extends BaseActivity {
 				ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(user.uxh), ivAvatar);
 				makeToast("上传成功！");
 			}else{
-				alert(result);
+				alert(result + "\n提示：如果手机无法上传，可以到ahutlesson.com网页版上传");
 			}
 		}
 		

@@ -30,7 +30,7 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 		super.onCreate(savedInstanceState);
 
 		getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-		getSupportActionBar().setIcon(R.drawable.preference);
+		getSupportActionBar().setIcon(R.drawable.ic_action_settings);
 		
 		addPreferencesFromResource(R.xml.preferences);
 
@@ -187,7 +187,7 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 			progressDialog.dismiss();
 			if(ret != null) {
 				alert(ret);
-			}else{
+			} else {
 				alert("œ¬‘ÿ≥…π¶£°");
 			}
 		}
