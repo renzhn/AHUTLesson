@@ -16,26 +16,27 @@
             android:orientation="vertical" >
 
             <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginBottom="10dp"
+                android:text="课友下载"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#0083D6" />
+            
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="12dp"
                 android:text="邀请小伙伴们一起安装使用课友吧！"
                 android:textSize="16sp" />
             
-            <TextView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_marginBottom="10dp"
-                android:text="方法一"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#33D800" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:autoLink="web"
-                android:text="用手机浏览器扫描下面的二维码"
+                android:text="用手机浏览器扫描下面的二维码或者打开网址http://ahutapp.com"
                 android:textColor="#555"
                 android:textSize="14sp" />
 
@@ -50,18 +51,25 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="20dp"
-                android:text="方法二"
+                android:text="课友微信公共账号"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textColor="#FF9C00" />
-
+                android:textColor="#FE00AD" />
+            
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:autoLink="web"
-                android:text="打开网址下载: http://ahutapp.com"
+                android:text="用微信扫一扫下面的二维码或者查找公共账号ahutapp"
                 android:textColor="#555"
                 android:textSize="14sp" />
+            
+            <ImageView
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/weixin_ahutapp_qrcode" />
+            
         </LinearLayout>
     </ScrollView>
 
