@@ -15,22 +15,21 @@ import android.widget.Toast;
 
 public class SoundNormalReceiver extends BroadcastReceiver {
 	
-	private SharedPreferences preferences;
-	
 	@Override
-	public void onReceive(Context context, Intent arg1) {
+	public void onReceive(Context context, Intent intent) {
 		
-		preferences = PreferenceManager.getDefaultSharedPreferences(context);
-		AudioManager am=(AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-		am.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
+		AudioManager am = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
 		
-		AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-		Toast.makeText(context, "已恢复正常音量", Toast.LENGTH_LONG).show();
+		int ringerMode = preferences.getInt("savedRingerMode", AudioManager.RINGER_MODE_NORMAL);
+		am.setRingerMode(ringerMode);
+		Toast.makeText(context, "已恢复上课前声音模式", Toast.LENGTH_LONG).show();
 		
 		//设置下一次
 		boolean enableSilent = preferences.getBoolean("SilentMode", true);
 		Lesson nextLesson = Timetable.getInstance(context).getNextLesson(Timetable.DelaySilent);
-		if(nextLesson!=null && enableSilent){
+		if(nextLesson != null && enableSilent){
+			AlarmManager alarm = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
 			long alarmTime = Timetable.getInstance(context).getNextTime(nextLesson, Timetable.DelaySilent);
 			Intent intent1 = new Intent(context,SoundSilentReceiver.class);
 			intent1.putExtra("week", nextLesson.week);
