@@ -27,13 +27,13 @@ public class GridView extends View {
 	private Lesson[][] lessons;
 	private Timetable timetable;
 
-	private float weekNameSize;
-	private float weekNameMargin;
-	private float lessonNameSize;
-	private float lessonNameMargin;
-	private float lessonPlaceSize;
-	private float lessonNamePlaceGap;
-	private float timePartitionGap;
+	private static float weekNameSize;
+	private static float weekNameMargin;
+	private static float lessonNameSize;
+	private static float lessonNameMargin;
+	private static float lessonPlaceSize;
+	private static float lessonNamePlaceGap;
+	private static float timePartitionGap;
 	
 	private int lessonNameMaxLines = 3; 
 	private int lessonNameMaxLength = 2;// Ã¿ÐÐ
@@ -47,16 +47,17 @@ public class GridView extends View {
 	public static final int BLACK = Color.parseColor("#333333");
 	public static final int LIGHTBLUE = Color.parseColor("#ECEFF2");
 
+	private static float lessonInfoSize;
+	private static float lessonInfoPadding;
+	private static float lessonInfoPaddingLeft;
+	private static NinePatchDrawable lessonInfoBackground;
+	
 	private GridPosition lessonPosition;
 	private Lesson lesson;
 	private int lessonInfoX, lessonInfoY;
-	private float lessonInfoSize;
-	private float lessonInfoPadding;
-	private float lessonInfoPaddingLeft;
 	private Rect lessonInfoBorder = new Rect();
 	private boolean showLessonInfo = false;
 	private boolean lessonInfoIsShowing = false;
-	private NinePatchDrawable lessonInfoBackground;
 	private boolean showLessonBackgroundIfNoLesson;
 	
 	//if lessons is null, load local
@@ -94,6 +95,7 @@ public class GridView extends View {
 		lessonPosition = null;
 		lesson = null;
 		invalidate();
+		lessonInfoIsShowing = false;
 	}
 	
 	private TextPaint textPaint = new TextPaint();
@@ -242,7 +244,7 @@ public class GridView extends View {
 		week = lesson.week;
 		time = lesson.time;
 		String place;
-		LessonName name = (lesson.alias.contentEquals("")) ? new LessonName(lesson.name) : new LessonName(lesson.alias);
+		LessonName name = new LessonName(lesson.name);
 		place = lesson.place;
 		float cellHeight = this.cellHeight;
 		int lessonNameMaxLines = this.lessonNameMaxLines;
@@ -474,6 +476,7 @@ public class GridView extends View {
 	}
 	
 	private void openLessonmateActivity() {
+		if (lessonPosition == null) return;
 		if (lessonPosition.lid == 0) return;
 		Intent i = new Intent(context, LessonmateActivity.class);
 		i.putExtra("lid", lessonPosition.lid);

@@ -51,7 +51,7 @@
                 android:layout_height="match_parent"
                 android:layout_marginBottom="10dp"
                 android:layout_marginTop="20dp"
-                android:text="课友微信公共账号"
+                android:text="关注课友微信公众号"
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:textColor="#FE00AD" />
             
@@ -60,7 +60,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
                 android:autoLink="web"
-                android:text="用微信扫一扫下面的二维码或者查找公共账号ahutapp"
+                android:text="用微信扫一扫下面的二维码或者查找公众号ahutapp"
                 android:textColor="#555"
                 android:textSize="14sp" />
             

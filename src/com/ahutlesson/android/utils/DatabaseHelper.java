@@ -19,7 +19,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	
 	public static final int dbVersion = 2;
 	public static final String lessonTableName = "lesson";
-	public static final String createLessonTableCmd = "CREATE TABLE " + lessonTableName + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, lid INTEGER, lessonname TEXT, lessonalias TEXT, teachername TEXT, lessonplace TEXT, startweek INTEGER, endweek INTEGER, week INTEGER ,time INTEGER);";
+	public static final String createLessonTableCmd = "CREATE TABLE " + lessonTableName + " (_id INTEGER PRIMARY KEY AUTOINCREMENT, lid INTEGER, lessonname TEXT, teachername TEXT, lessonplace TEXT, startweek INTEGER, endweek INTEGER, week INTEGER ,time INTEGER);";
 	
 	public DatabaseHelper(Context baseContext, String name) {
 		super(baseContext,name,null,dbVersion);
@@ -34,7 +34,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
 		if (oldVersion == 1 && newVersion == 2) {
-			dropColumn(db, lessonTableName, createLessonTableCmd, new String[]{ "homework"});
+			dropColumn(db, lessonTableName, createLessonTableCmd, new String[]{ "homework" , "lessonalias" });
 		}
 	}
 	

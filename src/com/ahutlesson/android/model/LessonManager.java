@@ -44,12 +44,11 @@ public class LessonManager {
 		lessons = new Lesson[7][5];
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 
-		String name, alias, place, teacher;
+		String name, place, teacher;
 		int lid, week, time, startweek, endweek;
 
-		String[] cols = { "lid", "lessonname", "lessonalias", "lessonplace",
-				"teachername", "startweek", "endweek", "week",
-				"time" };
+		String[] cols = { "lid", "lessonname", "lessonplace", "teachername",
+				"startweek", "endweek", "week", "time" };
 		Cursor lessoninfo = db.query("lesson", cols, null, null, null, null,
 				null);
 		if (lessoninfo.getCount() == 0) {
@@ -61,14 +60,13 @@ public class LessonManager {
 		do {
 			lid = lessoninfo.getInt(0);
 			name = lessoninfo.getString(1);
-			alias = lessoninfo.getString(2);
-			place = lessoninfo.getString(3);
-			teacher = lessoninfo.getString(4);
-			startweek = lessoninfo.getInt(5);
-			endweek = lessoninfo.getInt(6);
-			week = lessoninfo.getInt(7);
-			time = lessoninfo.getInt(8);
-			lessons[week][time] = new Lesson(lid, name, alias, place, teacher,
+			place = lessoninfo.getString(2);
+			teacher = lessoninfo.getString(3);
+			startweek = lessoninfo.getInt(4);
+			endweek = lessoninfo.getInt(5);
+			week = lessoninfo.getInt(6);
+			time = lessoninfo.getInt(7);
+			lessons[week][time] = new Lesson(lid, name, place, teacher,
 					startweek, endweek, week, time);
 		} while (lessoninfo.moveToNext());
 		lessoninfo.close();
@@ -97,52 +95,49 @@ public class LessonManager {
 		return (getLessonAt(week, time) != null);
 	}
 
-	public void addLessonAt(String lessonName, String lessonAlias,
-			String lessonPlace, String teacherName, int startWeek, int endWeek,
-			int week, int time) {
+	public void addLessonAt(String lessonName, String lessonPlace,
+			String teacherName, int startWeek, int endWeek, int week, int time) {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		ContentValues cv = new ContentValues();
 		cv.put("lid", 0);
 		cv.put("week", week);
 		cv.put("time", time);
 		cv.put("lessonname", lessonName);
-		cv.put("lessonalias", lessonAlias);
 		cv.put("lessonplace", lessonPlace);
 		cv.put("startweek", startWeek);
 		cv.put("endweek", endWeek);
 		cv.put("teachername", teacherName);
 		db.insert("lesson", null, cv);
 		db.close();
-		lessonManager.lessons[week][time] = new Lesson(0, lessonName, lessonAlias,
-				lessonPlace, teacherName, startWeek, endWeek, week,
-				time);;
+		lessonManager.lessons[week][time] = new Lesson(0, lessonName,
+				lessonPlace, teacherName, startWeek, endWeek, week, time);
+		;
 	}
 
-	public void editLessonAt(String lessonName, String lessonAlias,
-			String lessonPlace, String teacherName, int startWeek, int endWeek,
-			int week, int time) {
+	public void editLessonAt(String lessonName, String lessonPlace,
+			String teacherName, int startWeek, int endWeek, int week, int time) {
 		SQLiteDatabase db = DBHelper.getWritableDatabase();
 		LessonManager lessonManager = LessonManager.getInstance(context);
 		Lesson lesson = getLessonAt(week, time);
-		if (lesson == null) return;
+		if (lesson == null)
+			return;
 		Cursor result;
 		String[] selection = { "lessonname" };
 		result = db.query("lesson", selection, "week=" + String.valueOf(week)
 				+ " and time=" + String.valueOf(time), null, null, null, null);
 		ContentValues cv = new ContentValues();
 		cv.put("lessonname", lessonName);
-		cv.put("lessonalias", lessonAlias);
 		cv.put("lessonplace", lessonPlace);
 		cv.put("startweek", startWeek);
 		cv.put("endweek", endWeek);
 		cv.put("teachername", teacherName);
-		db.update("lesson", cv, "week=" + String.valueOf(week)
-				+ " AND time=" + String.valueOf(time), null);
+		db.update("lesson", cv, "week=" + String.valueOf(week) + " AND time="
+				+ String.valueOf(time), null);
 		result.close();
 		db.close();
-		lessonManager.lessons[week][time] = new Lesson(lesson.lid, lessonName, lessonAlias,
-				lessonPlace, teacherName, startWeek, endWeek, week,
-				time);;
+		lessonManager.lessons[week][time] = new Lesson(lesson.lid, lessonName,
+				lessonPlace, teacherName, startWeek, endWeek, week, time);
+		;
 	}
 
 	public void deleteDB() {
@@ -161,7 +156,6 @@ public class LessonManager {
 			ContentValues cv = new ContentValues();
 			cv.put("lid", lesson.lid);
 			cv.put("lessonname", lesson.name);
-			cv.put("lessonalias", lesson.alias);
 			cv.put("teachername", lesson.teacher);
 			cv.put("lessonplace", lesson.place);
 			cv.put("startweek", lesson.startweek);

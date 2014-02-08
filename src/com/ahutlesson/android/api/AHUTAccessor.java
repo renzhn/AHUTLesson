@@ -46,7 +46,7 @@ import com.ahutlesson.android.utils.Util;
 
 /**
  * @author OHRZ
- *
+ * 
  */
 public class AHUTAccessor {
 
@@ -57,7 +57,7 @@ public class AHUTAccessor {
 	private static final int TIMEOUT_SOCKET = 10000;
 	private HttpParams httpParameters = new BasicHttpParams();;
 
-	//public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+	// public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
 
 	public static final String SERVER_URL = "http://192.168.170.50/lesson/";
 
@@ -104,13 +104,13 @@ public class AHUTAccessor {
 			JSONTokener jsonParser = new JSONTokener(strResult);
 			JSONObject ret = (JSONObject) jsonParser.nextValue();
 			int retCode = ret.getInt("code");
-			if(retCode == 1) {
+			if (retCode == 1) {
 				String msg = ret.getString("msg");
 				throw new Exception(msg);
-			}else if(retCode == 0) {
+			} else if (retCode == 0) {
 				return ret;
-			} 
-		} catch (JSONException e) {  
+			}
+		} catch (JSONException e) {
 			throw new Exception("解析数据出错");
 		}
 		throw new Exception("服务器返回了错误的数据");
@@ -146,13 +146,13 @@ public class AHUTAccessor {
 		try {
 			JSONObject ret = (JSONObject) jsonParser.nextValue();
 			int retCode = ret.getInt("code");
-			if(retCode == 1) {
+			if (retCode == 1) {
 				String msg = ret.getString("msg");
 				throw new Exception(msg);
-			}else if(retCode == 0) {
+			} else if (retCode == 0) {
 				return ret;
-			} 
-		} catch (JSONException e) {  
+			}
+		} catch (JSONException e) {
 			throw new Exception("解析数据出错");
 		}
 		throw new Exception("服务器返回了错误的数据");
@@ -162,7 +162,8 @@ public class AHUTAccessor {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("x", uxh));
 		params.add(new BasicNameValuePair("p", password));
-		JSONObject ret = postURL(SERVER_URL + "api/user.handler.php?act=register", params);
+		JSONObject ret = postURL(SERVER_URL
+				+ "api/user.handler.php?act=register", params);
 		String cookie = ret.getString("data");
 		return cookie;
 	}
@@ -171,7 +172,8 @@ public class AHUTAccessor {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("x", uxh));
 		params.add(new BasicNameValuePair("p", password));
-		JSONObject ret = postURL(SERVER_URL + "api/user.handler.php?act=login", params);
+		JSONObject ret = postURL(SERVER_URL + "api/user.handler.php?act=login",
+				params);
 		String cookie = ret.getString("data");
 		return cookie;
 	}
@@ -205,18 +207,17 @@ public class AHUTAccessor {
 				lesson = lessons.getJSONObject(i);
 				int lid = lesson.getInt("lid");
 				String lessonName = lesson.getString("lessonname");
-				String lessonAlias = lesson.getString("lessonalias");
 				String teacherName = lesson.getString("teachername");
 				int week = lesson.getInt("week");
 				int time = lesson.getInt("time");
 				int startweek = lesson.getInt("startweek");
 				int endweek = lesson.getInt("endweek");
 				String lessonPlace = lesson.getString("place");
-				lessonList.add(new Lesson(lid, lessonName, lessonAlias,
-						lessonPlace, teacherName, startweek, endweek,
-						week, time));
+				lessonList.add(new Lesson(lid, lessonName, lessonPlace,
+						teacherName, startweek, endweek, week, time));
 			}
-			if(lessonList.size() == 0)	throw new Exception("该学号课表为空，请检查学号是否有误或者反馈");
+			if (lessonList.size() == 0)
+				throw new Exception("该学号课表为空，请检查学号是否有误或者反馈");
 			info.lessonList = lessonList;
 			JSONObject metadata = ret.getJSONObject("metadata");
 			info.xm = metadata.getString("xm");
@@ -243,11 +244,10 @@ public class AHUTAccessor {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
-
 	public ArrayList<Lessonmate> getLessonmateList(int lid, int page)
 			throws Exception {
-		JSONObject ret = getURL(SERVER_URL + "api/getlessonmates.php?lid=" + lid
-				+ "&page=" + page);
+		JSONObject ret = getURL(SERVER_URL + "api/getlessonmates.php?lid="
+				+ lid + "&page=" + page);
 		ArrayList<Lessonmate> list = new ArrayList<Lessonmate>();
 		try {
 			JSONArray lessonmates = ret.getJSONArray("data");
@@ -265,7 +265,8 @@ public class AHUTAccessor {
 				list.add(l);
 			}
 			JSONObject metadata = ret.getJSONObject("metadata");
-			LessonmateActivity.lessonmatesPerPage = metadata.getInt("lessonmatesPerPage");
+			LessonmateActivity.lessonmatesPerPage = metadata
+					.getInt("lessonmatesPerPage");
 			return list;
 		} catch (Exception ex) {
 			throw new Exception("解析数据出错");
@@ -301,13 +302,13 @@ public class AHUTAccessor {
 			JSONTokener jsonParser = new JSONTokener(strResult);
 			JSONObject ret = (JSONObject) jsonParser.nextValue();
 			int retCode = ret.getInt("code");
-			if(retCode == 1) {
+			if (retCode == 1) {
 				String msg = ret.getString("msg");
 				throw new Exception(msg);
-			}else if(retCode == 0) {
+			} else if (retCode == 0) {
 				return;
-			} 
-		} catch (JSONException e) {  
+			}
+		} catch (JSONException e) {
 			throw new Exception("解析数据出错");
 		}
 		throw new Exception("服务器返回了错误的数据");
@@ -316,8 +317,7 @@ public class AHUTAccessor {
 	public void setSignature(String signature) throws Exception {
 		List<NameValuePair> params = new ArrayList<NameValuePair>();
 		params.add(new BasicNameValuePair("s", signature));
-		postURL(SERVER_URL
-				+ "api/user.handler.php?act=setsignature", params);
+		postURL(SERVER_URL + "api/user.handler.php?act=setsignature", params);
 		return;
 	}
 
@@ -367,8 +367,12 @@ public class AHUTAccessor {
 		ChangeLog cl = new ChangeLog(context);
 		String appVer = cl.getThisVersion();
 		String lessondbVer = lessonManager.getLessondbVersion();
-		String timetableParam = "ty=" + timetableSetting.year + "&tm=" + timetableSetting.month + "&td=" + timetableSetting.day + "&ts=" + timetableSetting.getSeason();
-		JSONObject ret = getURL(SERVER_URL + "api/update.handler.php?act=check&a=" + appVer + "&l=" + lessondbVer + "&" + timetableParam);
+		String timetableParam = "ty=" + timetableSetting.year + "&tm="
+				+ timetableSetting.month + "&td=" + timetableSetting.day
+				+ "&ts=" + timetableSetting.getSeason();
+		JSONObject ret = getURL(SERVER_URL
+				+ "api/update.handler.php?act=check&a=" + appVer + "&l="
+				+ lessondbVer + "&" + timetableParam);
 		return ret.getJSONObject("data");
 	}
 }

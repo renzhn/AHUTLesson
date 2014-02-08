@@ -30,7 +30,7 @@
             <LinearLayout
                 android:layout_width="fill_parent"
                 android:layout_height="1px"
-                android:layout_marginBottom="3dp"
+                android:layout_marginBottom="18dp"
                 android:background="#DDD" />
 
             <EditText
@@ -38,14 +38,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="课程名称"
-                android:inputType="textNoSuggestions" >
-            </EditText>
-
-            <EditText
-                android:id="@+id/etLessonAlias"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="课程别名"
                 android:inputType="textNoSuggestions" >
             </EditText>
 

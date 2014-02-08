@@ -17,8 +17,8 @@ public class EditLessonActivity extends BaseActivity {
 
 	private Lesson lesson;
 	private int week, time, startWeek, endWeek;
-	private String lessonName, lessonAlias, lessonPlace, teacherName;
-	private EditText etLessonName, etLessonAlias, etLessonPlace, etTeacherName,
+	private String lessonName, lessonPlace, teacherName;
+	private EditText etLessonName, etLessonPlace, etTeacherName,
 			etStartWeek, etEndWeek;
 
 	private Timetable timetable;
@@ -42,7 +42,6 @@ public class EditLessonActivity extends BaseActivity {
 		tvTitle.setText(timetable.weekName[week] + timetable.lessontimeName[time]);
 
 		etLessonName = (EditText) findViewById(R.id.etLessonName);
-		etLessonAlias = (EditText) findViewById(R.id.etLessonAlias);
 		etLessonPlace = (EditText) findViewById(R.id.etLessonPlace);
 		etTeacherName = (EditText) findViewById(R.id.etTeacherName);
 		etStartWeek = (EditText) findViewById(R.id.etStartWeek);
@@ -51,7 +50,6 @@ public class EditLessonActivity extends BaseActivity {
 		lesson = LessonManager.getInstance(this).getLessonAt(week, time);
 		if (lesson != null) {
 			etLessonName.setText(lesson.name);
-			etLessonAlias.setText(lesson.alias);
 			etLessonPlace.setText(lesson.place);
 			etTeacherName.setText(lesson.teacher);
 			etStartWeek.setText(String.valueOf(lesson.startweek));
@@ -96,7 +94,6 @@ public class EditLessonActivity extends BaseActivity {
 
 	protected void editLesson() {
 		lessonName = etLessonName.getText().toString();
-		lessonAlias = etLessonAlias.getText().toString();
 		lessonPlace = etLessonPlace.getText().toString();
 		teacherName = etTeacherName.getText().toString();
 		String startWeekText = etStartWeek.getText().toString();
@@ -117,10 +114,10 @@ public class EditLessonActivity extends BaseActivity {
 		
 		LessonManager lessonManager = LessonManager.getInstance(this);
 		if (lessonManager.hasLessonAt(week, time)) {
-			lessonManager.editLessonAt(lessonName, lessonAlias, lessonPlace,
+			lessonManager.editLessonAt(lessonName, lessonPlace,
 				teacherName, startWeek, endWeek, week, time);
 		} else {
-			lessonManager.addLessonAt(lessonName, lessonAlias, lessonPlace,
+			lessonManager.addLessonAt(lessonName, lessonPlace,
 					teacherName, startWeek, endWeek, week, time);
 		}
 		
