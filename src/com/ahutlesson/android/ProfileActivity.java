@@ -203,9 +203,9 @@ public class ProfileActivity extends BaseActivity {
 			new UploadAvatar().execute();
 		}
 	}
-	
+
+	ProgressDialog progressDialog;
 	private class UploadAvatar extends AsyncTask<Integer, Integer, String> {
-		ProgressDialog progressDialog;
 		
 		@Override
 		protected void onPreExecute() {
@@ -224,7 +224,10 @@ public class ProfileActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(String result) {
-			progressDialog.dismiss();
+			try {
+				progressDialog.dismiss();
+				progressDialog = null;
+		    } catch (Exception e) {}
 			if(result == null) {
 				ImageLoader.getInstance().clearMemoryCache();
 				ImageLoader.getInstance().clearDiscCache();
@@ -234,7 +237,15 @@ public class ProfileActivity extends BaseActivity {
 				alert(result + "\n提示：如果手机无法上传，可以到ahutlesson.com网页版上传");
 			}
 		}
-		
-
 	}
+	
+	@Override
+	protected void onPause() {
+		try {
+			progressDialog.dismiss();
+			progressDialog = null;
+	    } catch (Exception e) {}
+		super.onPause();
+	}
+
 }

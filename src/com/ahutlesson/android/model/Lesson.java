@@ -1,7 +1,5 @@
 package com.ahutlesson.android.model;
 
-import android.content.Context;
-
 public class Lesson {
 
 	public String name, place, teacher;
@@ -19,16 +17,12 @@ public class Lesson {
 		time = time0;
 	}
 
-	public boolean beforeStart(Context context) {
-		return (Timetable.getInstance(context).numOfWeek < startweek);
+	public boolean isBeforeEnd(int numOfWeek) {
+		return numOfWeek <= endweek;
 	}
 
-	public boolean afterEnd(Context context) {
-		return (Timetable.getInstance(context).numOfWeek > endweek);
-	}
-
-	public boolean isInRange(Context context) {
-		return !beforeStart(context) && !afterEnd(context);
+	public boolean isInRange(int numOfWeek) {
+		return numOfWeek <= endweek;
 	}
 
 	public String getTitle() {

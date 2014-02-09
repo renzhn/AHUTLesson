@@ -93,26 +93,6 @@
         </PreferenceScreen>
     </PreferenceCategory>
     <PreferenceCategory android:title="课友网" >
-        <PreferenceScreen android:title="消息提醒" >
-            <PreferenceCategory android:title="消息提醒" >
-                <ListPreference
-                    android:defaultValue="5"
-                    android:entries="@array/CheckUnreadFreq_entries"
-                    android:entryValues="@array/CheckUnreadFreq_values"
-                    android:key="CheckUnreadFreq"
-                    android:summary="检查新消息频率，修改后下次启动生效"
-                    android:title="提醒频率" />
-
-                <CheckBoxPreference
-                    android:defaultValue="true"
-                    android:key="CheckUnreadSound"
-                    android:title="声音" />
-                <CheckBoxPreference
-                    android:defaultValue="true"
-                    android:key="CheckUnreadVibrate"
-                    android:title="振动" />
-            </PreferenceCategory>
-        </PreferenceScreen>
         <PreferenceScreen android:title="课表管理" >
             <PreferenceCategory android:title="课表管理" >
                 <Preference

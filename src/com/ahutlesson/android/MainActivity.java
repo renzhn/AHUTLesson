@@ -108,9 +108,9 @@ public class MainActivity extends BaseActivity {
 	public static boolean needRefresh = false;
 
 
-	public void refreshDateInfo() {
-		if (tvDateInfo != null)
-			tvDateInfo.setText(dateInfo());
+	public void refresh() {
+		if (tvDateInfo != null) tvDateInfo.setText(dateInfo());
+		if (gridView != null) gridView.refreshView();
 	}
 
 	@Override
@@ -118,8 +118,7 @@ public class MainActivity extends BaseActivity {
 		super.onResume();
 
 		if (needRefresh) {
-			refreshView();
-			refreshDateInfo();
+			refresh();
 		}
 
 		Alarm.setAlarm(this);
@@ -226,7 +225,7 @@ public class MainActivity extends BaseActivity {
 		case MENU_DELETE:
 			LessonManager.getInstance(this).deleteLessonAt(position.week,
 					position.time);
-			refreshView();
+			refresh();
 			break;
 		}
 		return super.onContextItemSelected(item);
@@ -234,12 +233,8 @@ public class MainActivity extends BaseActivity {
 	
 	@Override
 	public void onContextMenuClosed(android.view.Menu menu) {
-		refreshView();
+		refresh();
 		super.onContextMenuClosed(menu);
-	}
-
-	public void refreshView() {
-		if (gridView != null) gridView.refreshView();
 	}
 	
 	public String dateInfo() {
@@ -268,7 +263,7 @@ public class MainActivity extends BaseActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							refreshView();
+							refresh();
 						}
 					});
 					String latestLessondbVer = ret
@@ -289,11 +284,10 @@ public class MainActivity extends BaseActivity {
 					runOnUiThread(new Runnable() {
 						@Override
 						public void run() {
-							refreshDateInfo();
+							refresh();
 						}
 					});
-					makeToast("已更新时间表设置 (" + timetableSetting.getBeginDate()
-							+ ")");
+					makeToast("已更新开学时间：" + timetableSetting.getBeginDate());
 				}
 			} catch (Exception ex) {
 				Util.log(ex.getMessage());

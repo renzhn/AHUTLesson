@@ -22,34 +22,39 @@ public class AlarmActivity extends BaseActivity {
 	private MediaPlayer player;
 	private Lesson lesson;
 	private AlertDialog ad;
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		Timetable timetable = Timetable.getInstance(this);
 		LessonManager lessonManager = LessonManager.getInstance(this);
-		
+
 		int week = getIntent().getExtras().getInt("week");
 		int time = getIntent().getExtras().getInt("time");
-		
+
 		lesson = lessonManager.getLessonAt(week, time);
-		if(lesson==null) {
+		if (lesson == null) {
 			this.finish();
 		}
-		
-		int curTimeBlock = timetable.getCurrentTimeBlock(Timetable.DelayDefault);
-		if(curTimeBlock != -1 && lessonManager.getLessonAt(lesson.week, curTimeBlock) != null){
-			this.finish();//如果现在正在上课则不提醒
+
+		int curTimeBlock = timetable
+				.getCurrentTimeBlock(Timetable.DelayDefault);
+		if (curTimeBlock != -1
+				&& lessonManager.getLessonAt(lesson.week, curTimeBlock) != null) {
+			this.finish();// 如果现在正在上课则不提醒
 			return;
 		}
-		
+
 		playMusic();
 
-		SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		String alertMessage = preferences.getString("MessageWhenAlarm", "{TIME}有{LESSON}课，该上课了！！");
-		alertMessage = alertMessage.replace("{TIME}", timetable.lessontimeName[time]);
+		SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		String alertMessage = preferences.getString("MessageWhenAlarm",
+				"{TIME}有{LESSON}课，该上课了！！");
+		alertMessage = alertMessage.replace("{TIME}",
+				timetable.lessontimeName[time]);
 		alertMessage = alertMessage.replace("{LESSON}", lesson.name);
-		
+
 		ad = new AlertDialog.Builder(AlarmActivity.this)
 
 				.setTitle("上课提醒")
@@ -64,14 +69,14 @@ public class AlarmActivity extends BaseActivity {
 							}
 						}).show();
 	}
-	
+
 	public void playMusic() {
 		if (player == null) {
 			Uri uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
 			try {
 				player = new MediaPlayer();
 				player.setDataSource(this, uri);
-				final AudioManager audioManager = (AudioManager)getSystemService(Context.AUDIO_SERVICE);
+				final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
 				if (audioManager.getStreamVolume(AudioManager.STREAM_ALARM) != 0) {
 					player.setAudioStreamType(AudioManager.STREAM_ALARM);
 					player.setLooping(true);

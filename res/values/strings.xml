@@ -5,7 +5,7 @@
     <string name="changelog_full_title">更新记录</string>
     <string name="changelog_title">新版功能：</string>
     <string name="changelog_ok_button">知道了</string>
-    
+    <string name="changelog_show_full">更多...</string>
 	<string name="about">关于</string>
 	<string name="share">分享</string>
     <string name="setting">设置</string>

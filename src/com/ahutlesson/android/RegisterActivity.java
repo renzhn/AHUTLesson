@@ -51,9 +51,8 @@ public class RegisterActivity extends BaseActivity {
 		});
 	}
 
+	ProgressDialog progressDialog;
 	private class RegisterTask extends AsyncTask<Integer, Integer, String> {
-
-		ProgressDialog progressDialog;
 		
 		@Override
 		protected void onPreExecute() {
@@ -75,7 +74,10 @@ public class RegisterActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(String ret) {
-			progressDialog.dismiss();
+			try {
+				progressDialog.dismiss();
+				progressDialog = null;
+		    } catch (Exception e) {}
 			if(ret == null) {
 				openActivity(MainActivity.class);
 				RegisterActivity.this.finish();
@@ -84,4 +86,14 @@ public class RegisterActivity extends BaseActivity {
 			}
 		}
 	}
+	
+	@Override
+	protected void onPause() {
+		try {
+			progressDialog.dismiss();
+			progressDialog = null;
+	    } catch (Exception e) {}
+		super.onPause();
+	}
+
 }

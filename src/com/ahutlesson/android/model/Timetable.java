@@ -346,7 +346,7 @@ public class Timetable {
 		for (week = getCurrentWeekDay(); week < 7; week++) {
 			while (time < 5) {
 				lesson = lessonManager.getLessonAt(week, time);
-				if (lesson != null && lesson.isInRange(context)
+				if (lesson != null && lesson.isInRange(numOfWeek)
 						&& isNowHavingLesson(lesson) == -1
 						&& !isAppended(lesson))
 					return lesson;

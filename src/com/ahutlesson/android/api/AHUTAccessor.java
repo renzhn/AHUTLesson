@@ -57,9 +57,9 @@ public class AHUTAccessor {
 	private static final int TIMEOUT_SOCKET = 10000;
 	private HttpParams httpParameters = new BasicHttpParams();;
 
-	// public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
+	public static final String SERVER_URL = "http://ahutlesson.sinaapp.com/";
 
-	public static final String SERVER_URL = "http://192.168.170.50/lesson/";
+	// public static final String SERVER_URL = "http://192.168.170.50/lesson/";
 
 	public AHUTAccessor(Context context0) {
 		context = context0;

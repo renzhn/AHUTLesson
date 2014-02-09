@@ -46,9 +46,8 @@ public class LoginActivity extends BaseActivity {
 		});
 	}
 
+	ProgressDialog progressDialog;
 	private class LoginTask extends AsyncTask<Integer, Integer, Boolean> {
-
-		ProgressDialog progressDialog;
 		
 		@Override
 		protected void onPreExecute() {
@@ -70,13 +69,24 @@ public class LoginActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(Boolean ret) {
-			progressDialog.dismiss();
+			try {
+				progressDialog.dismiss();
+				progressDialog = null;
+		    } catch (Exception e) {}
 			if(ret) {
 				openActivity(MainActivity.class);
 				LoginActivity.this.finish();
 			}
 		}
-		
+	}
+
+	@Override
+	protected void onPause() {
+		try {
+			progressDialog.dismiss();
+			progressDialog = null;
+	    } catch (Exception e) {}
+		super.onPause();
 	}
 
 }

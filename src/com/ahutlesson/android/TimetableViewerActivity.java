@@ -38,8 +38,8 @@ public class TimetableViewerActivity extends BaseActivity {
 		}
 	}
 
+	ProgressDialog dialog;
 	class GetLessons extends AsyncTask<String, String, LessonsInfo> {
-		ProgressDialog dialog;
 
 		@Override
 		protected void onPreExecute() {
@@ -60,7 +60,10 @@ public class TimetableViewerActivity extends BaseActivity {
 
 		@Override
 		protected void onPostExecute(LessonsInfo ret) {
-			dialog.dismiss();
+			try {
+		        dialog.dismiss();
+		        dialog = null;
+		    } catch (Exception e) {}
 			if(ret == null) {
 				return;
 			}else{
@@ -69,6 +72,15 @@ public class TimetableViewerActivity extends BaseActivity {
 				showLessons();
 			}
 		}
+	}
+
+	@Override
+	protected void onPause() {
+		try {
+	        dialog.dismiss();
+	        dialog = null;
+	    } catch (Exception e) {}
+		super.onPause();
 	}
 
 	private void showLessons() {

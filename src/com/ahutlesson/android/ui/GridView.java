@@ -142,7 +142,11 @@ public class GridView extends View {
 		calendarHeight = viewHeight - weekNameHeight;
 		timePartitionGap = calendarHeight / 40;
 		cellHeight = (calendarHeight - timePartitionGap * 2) / 5;
-		lessonNamePlaceGap = cellHeight / 20;
+		lessonNamePlaceGap = cellHeight / 40;
+
+		lessonNameMaxLength = (int) ((cellWidth - lessonNameMargin) / (float) lessonNameSize);
+		lessonPlaceMaxLength = (int) (cellWidth / (float) lessonPlaceSize);
+		lessonNameMaxLines = (int) ((cellHeight - lessonPlaceMaxLength * 2 - lessonNamePlaceGap) / lessonNameSize);
 		
 		for (int i = 0; i < 8; i++) {
 			leftBorder[i] = cellWidth * i;
@@ -216,9 +220,6 @@ public class GridView extends View {
 	}
 	
 	private void drawLesson() {
-		lessonNameMaxLength = (int) ((cellWidth - lessonNameMargin) / (float) lessonNameSize);
-		lessonPlaceMaxLength = (int) (cellWidth / (float) lessonPlaceSize);
-		lessonNameMaxLines = (int) ((cellHeight - lessonPlaceMaxLength * 2 - lessonNamePlaceGap) / lessonNameSize);
 		for (Lesson[] lessonsOfDay : lessons) {
 			if (lessonsOfDay != null) {
 				for (Lesson lesson:lessonsOfDay) {
@@ -288,7 +289,7 @@ public class GridView extends View {
 		//画课程名
 		textTop = topBorder[time] + (cellHeight - lessonPlaceSize * placeLines - lessonNamePlaceGap + lessonNameSize * lines) / 2; //课程名最后一行的底部Y
 		
-		if (!lesson.isInRange(context)) {
+		if (!lesson.isBeforeEnd(timetable.numOfWeek)) {
 			textPaint.setARGB(30, 0, 0, 0);
 		} else {
 			textPaint.setColor(BLACK);
@@ -309,7 +310,7 @@ public class GridView extends View {
 
 		// 画地点
 		textPaint.setTextSize(lessonPlaceSize);
-		if(!lesson.isInRange(context)){
+		if(!lesson.isBeforeEnd(timetable.numOfWeek)){
 			textPaint.setARGB(30, 0, 0, 0);
 		}else{
 			textPaint.setColor(Color.parseColor("#B22222"));
