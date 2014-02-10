@@ -120,8 +120,6 @@ public class EditLessonActivity extends BaseActivity {
 			lessonManager.addLessonAt(lessonName, lessonPlace,
 					teacherName, startWeek, endWeek, week, time);
 		}
-		
-		MainActivity.needRefresh = true;
 	}
 
 }

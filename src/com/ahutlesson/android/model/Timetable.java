@@ -158,9 +158,13 @@ public class Timetable {
 		Calendar beginCal = Calendar.getInstance();
 		beginCal.set(beginDate_year, beginDate_month, beginDate_day);
 		Date beginDate = beginCal.getTime();
+		Date nowDate = Calendar.getInstance().getTime();
 
+		if (nowDate.compareTo(beginDate) < 0)
+			return 0;
+		
 		int days = Days.daysBetween(new org.joda.time.DateTime(beginDate),
-				new org.joda.time.DateTime(Calendar.getInstance().getTime()))
+				new org.joda.time.DateTime(nowDate))
 				.getDays();
 
 		if (days >= 0 && days <= 180)

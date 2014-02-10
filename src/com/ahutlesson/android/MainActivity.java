@@ -40,6 +40,8 @@ public class MainActivity extends BaseActivity {
 	private TextView tvDateInfo;
 	private GridView gridView;
 
+	public static boolean needRefresh = false;
+
 	private static final int MENU_PROFILE = 0;
 	private static final int MENU_TIMETABLEVIEWER = 1;
 	private static final int MENU_SETTING = 2;
@@ -105,9 +107,6 @@ public class MainActivity extends BaseActivity {
 		}
 	}
 
-	public static boolean needRefresh = false;
-
-
 	public void refresh() {
 		if (tvDateInfo != null) tvDateInfo.setText(dateInfo());
 		if (gridView != null) gridView.refreshView();
@@ -128,6 +127,7 @@ public class MainActivity extends BaseActivity {
 	@Override
 	protected void onPause() {
 		super.onPause();
+		needRefresh = true;
 		MobclickAgent.onPause(this);
 	}
 
@@ -239,6 +239,7 @@ public class MainActivity extends BaseActivity {
 	
 	public String dateInfo() {
 		Timetable timetable = Timetable.getInstance(this);
+		timetable.refreshNumOfWeek();
 		int numOfWeek = timetable.numOfWeek;
 		if (numOfWeek > 0) {
 			return "µÚ" + String.valueOf(numOfWeek) + "ÖÜ" + " "

@@ -22,7 +22,7 @@ public class Lesson {
 	}
 
 	public boolean isInRange(int numOfWeek) {
-		return numOfWeek <= endweek;
+		return numOfWeek >= startweek && numOfWeek <= endweek;
 	}
 
 	public String getTitle() {

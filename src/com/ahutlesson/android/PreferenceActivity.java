@@ -52,7 +52,6 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 								timetableSetting.month = month + 1;
 								timetableSetting.day = dayOfMonth;
 								timetable.setTimetableSetting(timetableSetting);
-								MainActivity.needRefresh = true;
 							}
 						};
 						DatePickerDialog dialog = new DatePickerDialog(
@@ -75,7 +74,6 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 							Object arg1) {
 						Timetable.getInstance(PreferenceActivity.this)
 								.toggleSeason();
-						MainActivity.needRefresh = true;
 						return true;
 					}
 				});
