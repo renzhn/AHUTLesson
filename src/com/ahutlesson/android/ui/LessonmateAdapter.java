@@ -3,6 +3,7 @@ package com.ahutlesson.android.ui;
 import java.util.ArrayList;
 
 import com.ahutlesson.android.R;
+import com.ahutlesson.android.TimetableViewerActivity;
 import com.ahutlesson.android.UserActivity;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lessonmate;
@@ -16,7 +17,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 
@@ -109,8 +109,9 @@ public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 			v.setOnClickListener(new View.OnClickListener() {
 				@Override
 				public void onClick(View v) {
-					Toast.makeText(context, "TA»¹Ã»ÓÐ×¢²á¿ÎÓÑ£¬¿ìÑûÇëTA°É£¡",
-							Toast.LENGTH_SHORT).show();
+					Intent i = new Intent(context, TimetableViewerActivity.class);
+					i.putExtra("uxh", lessonmate.xh);
+					context.startActivity(i);
 				}
 			});
 		}

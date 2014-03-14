@@ -103,7 +103,7 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:autoLink="email"
-            android:text="我的邮箱: renzhn@gmail.com"
+            android:text="我的邮箱: renznn@gmail.com"
             android:textColor="#555"
             android:textSize="14sp" />
         
