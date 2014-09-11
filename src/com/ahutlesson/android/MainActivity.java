@@ -44,6 +44,7 @@ public class MainActivity extends BaseActivity {
 
 	private static final int MENU_PROFILE = 0;
 	private static final int MENU_TIMETABLEVIEWER = 1;
+	private static final int MENU_LESSONMATESIMILARITY = 5;
 	private static final int MENU_SETTING = 2;
 	private static final int MENU_ABOUT = 3;
 	private static final int MENU_SHARE = 4;
@@ -137,6 +138,7 @@ public class MainActivity extends BaseActivity {
 			.setShowAsAction(MenuItem.SHOW_AS_ACTION_IF_ROOM);
 		menu.add(Menu.NONE, MENU_PROFILE, Menu.NONE, R.string.profile);
 		menu.add(Menu.NONE, MENU_TIMETABLEVIEWER, Menu.NONE, R.string.timetable_viewer);
+		menu.add(Menu.NONE, MENU_LESSONMATESIMILARITY, Menu.NONE, R.string.lessonmate_similarity);
 		menu.add(Menu.NONE, MENU_SETTING, Menu.NONE, R.string.setting);
 		menu.add(Menu.NONE, MENU_ABOUT, Menu.NONE, R.string.about);
 		return true;
@@ -178,6 +180,31 @@ public class MainActivity extends BaseActivity {
 			alert.setNegativeButton(R.string.cancel, null);
 
 			alert.show();
+			return true;
+		case MENU_LESSONMATESIMILARITY:
+			AlertDialog.Builder alert1 = new AlertDialog.Builder(this);
+
+			alert1.setTitle(R.string.lessonmate_similarity);
+			alert1.setMessage("«Î ‰»Î—ß∫≈£∫");
+
+			final EditText input1 = new EditText(this);
+			input1.setInputType(InputType.TYPE_CLASS_NUMBER);
+			alert1.setView(input1);
+			alert1.setPositiveButton(R.string.ok,
+					new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog,
+								int whichButton) {
+							String value = input1.getText().toString();
+							Intent i = new Intent(MainActivity.this,
+									LessonmateSimilarityActivity.class);
+							i.putExtra("uxh", value);
+							startActivity(i);
+						}
+					});
+
+			alert1.setNegativeButton(R.string.cancel, null);
+
+			alert1.show();
 			return true;
 		case MENU_SETTING:
 			openActivity(PreferenceActivity.class);

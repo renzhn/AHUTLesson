@@ -19,26 +19,27 @@ import com.ahutlesson.android.utils.ValidateHelper;
 public class TimetableViewerActivity extends BaseActivity {
 
 	private static final int MENU_RETYPE = 0;
-	
+
 	private String uxh;
 	private GridView gridView;
 	private Lesson lessons[][] = new Lesson[7][5];
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		enableHomeButton();
 
 		uxh = getIntent().getExtras().getString("uxh");
-		if(ValidateHelper.isXH(uxh)){
+		if (ValidateHelper.isXH(uxh)) {
 			new GetLessons().execute(uxh);
-		}else{
+		} else {
 			makeToast("不是有效的学号");
 			finish();
 		}
 	}
 
 	ProgressDialog dialog;
+
 	class GetLessons extends AsyncTask<String, String, LessonsInfo> {
 
 		@Override
@@ -51,7 +52,8 @@ public class TimetableViewerActivity extends BaseActivity {
 		@Override
 		protected LessonsInfo doInBackground(String... para) {
 			try {
-				return AHUTAccessor.getInstance(TimetableViewerActivity.this).getLessons(uxh);
+				return AHUTAccessor.getInstance(TimetableViewerActivity.this)
+						.getLessons(uxh);
 			} catch (Exception e) {
 				alert(e.getMessage());
 				return null;
@@ -61,12 +63,13 @@ public class TimetableViewerActivity extends BaseActivity {
 		@Override
 		protected void onPostExecute(LessonsInfo ret) {
 			try {
-		        dialog.dismiss();
-		        dialog = null;
-		    } catch (Exception e) {}
-			if(ret == null) {
+				dialog.dismiss();
+				dialog = null;
+			} catch (Exception e) {
+			}
+			if (ret == null) {
 				return;
-			}else{
+			} else {
 				lessons = ret.lessons;
 				actionBar.setTitle(ret.xm + "的课表");
 				showLessons();
@@ -77,9 +80,10 @@ public class TimetableViewerActivity extends BaseActivity {
 	@Override
 	protected void onPause() {
 		try {
-	        dialog.dismiss();
-	        dialog = null;
-	    } catch (Exception e) {}
+			dialog.dismiss();
+			dialog = null;
+		} catch (Exception e) {
+		}
 		super.onPause();
 	}
 
@@ -88,17 +92,17 @@ public class TimetableViewerActivity extends BaseActivity {
 			gridView = new GridView(TimetableViewerActivity.this, lessons);
 		setContentView(gridView);
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		menu.add(0, MENU_RETYPE, Menu.NONE, "重新输入")
-		.setIcon(android.R.drawable.ic_menu_search)
-		.setShowAsAction(
-				MenuItem.SHOW_AS_ACTION_IF_ROOM
-						| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
+				.setIcon(android.R.drawable.ic_menu_search)
+				.setShowAsAction(
+						MenuItem.SHOW_AS_ACTION_IF_ROOM
+								| MenuItem.SHOW_AS_ACTION_WITH_TEXT);
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId()) {
@@ -118,11 +122,11 @@ public class TimetableViewerActivity extends BaseActivity {
 						public void onClick(DialogInterface dialog,
 								int whichButton) {
 							String xh = input.getText().toString();
-							if(ValidateHelper.isXH(xh)){
+							if (ValidateHelper.isXH(xh)) {
 								uxh = xh;
 								lessons = new Lesson[7][5];
 								new GetLessons().execute();
-							}else{
+							} else {
 								alert("不是有效的学号");
 							}
 						}
@@ -135,5 +139,5 @@ public class TimetableViewerActivity extends BaseActivity {
 			return super.onOptionsItemSelected(item);
 		}
 	}
-	
+
 }

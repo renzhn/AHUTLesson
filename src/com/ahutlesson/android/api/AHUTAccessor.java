@@ -35,6 +35,7 @@ import com.ahutlesson.android.model.Lesson;
 import com.ahutlesson.android.model.LessonListInfo;
 import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Lessonmate;
+import com.ahutlesson.android.model.LessonmateSimilarity;
 import com.ahutlesson.android.model.LessonsInfo;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.TimetableSetting;
@@ -244,6 +245,26 @@ public class AHUTAccessor {
 		return SERVER_URL + "api/getavatar.php?uxh=" + uxh;
 	}
 
+	public ArrayList<LessonmateSimilarity> getLessonmateSimilarity(String xh) throws Exception {
+		JSONObject ret = getURL(SERVER_URL + "api/getlessonmatesimilarity.php?xh="
+				+ xh);
+		ArrayList<LessonmateSimilarity> list = new ArrayList<LessonmateSimilarity>();
+		try {
+			JSONArray data = ret.getJSONArray("data");
+			JSONObject obj;
+			for (int i = 0; i < data.length(); i++) {
+				obj = data.getJSONObject(i);
+				LessonmateSimilarity l = new LessonmateSimilarity();
+				l.xh = obj.getString("xh2");
+				l.similarity = obj.getDouble("similarity");
+				list.add(l);
+			}
+			return list;
+		} catch (Exception ex) {
+			throw new Exception("解析数据出错");
+		}
+	}
+	
 	public ArrayList<Lessonmate> getLessonmateList(int lid, int page)
 			throws Exception {
 		JSONObject ret = getURL(SERVER_URL + "api/getlessonmates.php?lid="
