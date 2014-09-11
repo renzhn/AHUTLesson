@@ -6,12 +6,16 @@ import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lessonmate;
 import com.ahutlesson.android.ui.LessonmateAdapter;
 import com.ahutlesson.android.utils.GlobalContext;
+import com.nostra13.universalimageloader.core.ImageLoader;
+import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -70,7 +74,29 @@ public class LessonmateActivity extends BaseActivity {
 					R.layout.lessonmate_item, lessonmateList);
 		}
 		lvList.setAdapter(lvLessonmateAdapter);
-		lvList.setOnItemClickListener(null);
+		lvList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				Lessonmate lessonmate = lessonmateList.get(position);
+				Intent i;
+				if (lessonmate.registered) {
+					i = new Intent(LessonmateActivity.this, UserActivity.class);
+					i.putExtra("uxh", lessonmate.xh);
+					LessonmateActivity.this.startActivity(i);
+				} else {
+					i = new Intent(LessonmateActivity.this, TimetableViewerActivity.class);
+					i.putExtra("uxh", lessonmate.xh);
+					LessonmateActivity.this.startActivity(i);
+				}
+			}
+
+		});
+
+		// Pause on scroll
+		PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
+		lvList.setOnScrollListener(listener);
+		
+		// Load data
 		new LoadLessonmates().execute();
 	}
 

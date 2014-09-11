@@ -256,6 +256,5 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 
 	public void clearImageCache() {
 		ImageLoader.getInstance().clearMemoryCache();
-		ImageLoader.getInstance().clearDiscCache();
 	}
 }

@@ -3,14 +3,11 @@ package com.ahutlesson.android.ui;
 import java.util.ArrayList;
 
 import com.ahutlesson.android.R;
-import com.ahutlesson.android.TimetableViewerActivity;
-import com.ahutlesson.android.UserActivity;
 import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lessonmate;
 import com.nostra13.universalimageloader.core.ImageLoader;
 
 import android.content.Context;
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +17,11 @@ import android.widget.TextView;
 
 public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 
-	private Context context;
 	private LayoutInflater inflater;
 
 	public LessonmateAdapter(Context context0, int textViewResourceId,
 			ArrayList<Lessonmate> list) {
 		super(context0, textViewResourceId, list);
-		context = context0;
 		inflater = LayoutInflater.from(context0);
 	}
 
@@ -67,19 +62,8 @@ public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 				ImageLoader.getInstance()
 						.displayImage(AHUTAccessor.getAvatarURI(lessonmate.xh),
 								holder.avatar);
-			} else {
-				holder.avatar.setImageResource(R.drawable.noavatar);
-			}
-			View.OnClickListener clickUserListener = new View.OnClickListener() {
-				@Override
-				public void onClick(View arg0) {
-					Intent i = new Intent(context, UserActivity.class);
-					i.putExtra("uxh", lessonmate.xh);
-					context.startActivity(i);
-				}
-			};
-			holder.avatar.setOnClickListener(clickUserListener);
-			v.setOnClickListener(clickUserListener);
+			} else ImageLoader.getInstance().displayImage("drawable://" + R.drawable.noavatar, holder.avatar);
+
 		} else {
 			ViewHolder holder;
 			if (v == null || !(v.getTag() instanceof ViewHolder)) {
@@ -106,14 +90,6 @@ public class LessonmateAdapter extends ArrayAdapter<Lessonmate> {
 			holder.xm.setText(lessonmate.xm);
 			holder.bj.setText(lessonmate.bj);
 			holder.zy.setText(lessonmate.zy);
-			v.setOnClickListener(new View.OnClickListener() {
-				@Override
-				public void onClick(View v) {
-					Intent i = new Intent(context, TimetableViewerActivity.class);
-					i.putExtra("uxh", lessonmate.xh);
-					context.startActivity(i);
-				}
-			});
 		}
 		return v;
 	}

@@ -18,7 +18,6 @@ public class GlobalContext {
 			DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()
 			.resetViewBeforeLoading(true)
 	        .cacheInMemory(true)
-	        .cacheOnDisc(true)
 			.build();
 			ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(mainActivity)
 			.defaultDisplayImageOptions(defaultOptions)

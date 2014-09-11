@@ -230,7 +230,6 @@ public class ProfileActivity extends BaseActivity {
 		    } catch (Exception e) {}
 			if(result == null) {
 				ImageLoader.getInstance().clearMemoryCache();
-				ImageLoader.getInstance().clearDiscCache();
 				ImageLoader.getInstance().displayImage(AHUTAccessor.getAvatarURI(user.uxh), ivAvatar);
 				makeToast("上传成功！");
 			}else{
