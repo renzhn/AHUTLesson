@@ -40,6 +40,10 @@ public class LessonmateSimilarityActivity extends BaseActivity {
 
 		uxh = getIntent().getExtras().getString("uxh");
 
+		actionBar.setTitle(getResources().getString(
+				R.string.lessonmate_similarity)
+				+ "： " + uxh);
+		
 		setContentView(R.layout.list);
 
 		layoutLoading = (LinearLayout) findViewById(R.id.layoutLoading);
@@ -107,9 +111,6 @@ public class LessonmateSimilarityActivity extends BaseActivity {
 		protected void onPostExecute(ArrayList<LessonmateSimilarity> ret) {
 			layoutLoading.setVisibility(View.GONE);
 			if (ret != null) {
-				actionBar.setTitle(getResources().getString(
-						R.string.lessonmate_similarity)
-						+ "： " + uxh);
 				layoutEmpty.setVisibility(View.GONE);
 				layoutList.setVisibility(View.VISIBLE);
 				list.addAll(ret);
@@ -154,6 +155,9 @@ public class LessonmateSimilarityActivity extends BaseActivity {
 							String xh = input.getText().toString();
 							if (ValidateHelper.isXH(xh)) {
 								uxh = xh;
+								actionBar.setTitle(getResources().getString(
+										R.string.lessonmate_similarity)
+										+ "： " + uxh);
 								new GetLessonmateSimilarity().execute();
 							} else {
 								alert("不是有效的学号");

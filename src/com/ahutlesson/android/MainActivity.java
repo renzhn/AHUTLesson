@@ -183,7 +183,8 @@ public class MainActivity extends BaseActivity {
 			AlertDialog.Builder alert1 = new AlertDialog.Builder(this);
 
 			alert1.setTitle(R.string.lessonmate_similarity);
-			alert1.setMessage("请输入学号：");
+			alert1.setMessage("“课友度”越高，你与TA上同一节课的课数越多\n" + 
+					"请输入学号：");
 
 			final EditText input1 = new EditText(this);
 			input1.setInputType(InputType.TYPE_CLASS_NUMBER);
