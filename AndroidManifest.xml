@@ -5,12 +5,11 @@
     android:versionName="2.4" >
 
     <application
+        android:allowBackup="true"
         android:icon="@drawable/ahutlesson"
         android:label="@string/app_name"
-        android:theme="@style/AHUTLesson"
-        android:allowBackup="true" >
-        <activity
-			android:name=".MainActivity" >
+        android:theme="@style/AHUTLesson" >
+        <activity android:name=".MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -50,7 +49,7 @@
         <activity
             android:name=".PreferenceActivity"
             android:label="设置"
-        	android:theme="@style/Theme.Sherlock" >
+            android:theme="@style/Theme.Sherlock" >
         </activity>
         <activity
             android:name=".EditLessonActivity"
@@ -79,15 +78,17 @@
         <receiver
             android:name="com.ahutlesson.android.alarm.SoundNormalReceiver"
             android:process=":remote" />
-        
-		<service
-		    android:name="com.umeng.common.net.DownloadingService"
-		    android:process=":DownloadingService" >
-		</service>
-		<activity 
-		    android:name="com.umeng.update.UpdateDialogActivity"
-		    android:theme="@android:style/Theme.Translucent.NoTitleBar" >
-		</activity>
+
+        <service
+            android:name="com.umeng.update.net.DownloadingService"
+            android:process=":DownloadingService" >
+        </service>
+
+        <activity
+            android:name="com.umeng.update.UpdateDialogActivity"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+        </activity>
+
         <meta-data
             android:name="UMENG_APPKEY"
             android:value="511dbbfd52701523af00002e" >
@@ -97,7 +98,9 @@
             android:value="Default" />
     </application>
 
-    <uses-sdk android:minSdkVersion="8" android:targetSdkVersion="19"/>
+    <uses-sdk
+        android:minSdkVersion="8"
+        android:targetSdkVersion="19" />
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />

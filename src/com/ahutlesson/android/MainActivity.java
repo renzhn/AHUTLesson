@@ -94,8 +94,6 @@ public class MainActivity extends BaseActivity {
 
 		UmengUpdateAgent.setUpdateOnlyWifi(false);
 		UmengUpdateAgent.update(this);
-
-		MobclickAgent.onError(this);
 	}
 
 	@Override
