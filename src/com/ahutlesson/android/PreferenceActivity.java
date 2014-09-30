@@ -4,6 +4,7 @@ import com.ahutlesson.android.model.LessonManager;
 import com.ahutlesson.android.model.Timetable;
 import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.model.UserManager;
+import com.ahutlesson.android.utils.GlobalContext;
 import com.actionbarsherlock.app.SherlockPreferenceActivity;
 import com.actionbarsherlock.view.MenuItem;
 import com.nostra13.universalimageloader.core.ImageLoader;
@@ -255,6 +256,7 @@ public class PreferenceActivity extends SherlockPreferenceActivity {
 	}
 
 	public void clearImageCache() {
+		GlobalContext.initImageLoader();
 		ImageLoader.getInstance().clearMemoryCache();
 	}
 }

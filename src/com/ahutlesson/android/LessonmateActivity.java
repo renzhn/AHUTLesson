@@ -6,9 +6,6 @@ import com.ahutlesson.android.api.AHUTAccessor;
 import com.ahutlesson.android.model.Lessonmate;
 import com.ahutlesson.android.ui.LessonmateAdapter;
 import com.ahutlesson.android.utils.GlobalContext;
-import com.nostra13.universalimageloader.core.ImageLoader;
-import com.nostra13.universalimageloader.core.listener.PauseOnScrollListener;
-
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -92,10 +89,6 @@ public class LessonmateActivity extends BaseActivity {
 
 		});
 
-		// Pause on scroll
-		PauseOnScrollListener listener = new PauseOnScrollListener(ImageLoader.getInstance(), true, true);
-		lvList.setOnScrollListener(listener);
-		
 		// Load data
 		new LoadLessonmates().execute();
 	}
