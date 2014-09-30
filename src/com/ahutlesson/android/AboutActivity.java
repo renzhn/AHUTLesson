@@ -1,5 +1,8 @@
 package com.ahutlesson.android;
 
+import com.ahutlesson.android.model.LessonManager;
+import com.ahutlesson.android.model.Timetable;
+import com.ahutlesson.android.model.TimetableSetting;
 import com.ahutlesson.android.utils.ChangeLog;
 import com.umeng.update.UmengUpdateAgent;
 import com.umeng.update.UmengUpdateListener;
@@ -21,8 +24,18 @@ public class AboutActivity extends BaseActivity {
 		final ChangeLog cl = new ChangeLog(AboutActivity.this);
 		
 		TextView tvVersion = (TextView) findViewById(R.id.tvVersion);
-		tvVersion.setText("版本: " + cl.getThisVersion());
 		
+		tvVersion.setText("版本: " + cl.getThisVersion());
+
+		TextView tvLessonDBVer = (TextView) findViewById(R.id.tvLessonDBVer);
+		TextView tvBeginDate = (TextView) findViewById(R.id.tvBeginDate);
+		TextView tvSeason = (TextView) findViewById(R.id.tvSeason);
+		
+		TimetableSetting timetableSetting = Timetable.getInstance(this).getTimetableSetting();
+		String lessondbVer = LessonManager.getInstance(this).getLessondbVersion();
+		tvLessonDBVer.setText(lessondbVer);
+		tvBeginDate.setText(timetableSetting.year + "年" + timetableSetting.month + "月" + timetableSetting.day + "日");
+		tvSeason.setText(timetableSetting.seasonWinter ? "冬季" : "夏季");
 		
 		Button btnCheckUpdate = (Button) findViewById(R.id.btnCheckUpdate);
 		Button btnChangelog = (Button) findViewById(R.id.btnChangelog);
